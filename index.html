@@ -1,0 +1,3557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Estudos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230c0a14'/><text x='50' y='68' font-size='60' text-anchor='middle'>🎯</text></svg>">
+<meta name="theme-color" content="#0c0a14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Painel de Estudos">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0c0a14;
+    --bg-panel:#161222;
+    --bg-panel-alt:#1c1830;
+    --bg-input:#22273140  ;
+    --border-subtle:#2a2445;
+    --border-soft:#352e58;
+    --accent-brass:#4ade80;
+    --accent-brass-dim:#2f8f5e;
+    --accent-sky:#22d3ee;
+    --accent-purple:#4ade80;
+    --accent-purple-dim:#2f8f5e;
+    --accent-ouro:#fcd34d;
+    --accent-rosa:#f472b6;
+    --text-primary:#f0eeff;
+    --text-muted:#8f87ac;
+    --text-faint:#5e5680;
+    --success:#34d399;
+    --success-dim:#1d3d33;
+    --danger:#fb7185;
+    --danger-dim:#4a2733;
+    --warn:#fcd34d;
+    --font-head:'Lora', serif;
+    --font-body:'Lora', serif;
+    --font-mono:'Roboto Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 60% 50% at 0% 20%, rgba(74,222,128,0.13) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 100% 55%, rgba(34,211,238,0.10) 0%, transparent 55%),
+      radial-gradient(ellipse 45% 35% at 50% 100%, rgba(252,211,77,0.06) 0%, transparent 60%),
+      var(--bg-deep);
+    background-attachment:fixed;
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    line-height:1.5;
+    min-height:100vh;
+  }
+  #app{max-width:1280px;margin:0 auto;padding:0 20px 80px;}
+
+  header.top{
+    padding:36px 4px 20px;
+    border-bottom:2px solid var(--accent-brass);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.top h1{
+    font-family:var(--font-head);
+    font-weight:700;
+    font-size:34px;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.top h1 .tit-lil{color:var(--accent-brass);font-style:italic;}
+  header.top h1 .tit-cia{color:var(--accent-sky);font-style:italic;}
+  header.top p{
+    margin:6px 0 0;
+    color:var(--text-muted);
+    font-size:16px;
+  }
+  header.top .clock{
+    font-family:var(--font-mono);
+    color:var(--accent-brass);
+    font-size:13px;
+    text-align:right;
+  }
+
+  nav.tabs{
+    display:flex;
+    gap:26px;
+    margin-top:22px;
+    border-bottom:1px solid var(--border-subtle);
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    background:none;
+    border:none;
+    color:var(--text-muted);
+    font-family:var(--font-body);
+    font-size:14.5px;
+    padding:10px 2px 12px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+  }
+  nav.tabs button svg{
+    width:15px;height:15px;
+    flex-shrink:0;
+    opacity:0.85;
+  }
+  nav.tabs button.active svg{opacity:1;color:var(--accent-brass);}
+  nav.tabs button.active{
+    color:var(--text-primary);
+    border-bottom:2px solid var(--accent-brass);
+  }
+  nav.tabs button:hover{color:var(--text-primary);}
+
+  .subtabs{
+    display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;
+  }
+  .subtab-btn{
+    background:var(--bg-panel-alt);
+    border:1px solid var(--border-soft);
+    color:var(--text-muted);
+    font-family:var(--font-body);
+    font-size:12.5px;
+    padding:7px 14px;
+    cursor:pointer;
+    border-radius:4px;
+  }
+  .subtab-btn.active{
+    background:var(--accent-brass);
+    border-color:var(--accent-brass);
+    color:#0e0a17;
+    font-weight:600;
+  }
+  .subtab-pane{display:none;}
+  .subtab-pane.active{display:block;}
+
+  .dia-row{
+    display:block;
+    padding:12px 0;
+    border-bottom:1px solid var(--border-subtle);
+  }
+  .dia-row:last-child{border-bottom:none;}
+  .dia-row.dia-hoje{
+    background:rgba(74,222,128,0.06);
+    border-left:3px solid var(--accent-brass);
+    padding-left:10px;
+    margin-left:-13px;
+  }
+  .dia-row.dia-hoje .dia-label{color:var(--accent-brass);font-weight:600;}
+  .dia-row-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+  }
+  .dia-row .dia-label{
+    font-family:var(--font-head);
+    font-size:13.5px;
+    flex-shrink:0;
+  }
+  .dia-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    align-items:center;
+    margin-top:10px;
+  }
+  .materia-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--bg-panel-alt);
+    border:1px solid var(--border-soft);
+    border-radius:14px;
+    padding:4px 10px 4px 8px;
+    font-size:12.5px;
+  }
+  .materia-chip .chip-x{
+    cursor:pointer;
+    color:var(--text-faint);
+    font-weight:600;
+  }
+
+  .materia-legenda-lista{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .materia-legenda-linha{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13.5px;
+  }
+  .materia-legenda-nome{
+    color:var(--text-primary);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    max-width:220px;
+  }
+  .materia-chip .chip-x:hover{color:var(--danger);}
+  .dia-add-select{width:auto;min-width:150px;max-width:200px;font-size:12.5px;padding:6px 8px;}
+
+  main{padding-top:28px;}
+  section.tab{display:none;}
+  section.tab.active{display:block;}
+
+  h2.section-title{
+    font-family:var(--font-head);
+    font-weight:600;
+    font-size:19px;
+    margin:0 0 4px;
+  }
+  p.section-sub{color:var(--text-muted);font-size:13.5px;margin:0 0 20px;}
+
+  .panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:7px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    padding:20px;
+    margin-bottom:20px;
+  }
+
+  .gadget{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:7px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.35);
+    overflow:hidden;
+    margin-bottom:0;
+  }
+  .gadget-header{
+    background:linear-gradient(90deg, var(--accent-brass-dim) 0%, #0c0a14 100%);
+    color:#f1ecf7;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:0.2px;
+    padding:12px 18px;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .gadget-body{padding:20px;}
+
+  /* ---- Painel / dashboard ---- */
+  .dashboard-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+  .dashboard-grid > .full{grid-column:1/-1;}
+  @media (min-width:860px){
+    .dashboard-grid{grid-template-columns:1fr 1fr;}
+  }
+
+  .atividade-assunto-grid{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+  @media (min-width:860px){
+    .atividade-assunto-grid{grid-template-columns:2fr 3fr;}
+  }
+
+  .stat-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:1px;
+    background:var(--border-subtle);
+    border:1px solid var(--border-subtle);
+  }
+  @media (min-width:560px){
+    .stat-grid{grid-template-columns:repeat(4,1fr);}
+  }
+  .stat-card{
+    background:var(--bg-panel);
+    padding:22px 14px 20px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .stat-card .stat-icon-big{
+    width:38px;height:38px;
+    color:#cfcad9;
+    margin-bottom:10px;
+    opacity:0.95;
+  }
+  .stat-card .stat-label-top{
+    color:var(--text-muted);
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:0.4px;
+    margin-bottom:12px;
+    display:block;
+  }
+  .status-pill{
+    display:inline-block;
+    min-width:64px;
+    padding:7px 14px;
+    border-radius:4px;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:14px;
+    color:#0e0a17;
+    line-height:1.2;
+  }
+
+  .week-chart{
+    padding-top:10px;
+  }
+  .week-bar-col{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-end;
+    height:100%;
+  }
+  .week-bar-value{font-size:10px;color:var(--text-faint);margin-bottom:5px;font-family:var(--font-mono);}
+  .week-bar{
+    width:100%;
+    max-width:30px;
+    background:var(--accent-sky);
+    min-height:3px;
+    transition:height 0.25s ease;
+  }
+  .week-bar.is-today{background:var(--accent-brass);}
+  .week-bar-label{margin-top:8px;font-size:11px;color:var(--text-muted);}
+  .week-bar-label.is-today{color:var(--accent-brass);}
+
+  .bar-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+    font-size:13.5px;
+  }
+  .bar-row .bar-label{width:150px;flex-shrink:0;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-track{flex:1;height:8px;background:var(--bg-panel-alt);position:relative;}
+  .bar-fill{height:100%;background:var(--accent-sky);}
+  .bar-value{width:70px;text-align:right;color:var(--text-muted);font-family:var(--font-mono);font-size:12px;flex-shrink:0;}
+
+  .assunto-grupo-header{
+    font-family:var(--font-head);
+    font-weight:600;
+    font-size:13.5px;
+    margin:16px 0 4px;
+    padding-bottom:6px;
+    border-bottom:1px solid var(--border-soft);
+    display:flex;
+    align-items:center;
+  }
+  .assunto-grupo-header:first-child{margin-top:0;}
+  .assunto-tempo-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:9px 0 9px 17px;
+    border-bottom:1px solid var(--border-subtle);
+    font-size:13px;
+  }
+  .assunto-tempo-row:last-child{border-bottom:none;}
+  .assunto-tempo-nome{
+    color:var(--text-primary);
+    line-height:1.4;
+    flex:1;
+    min-width:0;
+  }
+  .assunto-tempo-aprov{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:600;
+    width:44px;
+    flex-shrink:0;
+    text-align:right;
+  }
+  .assunto-tempo-valor{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:600;
+    width:80px;
+    flex-shrink:0;
+    text-align:right;
+  }
+
+  /* ---- Cronometro ---- */
+  .timer-display{
+    font-family:var(--font-mono);
+    font-size:56px;
+    letter-spacing:1px;
+    color:var(--accent-brass);
+    text-align:center;
+    margin:10px 0 24px;
+  }
+  .timer-select-row{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .timer-select-row select{flex:1;min-width:160px;}
+  .timer-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:6px;
+  }
+  .timer-status{
+    text-align:center;
+    color:var(--text-muted);
+    font-size:12.5px;
+    margin-bottom:20px;
+  }
+
+  select,input[type=text],input[type=date],input[type=number],textarea{
+    background:var(--bg-panel-alt);
+    border:1px solid var(--border-soft);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    font-size:13.5px;
+    padding:9px 10px;
+    width:100%;
+  }
+  input[type=checkbox]{accent-color:var(--accent-brass);width:16px;height:16px;cursor:pointer;}
+  select:focus,input:focus,textarea:focus{outline:1px solid var(--accent-sky);}
+
+  button.btn{
+    font-family:var(--font-body);
+    font-size:13px;
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    color:var(--text-primary);
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  button.btn:hover{border-color:var(--accent-brass);}
+  button.btn.primary{background:var(--accent-brass);border-color:var(--accent-brass);color:#1a1712;}
+  button.btn.primary:hover{background:#6ee7a0;}
+  button.btn.danger{color:var(--danger);}
+  button.btn.danger:hover{border-color:var(--danger);}
+  button.btn:disabled{opacity:0.35;cursor:not-allowed;}
+  button.btn.small{padding:5px 10px;font-size:12px;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table th{
+    text-align:left;
+    color:var(--text-muted);
+    font-weight:500;
+    font-size:12px;
+    padding:8px 10px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  table td{
+    padding:9px 10px;
+    border-bottom:1px solid var(--border-subtle);
+    vertical-align:middle;
+  }
+  table tr:hover td{background:var(--bg-panel-alt);}
+
+  .tag{
+    display:inline-block;
+    padding:2px 8px;
+    font-size:11.5px;
+    border:1px solid var(--border-soft);
+    color:var(--text-muted);
+  }
+  .tag.concluido{color:var(--success);border-color:var(--success-dim);}
+  .tag.atrasada{color:var(--danger);border-color:var(--danger-dim);}
+  .tag.estudando{color:var(--accent-sky);}
+
+  .add-form{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    align-items:flex-end;
+  }
+  .add-form > div{flex:1;min-width:150px;}
+  .add-form label{display:block;font-size:11.5px;color:var(--text-muted);margin-bottom:5px;}
+
+  .materia-block{margin-bottom:24px;}
+  .materia-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--border-soft);
+    margin-bottom:8px;
+  }
+  .materia-head h3{
+    font-family:var(--font-body);
+    font-size:16px;
+    margin:0;
+    font-weight:600;
+  }
+  .materia-head .materia-total{
+    font-family:var(--font-mono);
+    color:var(--accent-sky);
+    font-size:12.5px;
+  }
+
+  .empty-state{
+    color:var(--text-faint);
+    font-size:13.5px;
+    padding:30px 0;
+    text-align:center;
+    border:1px dashed var(--border-soft);
+  }
+
+  .edital-view{
+    white-space:pre-wrap;
+    font-size:13.5px;
+    line-height:1.7;
+    max-height:520px;
+    overflow-y:auto;
+    padding-right:6px;
+  }
+  .edital-meta{color:var(--text-faint);font-size:12px;margin-top:10px;}
+  textarea#editalTextarea{min-height:340px;resize:vertical;font-family:var(--font-body);line-height:1.6;}
+
+  .toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:var(--bg-panel-alt);
+    border:1px solid var(--accent-brass);
+    color:var(--text-primary);
+    padding:10px 18px;
+    font-size:13px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.25s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;}
+
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(5,3,10,0.72);
+    display:flex;align-items:center;justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-box{
+    background:var(--bg-panel);
+    border:1px solid var(--border-subtle);
+    border-radius:8px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.5);
+    max-width:480px;
+    width:100%;
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .modal-header{
+    background:linear-gradient(90deg, var(--accent-brass-dim) 0%, #0c0a14 100%);
+    color:#f1ecf7;
+    font-family:var(--font-head);
+    font-weight:600;
+    font-size:16px;
+    padding:14px 18px;
+  }
+  .modal-body{padding:18px;overflow-y:auto;font-size:13.5px;}
+  .modal-body .modal-item{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle);
+  }
+  .modal-body .modal-item:last-child{border-bottom:none;}
+  .modal-footer{
+    padding:14px 18px;
+    border-top:1px solid var(--border-subtle);
+    display:flex;justify-content:flex-end;gap:10px;
+  }
+
+  select.status-select{width:auto;min-width:140px;}
+
+  .color-swatch-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .color-swatch{
+    width:22px;height:22px;border-radius:50%;cursor:pointer;
+    border:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.25);
+  }
+  .color-swatch.selected{border-color:#fff;}
+  .color-dot-btn{
+    width:15px;height:15px;border-radius:50%;cursor:pointer;
+    border:1px solid rgba(255,255,255,0.35);display:inline-block;
+    vertical-align:middle;margin-right:10px;flex-shrink:0;
+  }
+  .materia-block{border-left:4px solid var(--border-soft);}
+  .materia-head h3{display:flex;align-items:center;}
+
+  .table-scroll{overflow-x:auto;}
+  .table-scroll table{min-width:680px;}
+
+  .qtd-controls{display:flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;}
+  .qtd-controls .qtd-correct{color:var(--success);width:44px;}
+  .qtd-controls .qtd-wrong{color:var(--danger);width:44px;}
+  .qtd-btn{
+    width:20px;height:20px;line-height:18px;padding:0;
+    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
+    color:var(--text-primary);cursor:pointer;font-family:var(--font-mono);font-size:13px;
+  }
+  .qtd-btn:hover{border-color:var(--accent-brass);}
+  .qtd-btn-somar{
+    height:20px;line-height:18px;padding:0 6px;white-space:nowrap;
+    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
+    color:var(--text-muted);cursor:pointer;font-family:var(--font-mono);font-size:10px;
+  }
+  .qtd-btn-somar:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
+  .qtd-value{min-width:18px;text-align:center;font-family:var(--font-mono);}
+  input.qtd-value-input[type=number]{
+    width:34px;
+    text-align:center;
+    font-family:var(--font-mono);
+    background:var(--bg-panel-alt);
+    border:1px solid var(--border-soft);
+    color:var(--text-primary);
+    font-size:12px;
+    padding:2px 0;
+    -moz-appearance:textfield;
+  }
+  input.qtd-value-input[type=number]::-webkit-outer-spin-button,
+  input.qtd-value-input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+
+  .mini-del-btn{
+    width:20px;height:20px;flex-shrink:0;line-height:16px;
+    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
+    color:var(--text-muted);cursor:pointer;font-size:15px;padding:0;
+  }
+  .mini-del-btn:hover{color:var(--danger);border-color:var(--danger);}
+  .mini-edit-btn{
+    width:20px;height:20px;flex-shrink:0;line-height:16px;
+    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
+    color:var(--text-muted);cursor:pointer;font-size:12px;padding:0;
+  }
+  .mini-edit-btn:hover{color:var(--accent-brass);border-color:var(--accent-brass);}
+  .acoes-assunto-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    width:110px;
+  }
+  .acoes-assunto-wrap .btn{width:100%;}
+
+  .guia-materia-block{margin-bottom:22px;}
+  .guia-assunto-row{
+    border-bottom:1px solid var(--border-subtle);
+    padding:12px 0;
+  }
+  .guia-assunto-row:last-child{border-bottom:none;}
+  .guia-assunto-topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .guia-assunto-nome{
+    font-size:13.5px;
+    color:var(--text-primary);
+  }
+  .guia-badge{
+    font-size:11px;
+    font-family:var(--font-mono);
+    padding:2px 8px;
+    border-radius:10px;
+    flex-shrink:0;
+  }
+  .guia-badge.tem-guia{background:var(--success-dim);color:var(--success);}
+  .guia-badge.sem-guia{background:var(--bg-panel-alt);color:var(--text-faint);}
+  .guia-painel{
+    margin-top:12px;
+    background:var(--bg-panel-alt);
+    border:1px solid var(--border-soft);
+    padding:14px;
+  }
+  .guia-texto-leitura{
+    white-space:pre-wrap;
+    font-size:16px;
+    line-height:1.8;
+    max-height:420px;
+    overflow-y:auto;
+    padding-right:6px;
+  }
+  .guia-cor-amarelo{color:var(--accent-ouro);font-weight:600;}
+  .guia-cor-verde{color:var(--success);font-weight:600;}
+  .guia-cor-vermelho{color:var(--danger);font-weight:600;}
+  .guia-cor-azul{color:var(--accent-sky);font-weight:600;}
+  .guia-cor-rosa{color:var(--accent-rosa);font-weight:600;}
+  .guia-cor-laranja{color:#fb923c;font-weight:600;}
+  .guia-cor-roxo{color:#a78bfa;font-weight:600;}
+  .guia-cor-cinza{color:#9ca3af;font-weight:600;}
+  .guia-cor-marrom{color:#c9a074;font-weight:600;}
+  .guia-cor-branco{color:var(--text-primary);font-weight:400;}
+  .guia-toolbar-cores{
+    display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+    margin-bottom:8px;
+  }
+  .guia-toolbar-cores span.guia-toolbar-label{
+    font-size:11.5px;color:var(--text-muted);margin-right:2px;
+  }
+  .guia-cor-btn{
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    padding:3px 10px;
+    font-size:11.5px;
+    font-family:var(--font-body);
+    border-radius:10px;
+    cursor:pointer;
+  }
+  .guia-cor-btn.cor-amarelo{color:var(--accent-ouro);}
+  .guia-cor-btn.cor-verde{color:var(--success);}
+  .guia-cor-btn.cor-vermelho{color:var(--danger);}
+  .guia-cor-btn.cor-azul{color:var(--accent-sky);}
+  .guia-cor-btn.cor-rosa{color:var(--accent-rosa);}
+  .guia-cor-btn.cor-laranja{color:#fb923c;}
+  .guia-cor-btn.cor-roxo{color:#a78bfa;}
+  .guia-cor-btn.cor-cinza{color:#9ca3af;}
+  .guia-cor-btn.cor-marrom{color:#c9a074;}
+  .guia-cor-btn.cor-branco{color:var(--text-primary);}
+  .guia-cor-btn:hover{border-color:currentColor;}
+  .guia-cor-btn.limpar{color:var(--text-muted);}
+  .guia-negrito-btn{
+    height:20px;line-height:18px;padding:0 10px;
+    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
+    color:var(--text-primary);cursor:pointer;font-family:var(--font-body);font-size:12px;font-weight:700;
+    border-radius:10px;
+  }
+  .guia-negrito-btn:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
+  .guia-toolbar-divisor{width:1px;height:16px;background:var(--border-soft);margin:0 2px;}
+  .guia-meta{color:var(--text-faint);font-size:11px;margin-top:10px;}
+
+  .caderno-item{
+    border-bottom:1px solid var(--border-subtle);
+    padding:14px 0;
+  }
+  .caderno-item:last-child{border-bottom:none;}
+  .caderno-item .caderno-head{
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:12.5px;color:var(--text-muted);
+  }
+  .caderno-item .caderno-enunciado{
+    font-size:13.5px;line-height:1.6;white-space:pre-wrap;margin-bottom:6px;
+  }
+  .caderno-item .caderno-anotacao{
+    font-size:12.5px;color:var(--text-muted);white-space:pre-wrap;
+    border-left:2px solid var(--border-soft);padding-left:10px;margin-bottom:8px;
+  }
+
+  @media (max-width:640px){
+    .timer-display{font-size:40px;}
+    .bar-row .bar-label{width:100px;font-size:12px;}
+    .add-form{flex-direction:column;align-items:stretch;}
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+<div id="loadingOverlay" style="position:fixed;inset:0;background:#07050c;display:flex;align-items:center;justify-content:center;z-index:300;color:#8f87ac;font-family:'Lora',serif;font-size:14px;">Carregando seus dados...</div>
+
+<div id="app">
+
+  <header class="top">
+    <div>
+      <h1>Painel de <span class="tit-lil">Estudos</span></h1>
+      <p>Disciplina hoje, aprovação amanhã.</p>
+    </div>
+    <div class="clock" id="headerClock"></div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="painel" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
+    <button data-tab="cronometro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cronômetro</button>
+    <button data-tab="materias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/></svg>Matérias e assuntos</button>
+    <button data-tab="revisoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>Revisões</button>
+    <button data-tab="guias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></svg>Guias Rápidos</button>
+    <button data-tab="caderno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>Caderno de erros</button>
+    <button data-tab="edital"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h6M9 17h6"/></svg>Edital</button>
+    <button data-tab="checkin"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>Check-in extra</button>
+  </nav>
+
+  <main>
+
+    <!-- PAINEL -->
+    <section class="tab active" id="tab-painel">
+      <h2 class="section-title">Visão geral</h2>
+      <p class="section-sub">Resumo do seu progresso líquido de estudo.</p>
+
+      <div class="gadget" style="margin-bottom:20px;">
+        <div class="gadget-header">Concurso</div>
+        <div class="gadget-body">
+          <div id="concursoView"></div>
+          <div id="concursoEdit" style="display:none;">
+            <div class="add-form">
+              <div>
+                <label>Nome do concurso / edital</label>
+                <input type="text" id="concursoNomeInput" placeholder="Ex.: SEDES 2026">
+              </div>
+              <div>
+                <label>Cargo pretendido</label>
+                <input type="text" id="concursoCargoInput" placeholder="Ex.: Técnico em Desenvolvimento e Assistência Social">
+              </div>
+              <div>
+                <label>Data da prova</label>
+                <input type="date" id="concursoDataInput">
+              </div>
+            </div>
+            <button class="btn primary small" id="btnSalvarConcurso">Salvar</button>
+            <button class="btn small" id="btnCancelarConcurso">Cancelar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gadget" style="margin-bottom:20px;">
+        <div class="gadget-header">Grade de estudos da semana</div>
+        <div class="gadget-body">
+          <p class="section-sub" style="margin-bottom:14px;">Monte seu planejamento: escolha quais matérias estudar em cada dia.</p>
+          <div id="gradeHorariaContainer"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="gadget full">
+          <div class="gadget-header">Resumo geral</div>
+          <div class="gadget-body">
+            <div class="stat-grid" id="statGrid"></div>
+          </div>
+        </div>
+
+        <div class="gadget">
+          <div class="gadget-header">Meta diária</div>
+          <div class="gadget-body">
+            <p class="section-sub" style="margin-bottom:10px;">Tempo líquido de hoje em relação à sua meta.</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:12px;color:var(--text-muted);">Meta (min):</span>
+              <input type="number" id="metaDiariaInput" min="0" step="5" style="max-width:90px;">
+            </div>
+            <div class="bar-track" style="height:14px;">
+              <div class="bar-fill" id="metaDiariaBar" style="height:100%;"></div>
+            </div>
+            <p class="edital-meta" id="metaDiariaTexto" style="margin-top:8px;"></p>
+          </div>
+        </div>
+
+        <div class="gadget">
+          <div class="gadget-header">Check-in extra</div>
+          <div class="gadget-body">
+            <p class="section-sub" style="margin-bottom:12px;">Ouviu ou leu algo fora da mesa de estudos hoje? Registre quantas vezes quiser.</p>
+            <div id="checkinLista"></div>
+            <button class="btn" id="btnAbrirCheckinForm" style="width:100%;margin-top:6px;">+ Adicionar registro</button>
+            <div id="checkinForm" style="display:none;margin-top:14px;">
+              <div class="add-form" style="margin-bottom:10px;">
+                <div>
+                  <label>O que você ouviu/leu/estudou</label>
+                  <input type="text" id="checkinDescricaoInput" placeholder="Ex.: CF 88 - art 1 ao 3">
+                </div>
+                <div>
+                  <label>Minutos</label>
+                  <input type="number" id="checkinMinutosInput" min="0" step="5" placeholder="30">
+                </div>
+              </div>
+              <button class="btn primary small" id="btnSalvarCheckin">Salvar</button>
+              <button class="btn small" id="btnCancelarCheckin">Cancelar</button>
+            </div>
+            <p class="edital-meta" id="checkinMesTexto" style="margin-top:10px;"></p>
+          </div>
+        </div>
+
+        <div class="gadget full">
+          <div class="gadget-header">Horas por matéria</div>
+          <div class="gadget-body">
+            <div id="materiaHorasWrap" style="position:relative;min-height:230px;">
+              <div id="barList" style="position:absolute;top:0;left:0;z-index:1;"></div>
+              <div id="materiaDonutWrap" style="display:flex;justify-content:center;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="full atividade-assunto-grid">
+          <div class="gadget">
+            <div class="gadget-header">Atividade dos últimos 7 dias</div>
+            <div class="gadget-body">
+              <p class="section-sub" style="margin-bottom:2px;">Tempo líquido estudado por dia.</p>
+              <div class="week-chart" id="weekChart"></div>
+            </div>
+          </div>
+
+          <div class="gadget">
+            <div class="gadget-header">Tempo por assunto</div>
+            <div class="gadget-body">
+              <p class="section-sub" style="margin-bottom:16px;">Na mesma ordem em que os assuntos foram cadastrados em Matérias e assuntos.</p>
+              <div id="assuntoBarList" style="max-height:360px;overflow-y:auto;padding-right:4px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gadget full">
+          <div class="gadget-header">Backup dos dados</div>
+          <div class="gadget-body">
+            <p class="section-sub" style="margin-bottom:16px;">Seus dados já sincronizam automaticamente entre seus aparelhos pela planilha conectada. Este backup é só uma cópia extra de segurança, útil para guardar um ponto no tempo ou levar seus dados para outro lugar.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+              <button class="btn primary" id="btnExportBackup">Exportar backup (.json)</button>
+              <label class="btn" for="importBackupInput" style="cursor:pointer;margin:0;">Importar backup</label>
+              <input type="file" id="importBackupInput" accept=".json,application/json" style="display:none;">
+            </div>
+            <p class="edital-meta" id="backupMeta" style="margin-top:12px;"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CRONOMETRO -->
+    <section class="tab" id="tab-cronometro">
+      <h2 class="section-title">Cronômetro de estudo</h2>
+      <p class="section-sub">Conta apenas o tempo líquido: pausas não somam ao total.</p>
+      <div class="panel">
+        <div class="timer-select-row">
+          <select id="timerMateria"><option value="">Selecione a matéria</option></select>
+          <select id="timerAssunto"><option value="">Assunto (opcional)</option></select>
+        </div>
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+        <div class="timer-buttons">
+          <button class="btn primary" id="btnStart">Iniciar</button>
+          <button class="btn" id="btnPause" disabled>Pausar</button>
+          <button class="btn danger" id="btnStop" disabled>Finalizar e salvar</button>
+        </div>
+        <p class="timer-status" id="timerStatus">Parado</p>
+      </div>
+      <div class="panel">
+        <h2 class="section-title" style="margin-bottom:14px;">Sessões registradas</h2>
+        <table id="sessionsTable">
+          <thead><tr><th>Data</th><th>Matéria</th><th>Assunto</th><th>Duração</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-state" id="sessionsEmpty" style="display:none;">Nenhuma sessão registrada ainda.</div>
+      </div>
+    </section>
+
+    <!-- MATERIAS -->
+    <section class="tab" id="tab-materias">
+      <h2 class="section-title">Matérias e assuntos</h2>
+      <p class="section-sub">Cadastre manualmente o que você precisa estudar e acompanhe o status de cada assunto.</p>
+
+      <div class="panel">
+        <div class="add-form">
+          <div>
+            <label>Nova matéria</label>
+            <input type="text" id="novaMateriaInput" placeholder="Ex.: Língua Portuguesa">
+          </div>
+          <div style="flex:0;">
+            <button class="btn primary" id="btnAddMateria">Adicionar matéria</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:2px;">Cor do bloco</label>
+          <div class="color-swatch-grid" id="novaMateriaSwatches"></div>
+        </div>
+      </div>
+
+      <div id="materiasList"></div>
+      <div class="empty-state" id="materiasEmpty" style="display:none;">Nenhuma matéria cadastrada. Adicione a primeira acima.</div>
+    </section>
+
+    <!-- REVISOES -->
+    <section class="tab" id="tab-revisoes">
+      <h2 class="section-title">Revisões</h2>
+      <p class="section-sub">Ao marcar um assunto como concluído, ele entra na fila de revisão com marcos em 24h, 7, 14, 21 e 28 dias. Ao completar bem a etapa de 28 dias, o ciclo reinicia do zero. Você também pode adicionar revisões manualmente.</p>
+
+      <div class="panel">
+        <div class="add-form">
+          <div>
+            <label>Matéria</label>
+            <select id="revMateria"><option value="">Selecione</option></select>
+          </div>
+          <div>
+            <label>Assunto</label>
+            <select id="revAssunto"><option value="">Selecione</option></select>
+          </div>
+          <div>
+            <label>Data da revisão</label>
+            <input type="date" id="revData">
+          </div>
+          <div style="flex:0;">
+            <button class="btn primary" id="btnAddRevisao">Adicionar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="table-scroll">
+        <table id="revisoesTable">
+          <thead><tr><th>Data</th><th>Matéria</th><th>Assunto</th><th>Marco</th><th>Status</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        </div>
+        <div class="empty-state" id="revisoesEmpty" style="display:none;">Nenhuma revisão agendada.</div>
+      </div>
+    </section>
+
+    <!-- CADERNO DE ERROS -->
+    <section class="tab" id="tab-caderno">
+      <h2 class="section-title">Caderno de erros</h2>
+      <p class="section-sub">Registre as questões que você errou para revisar depois com calma.</p>
+
+      <div class="panel">
+        <div class="add-form">
+          <div>
+            <label>Matéria</label>
+            <select id="cadMateria"><option value="">Selecione</option></select>
+          </div>
+          <div>
+            <label>Assunto</label>
+            <select id="cadAssunto"><option value="">Selecione</option></select>
+          </div>
+          <div>
+            <label>Data</label>
+            <input type="date" id="cadData">
+          </div>
+        </div>
+        <div class="add-form">
+          <div>
+            <label>Banca</label>
+            <input type="text" id="cadBanca" list="listaBancas" placeholder="Ex.: Cebraspe">
+            <datalist id="listaBancas">
+              <option value="Cebraspe"></option>
+              <option value="Quadrix"></option>
+              <option value="FGV"></option>
+              <option value="FCC"></option>
+              <option value="Cesgranrio"></option>
+              <option value="IBFC"></option>
+              <option value="IADES"></option>
+              <option value="AOCP"></option>
+              <option value="Vunesp"></option>
+            </datalist>
+          </div>
+          <div>
+            <label>Tipo de erro</label>
+            <input type="text" id="cadTipoErro" list="listaTiposErro" placeholder="Ex.: Pegadinha">
+            <datalist id="listaTiposErro">
+              <option value="Inversão de conceito"></option>
+              <option value="Decoreba de lei seca"></option>
+              <option value="Pegadinha"></option>
+              <option value="Interpretação de texto"></option>
+              <option value="Desatenção"></option>
+              <option value="Conteúdo não estudado"></option>
+              <option value="Confusão entre institutos"></option>
+            </datalist>
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">O que a questão pedia / onde você errou</label>
+          <textarea id="cadEnunciado" style="min-height:90px;" placeholder="Cole ou resuma o enunciado da questão..."></textarea>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Anotação (o porquê do erro, gabarito comentado, etc.)</label>
+          <textarea id="cadAnotacao" style="min-height:70px;" placeholder="Opcional"></textarea>
+        </div>
+        <button class="btn primary" id="btnAddErro">Adicionar ao caderno</button>
+      </div>
+
+      <div class="panel">
+        <div class="add-form" style="margin-bottom:0;">
+          <div>
+            <label>Buscar por palavra-chave</label>
+            <input type="text" id="cadBusca" placeholder="Buscar em enunciado, anotação, banca, matéria...">
+          </div>
+          <div>
+            <label>Filtrar</label>
+            <select id="cadFiltroStatus">
+              <option value="todos">Todos</option>
+              <option value="pendentes">Pendentes</option>
+              <option value="revisados">Revisados</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div id="cadernoList"></div>
+        <div class="empty-state" id="cadernoEmpty" style="display:none;">Nenhuma questão registrada ainda.</div>
+      </div>
+    </section>
+
+    <!-- EDITAL -->
+    <section class="tab" id="tab-edital">
+      <h2 class="section-title">Edital</h2>
+      <p class="section-sub">Cole o texto do edital e acompanhe a cobertura por tópico.</p>
+
+      <div class="subtabs">
+        <button class="subtab-btn active" data-subtab="editalTexto">Texto do edital</button>
+        <button class="subtab-btn" data-subtab="editalChecklist">Checklist verticalizado</button>
+      </div>
+
+      <div class="subtab-pane active" id="pane-editalTexto">
+        <div class="panel">
+          <div id="editalReadMode">
+            <div class="edital-view" id="editalView"></div>
+            <div class="edital-meta" id="editalMeta"></div>
+            <div style="margin-top:14px;">
+              <button class="btn" id="btnEditEdital">Editar edital</button>
+            </div>
+          </div>
+          <div id="editalEditMode" style="display:none;">
+            <div style="margin-bottom:10px;">
+              <label style="font-size:11.5px;color:var(--text-muted);">Importar de arquivo .txt ou PDF (opcional)</label><br>
+              <input type="file" id="editalFileInput" accept=".txt,.pdf,application/pdf" style="margin-top:6px;">
+              <p style="font-size:11px;color:var(--text-faint);margin:6px 0 0;">A leitura de PDF precisa de internet no momento da importação. Depois de salvo, o texto fica disponível offline normalmente.</p>
+            </div>
+            <textarea id="editalTextarea" placeholder="Cole aqui o texto do edital..."></textarea>
+            <div style="margin-top:12px;display:flex;gap:10px;">
+              <button class="btn primary" id="btnSaveEdital">Salvar edital</button>
+              <button class="btn" id="btnCancelEdital">Cancelar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="subtab-pane" id="pane-editalChecklist">
+        <div class="panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span style="font-size:12.5px;color:var(--text-muted);">Cobertura do edital</span>
+            <span style="font-family:var(--font-mono);font-size:13px;color:var(--accent-brass);" id="editalProgressoTexto">0%</span>
+          </div>
+          <div class="bar-track" style="height:10px;">
+            <div class="bar-fill" id="editalProgressoBar" style="height:100%;background:var(--accent-brass);"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="add-form">
+            <div>
+              <label>Novo tópico do edital</label>
+              <input type="text" id="novoTopicoEditalInput" placeholder="Ex.: PSB - conceitos e princípios">
+            </div>
+            <div style="flex:0;">
+              <button class="btn primary" id="btnAddTopicoEdital">Adicionar</button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="table-scroll">
+          <table id="editalTopicosTable">
+            <thead><tr><th>Tópico</th><th>Teoria</th><th>Resumo</th><th>Questões</th><th>Revisado</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          </div>
+          <div class="empty-state" id="editalTopicosEmpty" style="display:none;">Nenhum tópico cadastrado ainda.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHECK-IN EXTRA -->
+    <section class="tab" id="tab-checkin">
+      <h2 class="section-title">Check-in extra</h2>
+      <p class="section-sub">Histórico de tudo que você estudou fora da mesa — leituras, áudios, podcasts.</p>
+
+      <div class="stat-grid" id="checkinStatsGrid" style="margin-bottom:20px;"></div>
+
+      <div class="panel">
+        <div id="checkinHistoricoList"></div>
+        <div class="empty-state" id="checkinHistoricoEmpty" style="display:none;">Nenhum check-in registrado ainda. Adicione pelo Painel.</div>
+      </div>
+    </section>
+
+    <!-- GUIAS RÁPIDOS -->
+    <section class="tab" id="tab-guias">
+      <h2 class="section-title">Guias Rápidos</h2>
+      <p class="section-sub">Seus materiais de resumo por matéria e assunto — importe um PDF, .docx ou HTML, ou cole o texto direto. Organizado igual à aba Matérias e assuntos.</p>
+      <div id="guiasContainer"></div>
+      <div class="empty-state" id="guiasEmpty" style="display:none;">Cadastre matérias e assuntos primeiro, na aba "Matérias e assuntos".</div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<div class="modal-overlay" id="revisoesModalOverlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">🎯 Revisões do dia</div>
+    <div class="modal-body" id="revisoesModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn" id="btnFecharModal">Fechar</button>
+      <button class="btn primary" id="btnIrRevisoesModal">Ir para Revisões</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  if(typeof pdfjsLib !== "undefined"){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+
+  var STORAGE_KEY = "painelEstudosSedes2026";
+
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+  function todayISO(){
+    var d = new Date();
+    var ano = d.getFullYear();
+    var mes = ("0"+(d.getMonth()+1)).slice(-2);
+    var dia = ("0"+d.getDate()).slice(-2);
+    return ano+"-"+mes+"-"+dia;
+  }
+  function addDaysISO(iso, days){
+    var d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0,10);
+  }
+  function formatDateBR(iso){
+    if(!iso) return "";
+    var p = iso.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+  }
+  function formatHMS(totalSeconds){
+    totalSeconds = Math.max(0, Math.floor(totalSeconds));
+    var h = Math.floor(totalSeconds/3600);
+    var m = Math.floor((totalSeconds%3600)/60);
+    var s = totalSeconds%60;
+    function pad(n){ return n<10 ? "0"+n : ""+n; }
+    return pad(h)+":"+pad(m)+":"+pad(s);
+  }
+  function formatDuration(totalSeconds){
+    var h = Math.floor(totalSeconds/3600);
+    var m = Math.round((totalSeconds%3600)/60);
+    if(h<=0) return m+"min";
+    return h+"h"+(m>0?" "+m+"min":"");
+  }
+
+  var COLOR_PALETTE = [
+    "#7fb88f", "#e0768a", "#6fa3c7", "#c9a15e", "#a78bda",
+    "#e0a75e", "#5ec9c1", "#d688b8", "#8fae5e", "#e0c15e",
+    "#7a9ee0", "#c97a9e", "#5ec98a", "#d67a5e", "#9e8fd6",
+    "#5e9ec9", "#c9c15e", "#d65e8a", "#7ad6c9", "#a3a3d6"
+  ];
+  var novaMateriaCor = null;
+  var openColorPickerFor = null;
+
+  function pickDefaultColor(){
+    var usadas = state.materias.map(function(m){ return m.cor; });
+    for(var i=0;i<COLOR_PALETTE.length;i++){
+      if(usadas.indexOf(COLOR_PALETTE[i]) === -1) return COLOR_PALETTE[i];
+    }
+    return COLOR_PALETTE[state.materias.length % COLOR_PALETTE.length];
+  }
+
+  function renderColorSwatches(container, selectedColor, onSelect){
+    container.innerHTML = "";
+    COLOR_PALETTE.forEach(function(c){
+      var sw = document.createElement("div");
+      sw.className = "color-swatch" + (c === selectedColor ? " selected" : "");
+      sw.style.background = c;
+      sw.title = c;
+      sw.addEventListener("click", function(){ onSelect(c); });
+      container.appendChild(sw);
+    });
+  }
+
+  function renderNovaMateriaSwatches(){
+    if(!novaMateriaCor) novaMateriaCor = pickDefaultColor();
+    var container = document.getElementById("novaMateriaSwatches");
+    renderColorSwatches(container, novaMateriaCor, function(c){
+      novaMateriaCor = c;
+      renderNovaMateriaSwatches();
+    });
+  }
+
+  function colorDotHtml(color){
+    return "<span style='display:inline-block;width:9px;height:9px;border-radius:50%;background:"+(color||"#5c6472")+";margin-right:6px;flex-shrink:0;'></span>";
+  }
+
+  function defaultState(){
+    return {
+      materias: [],
+      sessions: [],
+      revisoes: [],
+      cadernoErros: [],
+      edital: { texto:"", atualizadoEm:null },
+      editalTopicos: [],
+      concurso: { nome:"", dataProva:null },
+      metaDiariaMin: 120,
+      checkins: {},
+      gradeHoraria: { dom:[], seg:[], ter:[], qua:[], qui:[], sex:[], sab:[] },
+      timer: { rodando:false, inicio:null, acumulado:0, materiaId:"", assuntoId:"" }
+    };
+  }
+
+  var state = defaultState();
+
+  function mesclarComPadrao(parsed){
+    var d = defaultState();
+    return Object.assign(d, parsed, {
+      materias: parsed.materias || [],
+      sessions: parsed.sessions || [],
+      revisoes: parsed.revisoes || [],
+      cadernoErros: parsed.cadernoErros || [],
+      edital: parsed.edital || d.edital,
+      editalTopicos: parsed.editalTopicos || [],
+      concurso: parsed.concurso || d.concurso,
+      metaDiariaMin: (parsed.metaDiariaMin!==undefined && parsed.metaDiariaMin!==null) ? parsed.metaDiariaMin : d.metaDiariaMin,
+      checkins: parsed.checkins || {},
+      gradeHoraria: parsed.gradeHoraria || d.gradeHoraria,
+      timer: parsed.timer || d.timer
+    });
+  }
+
+  var SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbw818Fj3ENQ_5jk9PEdY4bNylceIProGAaBJW5N63_zpynQry4dP5m4qla_R281IA5-/exec";
+  var SHEETS_API_TOKEN = "Mesopetamenos#12";
+  var _jsonpContador = 0;
+
+  function jsonpRequest(url){
+    return new Promise(function(resolve, reject){
+      var callbackName = "sheetsCallback_" + (_jsonpContador++);
+      var script = document.createElement("script");
+      var timeoutId = setTimeout(function(){
+        cleanup();
+        reject(new Error("timeout ao contatar a planilha"));
+      }, 10000);
+      function cleanup(){
+        delete window[callbackName];
+        if(script.parentNode) script.parentNode.removeChild(script);
+        clearTimeout(timeoutId);
+      }
+      window[callbackName] = function(data){
+        cleanup();
+        resolve(data);
+      };
+      script.onerror = function(){
+        cleanup();
+        reject(new Error("falha ao carregar script da planilha"));
+      };
+      script.src = url + (url.indexOf("?") > -1 ? "&" : "?") + "callback=" + callbackName;
+      document.body.appendChild(script);
+    });
+  }
+
+  function carregarEstado(){
+    return jsonpRequest(SHEETS_API_URL + "?token=" + encodeURIComponent(SHEETS_API_TOKEN))
+      .then(function(data){
+        if(data && data.error) throw new Error(data.error);
+        if(!data || !data.value){
+          return defaultState();
+        }
+        var estado = mesclarComPadrao(JSON.parse(data.value));
+        try{ localStorage.setItem(STORAGE_KEY, data.value); }catch(e){}
+        return estado;
+      })
+      .catch(function(err){
+        console.error("Não foi possível conectar à planilha, usando dados locais.", err);
+        try{
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if(raw) return mesclarComPadrao(JSON.parse(raw));
+        }catch(e){}
+        return defaultState();
+      });
+  }
+
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      console.error("Falha ao salvar dados localmente", e);
+    }
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ token: SHEETS_API_TOKEN, value: JSON.stringify(state) })
+    }).catch(function(e){
+      console.error("Falha ao sincronizar com a planilha", e);
+      showToast("Sem conexão com a planilha agora — salvo só neste navegador por enquanto.");
+    });
+  }
+
+  /* ---------------- GUIAS RÁPIDOS ---------------- */
+  var guias = {};
+
+  function carregarGuias(){
+    return jsonpRequest(SHEETS_API_URL + "?token=" + encodeURIComponent(SHEETS_API_TOKEN) + "&action=guias")
+      .then(function(data){
+        if(data && data.error) throw new Error(data.error);
+        var mapa = (data && data.guias) ? data.guias : {};
+        try{ localStorage.setItem(STORAGE_KEY+"_guias", JSON.stringify(mapa)); }catch(e){}
+        return mapa;
+      })
+      .catch(function(err){
+        console.error("Não foi possível carregar os guias da planilha, usando cache local.", err);
+        try{
+          var raw = localStorage.getItem(STORAGE_KEY+"_guias");
+          if(raw) return JSON.parse(raw);
+        }catch(e){}
+        return {};
+      });
+  }
+
+  function salvarGuiaRemota(assuntoId, guiaObj){
+    guias[assuntoId] = guiaObj;
+    try{ localStorage.setItem(STORAGE_KEY+"_guias", JSON.stringify(guias)); }catch(e){}
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ token: SHEETS_API_TOKEN, action: "guia", assuntoId: assuntoId, guia: guiaObj })
+    }).catch(function(e){
+      console.error("Falha ao sincronizar guia com a planilha", e);
+      showToast("Guia salvo só neste navegador por enquanto (sem conexão com a planilha).");
+    });
+  }
+
+  function excluirGuiaRemota(assuntoId){
+    delete guias[assuntoId];
+    try{ localStorage.setItem(STORAGE_KEY+"_guias", JSON.stringify(guias)); }catch(e){}
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ token: SHEETS_API_TOKEN, action: "guiaDelete", assuntoId: assuntoId })
+    }).catch(function(e){ console.error("Falha ao excluir guia na planilha", e); });
+  }
+
+  function extrairTextoArquivo(file){
+    var nome = file.name.toLowerCase();
+    if(nome.endsWith(".pdf") || file.type === "application/pdf"){
+      return extrairTextoPDF(file);
+    }
+    if(nome.endsWith(".docx")){
+      return file.arrayBuffer().then(function(buffer){
+        return mammoth.extractRawText({ arrayBuffer: buffer });
+      }).then(function(resultado){
+        return resultado.value;
+      });
+    }
+    if(nome.endsWith(".doc")){
+      return Promise.reject(new Error("Formato .doc antigo não é suportado. Salve como .docx e tente de novo."));
+    }
+    if(nome.endsWith(".html") || nome.endsWith(".htm") || file.type === "text/html"){
+      return file.text().then(function(html){
+        var div = document.createElement("div");
+        div.innerHTML = html;
+        return div.textContent.trim();
+      });
+    }
+    return file.text();
+  }
+
+  function showToast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+
+  function findMateria(id){
+    for(var i=0;i<state.materias.length;i++){ if(state.materias[i].id===id) return state.materias[i]; }
+    return null;
+  }
+  function findAssunto(materiaId, assuntoId){
+    var m = findMateria(materiaId);
+    if(!m) return null;
+    for(var i=0;i<m.assuntos.length;i++){ if(m.assuntos[i].id===assuntoId) return m.assuntos[i]; }
+    return null;
+  }
+
+  /* ---------------- TABS ---------------- */
+  var tabButtons = document.querySelectorAll("nav.tabs button");
+  var tabSections = document.querySelectorAll("section.tab");
+  tabButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabButtons.forEach(function(b){ b.classList.remove("active"); });
+      tabSections.forEach(function(s){ s.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+      renderAll();
+    });
+  });
+
+  /* ---------------- HEADER CLOCK ---------------- */
+  function tickClock(){
+    var d = new Date();
+    document.getElementById("headerClock").textContent =
+      d.toLocaleDateString("pt-BR") + "  " + d.toLocaleTimeString("pt-BR");
+  }
+  setInterval(tickClock, 1000);
+  tickClock();
+
+  /* ---------------- VIRADA DE DIA (meia-noite) ---------------- */
+  var ultimaDataConhecida = todayISO();
+  setInterval(function(){
+    var dataAtual = todayISO();
+    if(dataAtual !== ultimaDataConhecida){
+      ultimaDataConhecida = dataAtual;
+      renderAll();
+      mostrarModalRevisoesDoDia();
+    }
+  }, 30000);
+
+  /* ---------------- TIMER ---------------- */
+  var timerInterval = null;
+
+  function currentElapsedSeconds(){
+    var t = state.timer;
+    var extra = (t.rodando && t.inicio) ? (Date.now() - t.inicio)/1000 : 0;
+    return t.acumulado + extra;
+  }
+
+  function updateTimerDisplay(){
+    document.getElementById("timerDisplay").textContent = formatHMS(currentElapsedSeconds());
+  }
+
+  function refreshTimerControls(){
+    var t = state.timer;
+    document.getElementById("btnStart").disabled = t.rodando;
+    document.getElementById("btnPause").disabled = !t.rodando;
+    document.getElementById("btnStop").disabled = !(t.rodando || t.acumulado > 0);
+    document.getElementById("timerMateria").disabled = t.rodando || t.acumulado > 0;
+    document.getElementById("timerAssunto").disabled = t.rodando || t.acumulado > 0;
+    var status = "Parado";
+    if(t.rodando) status = "Em andamento";
+    else if(t.acumulado > 0) status = "Pausado";
+    document.getElementById("timerStatus").textContent = status;
+  }
+
+  function populateTimerSelects(){
+    var selM = document.getElementById("timerMateria");
+    var selA = document.getElementById("timerAssunto");
+    var prevM = state.timer.materiaId;
+    var prevA = state.timer.assuntoId;
+    selM.innerHTML = '<option value="">Selecione a matéria</option>';
+    state.materias.forEach(function(m){
+      var o = document.createElement("option");
+      o.value = m.id; o.textContent = m.nome;
+      o.style.color = m.cor || "";
+      if(m.id === prevM) o.selected = true;
+      selM.appendChild(o);
+    });
+    populateAssuntoSelectFor(selA, prevM, prevA);
+  }
+
+  function populateAssuntoSelectFor(selA, materiaId, selectedAssuntoId){
+    selA.innerHTML = '<option value="">Assunto (opcional)</option>';
+    var m = findMateria(materiaId);
+    if(m){
+      m.assuntos.forEach(function(a){
+        var o = document.createElement("option");
+        o.value = a.id; o.textContent = a.nome;
+        if(a.id === selectedAssuntoId) o.selected = true;
+        selA.appendChild(o);
+      });
+    }
+  }
+
+  document.getElementById("timerMateria").addEventListener("change", function(){
+    state.timer.materiaId = this.value;
+    state.timer.assuntoId = "";
+    populateAssuntoSelectFor(document.getElementById("timerAssunto"), this.value, "");
+    saveState();
+  });
+  document.getElementById("timerAssunto").addEventListener("change", function(){
+    state.timer.assuntoId = this.value;
+    saveState();
+  });
+
+  document.getElementById("btnStart").addEventListener("click", function(){
+    state.timer.rodando = true;
+    state.timer.inicio = Date.now();
+    saveState();
+    refreshTimerControls();
+    updateTimerDisplay();
+  });
+
+  document.getElementById("btnPause").addEventListener("click", function(){
+    var t = state.timer;
+    if(t.rodando && t.inicio){
+      t.acumulado += (Date.now() - t.inicio)/1000;
+    }
+    t.rodando = false;
+    t.inicio = null;
+    saveState();
+    refreshTimerControls();
+    updateTimerDisplay();
+  });
+
+  document.getElementById("btnStop").addEventListener("click", function(){
+    var t = state.timer;
+    var total = currentElapsedSeconds();
+    if(total < 1){
+      t.rodando = false; t.inicio = null; t.acumulado = 0;
+      saveState(); refreshTimerControls(); updateTimerDisplay();
+      return;
+    }
+    state.sessions.push({
+      id: uid(),
+      materiaId: t.materiaId || "",
+      assuntoId: t.assuntoId || "",
+      data: todayISO(),
+      duracaoSec: Math.round(total)
+    });
+    t.rodando = false; t.inicio = null; t.acumulado = 0;
+    saveState();
+    refreshTimerControls();
+    updateTimerDisplay();
+    renderCronometroSessions();
+    showToast("Sessão salva: " + formatDuration(total));
+  });
+
+  function timerLoop(){
+    if(state.timer.rodando){
+      updateTimerDisplay();
+    }
+  }
+  timerInterval = setInterval(timerLoop, 1000);
+
+  function renderCronometroSessions(){
+    var tbody = document.querySelector("#sessionsTable tbody");
+    tbody.innerHTML = "";
+    var sessions = state.sessions.slice().sort(function(a,b){ return (b.data||"").localeCompare(a.data||""); });
+    document.getElementById("sessionsEmpty").style.display = sessions.length ? "none" : "block";
+    sessions.forEach(function(s){
+      var m = findMateria(s.materiaId);
+      var a = m ? findAssunto(m.id, s.assuntoId) : null;
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td></td>"+
+        "<td>"+(m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+"</td>"+
+        "<td>"+(a ? escapeHtml(a.nome) : "—")+"</td>"+
+        "<td style='font-family:var(--font-mono);'>"+formatDuration(s.duracaoSec)+"</td>"+
+        "<td></td>";
+      var tdData = tr.firstElementChild;
+      var inputData = document.createElement("input");
+      inputData.type = "date";
+      inputData.value = s.data;
+      inputData.style.minWidth = "130px";
+      inputData.addEventListener("change", function(){
+        if(!this.value) return;
+        s.data = this.value;
+        saveState();
+        renderAll();
+      });
+      tdData.appendChild(inputData);
+      var tdBtn = tr.lastElementChild;
+      var btn = document.createElement("button");
+      btn.className = "btn small danger";
+      btn.textContent = "Excluir";
+      btn.addEventListener("click", function(){
+        state.sessions = state.sessions.filter(function(x){ return x.id !== s.id; });
+        saveState();
+        renderAll();
+      });
+      tdBtn.appendChild(btn);
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ---------------- MATERIAS ---------------- */
+  document.getElementById("btnAddMateria").addEventListener("click", function(){
+    var input = document.getElementById("novaMateriaInput");
+    var nome = input.value.trim();
+    if(!nome){ showToast("Digite o nome da matéria."); return; }
+    var cor = novaMateriaCor || pickDefaultColor();
+    state.materias.push({ id: uid(), nome: nome, assuntos: [], cor: cor, peso: 1, metaSemanalHoras: 0 });
+    input.value = "";
+    novaMateriaCor = null;
+    saveState();
+    renderAll();
+    showToast("Matéria adicionada.");
+  });
+  document.getElementById("novaMateriaInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ document.getElementById("btnAddMateria").click(); }
+  });
+
+  function statusLabel(status){
+    var map = {
+      "nao_iniciado": "Não iniciado",
+      "estudando": "Estudando",
+      "revisao": "Em revisão",
+      "concluido": "Concluído"
+    };
+    return map[status] || "Não iniciado";
+  }
+
+  var ETAPAS = [
+    { key:"24h", dias:1, label:"24h" },
+    { key:"7d", dias:7, label:"7 dias" },
+    { key:"14d", dias:14, label:"14 dias" },
+    { key:"21d", dias:21, label:"21 dias" },
+    { key:"28d", dias:28, label:"28 dias" }
+  ];
+
+  function criarRevisao(materia, assunto, etapaObj, ciclo){
+    var data = addDaysISO(todayISO(), etapaObj.dias);
+    var existe = state.revisoes.some(function(r){
+      return r.assuntoId===assunto.id && r.etapa===etapaObj.key && r.ciclo===ciclo && !r.feita;
+    });
+    if(!existe){
+      state.revisoes.push({ id: uid(), materiaId: materia.id, assuntoId: assunto.id, data: data, etapa: etapaObj.key, ciclo: ciclo, feita:false });
+    }
+  }
+
+  function marcarConcluido(materia, assunto){
+    var hoje = todayISO();
+    assunto.status = "concluido";
+    assunto.dataConclusao = hoje;
+    if(!assunto.ciclo) assunto.ciclo = 1;
+    criarRevisao(materia, assunto, ETAPAS[0], assunto.ciclo);
+  }
+
+  function completarRevisaoBom(revisao){
+    var m = findMateria(revisao.materiaId);
+    var a = m ? findAssunto(m.id, revisao.assuntoId) : null;
+    if(a){
+      var idxAtual = ETAPAS.findIndex(function(e){ return e.key===revisao.etapa; });
+      if(idxAtual === -1 || idxAtual === ETAPAS.length-1){
+        a.ciclo = (a.ciclo||1) + 1;
+        revisao.etapa = ETAPAS[0].key;
+        revisao.data = addDaysISO(todayISO(), ETAPAS[0].dias);
+        revisao.ciclo = a.ciclo;
+        showToast("Ciclo concluído! Reiniciando no ciclo "+a.ciclo+", marco de 24h.");
+      } else {
+        var proxima = ETAPAS[idxAtual+1];
+        revisao.etapa = proxima.key;
+        revisao.data = addDaysISO(todayISO(), proxima.dias);
+        showToast("Avançou para a etapa de "+proxima.label+".");
+      }
+    }
+    saveState();
+    renderAll();
+  }
+
+  function completarRevisaoReforco(revisao){
+    revisao.data = addDaysISO(todayISO(), 2);
+    saveState();
+    renderAll();
+    showToast("Revisão pontual marcada para daqui a 2 dias, mesma etapa.");
+  }
+
+  function renderMaterias(){
+    var container = document.getElementById("materiasList");
+    container.innerHTML = "";
+    document.getElementById("materiasEmpty").style.display = state.materias.length ? "none" : "block";
+
+    state.materias.forEach(function(m, idx){
+      if(!m.cor){ m.cor = COLOR_PALETTE[idx % COLOR_PALETTE.length]; saveState(); }
+
+      var totalSec = state.sessions
+        .filter(function(s){ return s.materiaId === m.id; })
+        .reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
+
+      var certasMateria = 0, erradasMateria = 0;
+      m.assuntos.forEach(function(a){
+        certasMateria += (a.questoesCertas || 0);
+        erradasMateria += (a.questoesErradas || 0);
+      });
+      var totalQMateria = certasMateria + erradasMateria;
+      var aproveitamentoMateria = totalQMateria > 0 ? Math.round((certasMateria/totalQMateria)*100) : null;
+      var corAprov = aproveitamentoMateria===null ? "var(--text-faint)" : (aproveitamentoMateria>=70?"var(--success)":(aproveitamentoMateria>=40?"var(--warn)":"var(--danger)"));
+
+      var block = document.createElement("div");
+      block.className = "materia-block panel";
+      block.style.borderLeftColor = m.cor;
+
+      var head = document.createElement("div");
+      head.className = "materia-head";
+      head.innerHTML =
+        "<h3><span class='color-dot-btn colorDotTrigger' style='background:"+m.cor+"' title='Alterar cor'></span>"+
+        "<span class='materia-nome-texto'>"+escapeHtml(m.nome)+"</span>"+
+        "<span class='mini-edit-btn editarMateriaBtn' title='Editar nome' style='margin-left:8px;'>✎</span></h3>"+
+        "<div style='display:flex;align-items:center;gap:14px;'>"+
+        "<span style='font-size:11.5px;color:"+corAprov+";font-family:var(--font-mono);' title='Aproveitamento em questões'>"+(aproveitamentoMateria===null?"— %":aproveitamentoMateria+"%")+"</span>"+
+        "<span class='materia-total' style='color:"+m.cor+"'>"+formatDuration(totalSec)+"</span>"+
+        "</div>";
+      head.querySelector(".colorDotTrigger").addEventListener("click", function(){
+        openColorPickerFor = (openColorPickerFor === m.id) ? null : m.id;
+        renderMaterias();
+      });
+      head.querySelector(".editarMateriaBtn").addEventListener("click", function(){
+        var novoNome = prompt("Editar nome da matéria:", m.nome);
+        if(novoNome === null) return;
+        novoNome = novoNome.trim();
+        if(!novoNome){ showToast("O nome não pode ficar vazio."); return; }
+        m.nome = novoNome;
+        saveState();
+        renderAll();
+      });
+
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn small danger";
+      delBtn.textContent = "Remover matéria";
+      delBtn.addEventListener("click", function(){
+        if(!confirm('Remover a matéria "'+m.nome+'" e todos os seus assuntos?')) return;
+        state.materias = state.materias.filter(function(x){ return x.id !== m.id; });
+        state.revisoes = state.revisoes.filter(function(r){ return r.materiaId !== m.id; });
+        saveState();
+        renderAll();
+      });
+      head.lastElementChild.appendChild(delBtn);
+      block.appendChild(head);
+
+      if(openColorPickerFor === m.id){
+        var pickerDiv = document.createElement("div");
+        pickerDiv.className = "color-swatch-grid";
+        pickerDiv.style.marginBottom = "14px";
+        renderColorSwatches(pickerDiv, m.cor, function(c){
+          m.cor = c;
+          openColorPickerFor = null;
+          saveState();
+          renderAll();
+        });
+        block.appendChild(pickerDiv);
+      }
+
+      if(m.peso === undefined) m.peso = 1;
+      if(m.metaSemanalHoras === undefined) m.metaSemanalHoras = 0;
+      var seteDiasAtrasMat = addDaysISO(todayISO(), -6);
+      var totalSemanaMat = state.sessions
+        .filter(function(s){ return s.materiaId === m.id && s.data >= seteDiasAtrasMat; })
+        .reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
+
+      var pesoMetaRow = document.createElement("div");
+      pesoMetaRow.style.cssText = "display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;margin-bottom:14px;";
+      pesoMetaRow.innerHTML =
+        "<div><label style='font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;'>Peso na prova</label>"+
+        "<select class='pesoSelect' style='width:auto;min-width:70px;'>"+
+        [1,1.5,2,2.5,3].map(function(v){ return "<option value='"+v+"'"+(m.peso===v?" selected":"")+">"+v+"</option>"; }).join("")+
+        "</select></div>"+
+        "<div><label style='font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;'>Meta semanal (h)</label>"+
+        "<input type='number' class='metaSemanalInput' min='0' step='0.5' value='"+m.metaSemanalHoras+"' style='width:auto;min-width:70px;'></div>"+
+        (m.metaSemanalHoras > 0 ?
+          "<div style='flex:1;min-width:140px;'><label style='font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px;'>Progresso da semana</label>"+
+          "<div class='bar-track'><div class='bar-fill' style='width:"+Math.min(100, Math.round((totalSemanaMat/(m.metaSemanalHoras*3600))*100))+"%;background:"+m.cor+";'></div></div>"+
+          "<div style='font-size:11px;color:var(--text-faint);margin-top:3px;'>"+formatDuration(totalSemanaMat)+" de "+m.metaSemanalHoras+"h</div></div>"
+          : "");
+      pesoMetaRow.querySelector(".pesoSelect").addEventListener("change", function(){
+        m.peso = parseFloat(this.value);
+        saveState();
+        renderPainelDashboard();
+      });
+      pesoMetaRow.querySelector(".metaSemanalInput").addEventListener("change", function(){
+        var v = parseFloat(this.value);
+        m.metaSemanalHoras = isNaN(v) || v < 0 ? 0 : v;
+        saveState();
+        renderMaterias();
+      });
+      block.appendChild(pesoMetaRow);
+
+      var addRow = document.createElement("div");
+      addRow.className = "add-form";
+      addRow.style.marginBottom = "14px";
+      addRow.innerHTML =
+        "<div><label>Novo assunto</label><input type='text' placeholder='Ex.: Lei 8.666/93' class='novoAssuntoInput'></div>";
+      var addBtnWrap = document.createElement("div");
+      addBtnWrap.style.flex = "0";
+      var addBtn = document.createElement("button");
+      addBtn.className = "btn";
+      addBtn.textContent = "Adicionar assunto";
+      addBtnWrap.appendChild(addBtn);
+      addRow.appendChild(addBtnWrap);
+      block.appendChild(addRow);
+
+      var input = addRow.querySelector(".novoAssuntoInput");
+      function addAssunto(){
+        var nome = input.value.trim();
+        if(!nome){ showToast("Digite o nome do assunto."); return; }
+        m.assuntos.push({ id: uid(), nome: nome, status: "nao_iniciado", dataConclusao: null, dataInicio: todayISO(), questoesCertas: 0, questoesErradas: 0, ciclo: 1 });
+        input.value = "";
+        saveState();
+        renderAll();
+      }
+      addBtn.addEventListener("click", addAssunto);
+      input.addEventListener("keydown", function(e){ if(e.key==="Enter") addAssunto(); });
+
+      if(m.assuntos.length === 0){
+        var empty = document.createElement("div");
+        empty.className = "empty-state";
+        empty.textContent = "Nenhum assunto cadastrado nesta matéria.";
+        block.appendChild(empty);
+      } else {
+        var tableWrap = document.createElement("div");
+        tableWrap.className = "table-scroll";
+        var table = document.createElement("table");
+        table.innerHTML = "<thead><tr><th>Assunto</th><th>Início do estudo</th><th>Tempo estudado</th><th>Status</th><th>Questões</th><th></th></tr></thead>";
+        var tbody = document.createElement("tbody");
+        m.assuntos.forEach(function(a){
+          if(a.dataInicio === undefined) a.dataInicio = null;
+          if(a.questoesCertas === undefined) a.questoesCertas = 0;
+          if(a.questoesErradas === undefined) a.questoesErradas = 0;
+
+          var tr = document.createElement("tr");
+
+          function excluirAssunto(){
+            if(!confirm('Excluir o assunto "'+a.nome+'"?')) return;
+            m.assuntos = m.assuntos.filter(function(x){ return x.id !== a.id; });
+            state.revisoes = state.revisoes.filter(function(r){ return r.assuntoId !== a.id; });
+            if(guias[a.id]) excluirGuiaRemota(a.id);
+            saveState();
+            renderAll();
+          }
+
+          var tdNome = document.createElement("td");
+          var nomeWrap = document.createElement("div");
+          nomeWrap.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;gap:8px;";
+          var nomeTextWrap = document.createElement("div");
+          var nomeLinha = document.createElement("div");
+          nomeLinha.textContent = a.nome;
+          nomeTextWrap.appendChild(nomeLinha);
+          if(a.dataInicio){
+            var diasEstudo = Math.floor((new Date(todayISO()+"T00:00:00") - new Date(a.dataInicio+"T00:00:00")) / 86400000);
+            var subInfo = document.createElement("div");
+            subInfo.style.cssText = "font-size:11px;color:var(--text-faint);margin-top:2px;";
+            subInfo.textContent = diasEstudo <= 0 ? "Começou hoje" : "Há "+diasEstudo+" dia"+(diasEstudo>1?"s":"")+" de estudo";
+            if(a.status==="concluido" || (a.ciclo && a.ciclo>1)){
+              subInfo.textContent += " · Ciclo "+(a.ciclo||1);
+            }
+            nomeTextWrap.appendChild(subInfo);
+          }
+          var miniEdit = document.createElement("button");
+          miniEdit.className = "mini-edit-btn";
+          miniEdit.title = "Editar nome do assunto";
+          miniEdit.textContent = "✎";
+          miniEdit.addEventListener("click", function(){
+            var novoNome = prompt("Editar nome do assunto:", a.nome);
+            if(novoNome === null) return;
+            novoNome = novoNome.trim();
+            if(!novoNome){ showToast("O nome não pode ficar vazio."); return; }
+            a.nome = novoNome;
+            saveState();
+            renderAll();
+          });
+          var miniDel = document.createElement("button");
+          miniDel.className = "mini-del-btn";
+          miniDel.title = "Excluir assunto";
+          miniDel.textContent = "×";
+          miniDel.addEventListener("click", excluirAssunto);
+          var miniBotoesWrap = document.createElement("div");
+          miniBotoesWrap.style.cssText = "display:flex;gap:5px;flex-shrink:0;";
+          miniBotoesWrap.appendChild(miniEdit);
+          miniBotoesWrap.appendChild(miniDel);
+          nomeWrap.appendChild(nomeTextWrap);
+          nomeWrap.appendChild(miniBotoesWrap);
+          tdNome.appendChild(nomeWrap);
+
+          var tdInicio = document.createElement("td");
+          var inputInicio = document.createElement("input");
+          inputInicio.type = "date";
+          inputInicio.style.minWidth = "130px";
+          if(a.dataInicio) inputInicio.value = a.dataInicio;
+          inputInicio.addEventListener("change", function(){
+            a.dataInicio = this.value || null;
+            saveState();
+            renderMaterias();
+          });
+          tdInicio.appendChild(inputInicio);
+
+          var tdTempo = document.createElement("td");
+          var tempoAssuntoSec = state.sessions
+            .filter(function(s){ return s.materiaId === m.id && s.assuntoId === a.id; })
+            .reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
+          tdTempo.style.fontFamily = "var(--font-mono)";
+          tdTempo.style.color = tempoAssuntoSec > 0 ? "var(--accent-sky)" : "var(--text-faint)";
+          tdTempo.textContent = tempoAssuntoSec > 0 ? formatDuration(tempoAssuntoSec) : "—";
+
+          var tdStatus = document.createElement("td");
+          var sel = document.createElement("select");
+          sel.className = "status-select";
+          [["nao_iniciado","Não iniciado"],["estudando","Estudando"],["revisao","Em revisão"],["concluido","Concluído"]]
+            .forEach(function(opt){
+              var o = document.createElement("option");
+              o.value = opt[0]; o.textContent = opt[1];
+              if(a.status === opt[0]) o.selected = true;
+              sel.appendChild(o);
+            });
+          sel.addEventListener("change", function(){
+            var novo = this.value;
+            if(novo === "estudando" && !a.dataInicio){
+              a.dataInicio = todayISO();
+            }
+            if(novo === "concluido" && a.status !== "concluido"){
+              marcarConcluido(m, a);
+              showToast("Assunto concluído. Primeira revisão agendada para amanhã (24h).");
+            } else {
+              a.status = novo;
+              if(novo !== "concluido") a.dataConclusao = null;
+            }
+            saveState();
+            renderAll();
+          });
+          tdStatus.appendChild(sel);
+
+          var tdQtd = document.createElement("td");
+          var qtdWrap = document.createElement("div");
+          qtdWrap.style.cssText = "display:flex;flex-direction:column;gap:4px;";
+
+          var certaRow = document.createElement("div");
+          certaRow.className = "qtd-controls";
+          certaRow.innerHTML = "<span class='qtd-correct'>Certas</span>";
+          var certaMinus = document.createElement("button");
+          certaMinus.className = "qtd-btn"; certaMinus.textContent = "–";
+          var certaVal = document.createElement("input");
+          certaVal.type = "number"; certaVal.min = "0";
+          certaVal.className = "qtd-value-input"; certaVal.value = a.questoesCertas;
+          var certaPlus = document.createElement("button");
+          certaPlus.className = "qtd-btn"; certaPlus.textContent = "+";
+          certaMinus.addEventListener("click", function(){
+            a.questoesCertas = Math.max(0, a.questoesCertas - 1);
+            saveState(); renderAll();
+          });
+          certaPlus.addEventListener("click", function(){
+            a.questoesCertas = a.questoesCertas + 1;
+            saveState(); renderAll();
+          });
+          certaVal.addEventListener("change", function(){
+            var novo = parseInt(this.value, 10);
+            if(isNaN(novo) || novo < 0) novo = 0;
+            a.questoesCertas = novo;
+            saveState(); renderAll();
+          });
+          var certaSomar = document.createElement("button");
+          certaSomar.className = "qtd-btn-somar"; certaSomar.textContent = "+ lote";
+          certaSomar.title = "Somar uma quantidade ao total de certas, sem precisar calcular";
+          certaSomar.addEventListener("click", function(){
+            var val = prompt("Quantas questões CERTAS você fez agora? (será somado ao total atual: "+a.questoesCertas+")", "");
+            if(val === null) return;
+            var num = parseInt(val, 10);
+            if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
+            a.questoesCertas = a.questoesCertas + num;
+            saveState(); renderAll();
+            showToast("Somado +"+num+" certas. Novo total: "+a.questoesCertas+".");
+          });
+          certaRow.appendChild(certaMinus); certaRow.appendChild(certaVal); certaRow.appendChild(certaPlus); certaRow.appendChild(certaSomar);
+
+          var erradaRow = document.createElement("div");
+          erradaRow.className = "qtd-controls";
+          erradaRow.innerHTML = "<span class='qtd-wrong'>Erradas</span>";
+          var erradaMinus = document.createElement("button");
+          erradaMinus.className = "qtd-btn"; erradaMinus.textContent = "–";
+          var erradaVal = document.createElement("input");
+          erradaVal.type = "number"; erradaVal.min = "0";
+          erradaVal.className = "qtd-value-input"; erradaVal.value = a.questoesErradas;
+          var erradaPlus = document.createElement("button");
+          erradaPlus.className = "qtd-btn"; erradaPlus.textContent = "+";
+          erradaMinus.addEventListener("click", function(){
+            a.questoesErradas = Math.max(0, a.questoesErradas - 1);
+            saveState(); renderAll();
+          });
+          erradaPlus.addEventListener("click", function(){
+            a.questoesErradas = a.questoesErradas + 1;
+            saveState(); renderAll();
+            abrirCadernoComPreset(m.id, a.id);
+          });
+          erradaVal.addEventListener("change", function(){
+            var novo = parseInt(this.value, 10);
+            if(isNaN(novo) || novo < 0) novo = 0;
+            var delta = novo - a.questoesErradas;
+            a.questoesErradas = novo;
+            saveState(); renderAll();
+            if(delta > 0){ abrirCadernoComPreset(m.id, a.id); }
+          });
+          var erradaSomar = document.createElement("button");
+          erradaSomar.className = "qtd-btn-somar"; erradaSomar.textContent = "+ lote";
+          erradaSomar.title = "Somar uma quantidade ao total de erradas, sem precisar calcular";
+          erradaSomar.addEventListener("click", function(){
+            var val = prompt("Quantas questões ERRADAS você fez agora? (será somado ao total atual: "+a.questoesErradas+")", "");
+            if(val === null) return;
+            var num = parseInt(val, 10);
+            if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
+            a.questoesErradas = a.questoesErradas + num;
+            saveState(); renderAll();
+            showToast("Somado +"+num+" erradas. Novo total: "+a.questoesErradas+".");
+            abrirCadernoComPreset(m.id, a.id);
+          });
+          erradaRow.appendChild(erradaMinus); erradaRow.appendChild(erradaVal); erradaRow.appendChild(erradaPlus); erradaRow.appendChild(erradaSomar);
+
+          qtdWrap.appendChild(certaRow);
+          qtdWrap.appendChild(erradaRow);
+          tdQtd.appendChild(qtdWrap);
+
+          var tdDel = document.createElement("td");
+          var registrarBtn = document.createElement("button");
+          registrarBtn.className = "btn small";
+          registrarBtn.textContent = "Registrar erro";
+          registrarBtn.addEventListener("click", function(){
+            abrirCadernoComPreset(m.id, a.id);
+          });
+          var delA = document.createElement("button");
+          delA.className = "btn small danger";
+          delA.textContent = "Excluir";
+          delA.addEventListener("click", excluirAssunto);
+          var acoesWrap = document.createElement("div");
+          acoesWrap.className = "acoes-assunto-wrap";
+          acoesWrap.appendChild(registrarBtn);
+          acoesWrap.appendChild(delA);
+          tdDel.appendChild(acoesWrap);
+
+          tr.appendChild(tdNome); tr.appendChild(tdInicio); tr.appendChild(tdTempo); tr.appendChild(tdStatus); tr.appendChild(tdQtd); tr.appendChild(tdDel);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        tableWrap.appendChild(table);
+        block.appendChild(tableWrap);
+      }
+
+      container.appendChild(block);
+    });
+
+    renderNovaMateriaSwatches();
+  }
+
+  /* ---------------- REVISOES ---------------- */
+  function populateRevisaoSelects(){
+    var selM = document.getElementById("revMateria");
+    var selA = document.getElementById("revAssunto");
+    var prevM = selM.value;
+    selM.innerHTML = '<option value="">Selecione</option>';
+    state.materias.forEach(function(m){
+      var o = document.createElement("option");
+      o.value = m.id; o.textContent = m.nome;
+      o.style.color = m.cor || "";
+      selM.appendChild(o);
+    });
+    if(prevM) selM.value = prevM;
+    populateAssuntoSelectFor(selA, selM.value, "");
+    selA.querySelector("option").textContent = "Selecione";
+  }
+  document.getElementById("revMateria").addEventListener("change", function(){
+    populateAssuntoSelectFor(document.getElementById("revAssunto"), this.value, "");
+    document.getElementById("revAssunto").querySelector("option").textContent = "Selecione";
+  });
+
+  document.getElementById("btnAddRevisao").addEventListener("click", function(){
+    var materiaId = document.getElementById("revMateria").value;
+    var assuntoId = document.getElementById("revAssunto").value;
+    var data = document.getElementById("revData").value;
+    if(!materiaId || !data){ showToast("Selecione a matéria e a data."); return; }
+    state.revisoes.push({ id: uid(), materiaId: materiaId, assuntoId: assuntoId || "", data: data, feita: false });
+    saveState();
+    document.getElementById("revData").value = "";
+    renderRevisoes();
+    showToast("Revisão adicionada.");
+  });
+
+  function renderRevisoes(){
+    populateRevisaoSelects();
+    var tbody = document.querySelector("#revisoesTable tbody");
+    tbody.innerHTML = "";
+    var hoje = todayISO();
+    var lista = state.revisoes.slice().sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
+    document.getElementById("revisoesEmpty").style.display = lista.length ? "none" : "block";
+    lista.forEach(function(r){
+      var m = findMateria(r.materiaId);
+      var a = m ? findAssunto(m.id, r.assuntoId) : null;
+      var etapaObj = ETAPAS.find(function(e){ return e.key===r.etapa; });
+      var tr = document.createElement("tr");
+      var atrasada = !r.feita && r.data < hoje;
+      var tag = r.feita ? "<span class='tag concluido'>Concluída</span>"
+              : atrasada ? "<span class='tag atrasada'>Atrasada</span>"
+              : "<span class='tag'>Pendente</span>";
+      var marcoTxt = etapaObj ? etapaObj.label + (r.ciclo ? " · ciclo "+r.ciclo : "") : "—";
+      tr.innerHTML =
+        "<td>"+formatDateBR(r.data)+"</td>"+
+        "<td>"+(m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+"</td>"+
+        "<td>"+(a ? escapeHtml(a.nome) : "—")+"</td>"+
+        "<td style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+marcoTxt+"</td>"+
+        "<td>"+tag+"</td>"+
+        "<td></td>";
+      var tdAcoes = tr.lastElementChild;
+      if(!r.feita){
+        if(r.etapa){
+          var bomBtn = document.createElement("button");
+          bomBtn.className = "btn small";
+          bomBtn.textContent = "Fui bem (80%+)";
+          bomBtn.title = "Concluir o bloco de questões com bom desempenho e avançar de etapa";
+          bomBtn.style.marginRight = "6px";
+          bomBtn.addEventListener("click", function(){ completarRevisaoBom(r); });
+          tdAcoes.appendChild(bomBtn);
+
+          var reforcoBtn = document.createElement("button");
+          reforcoBtn.className = "btn small";
+          reforcoBtn.textContent = "Preciso reforçar";
+          reforcoBtn.title = "Rendimento baixo: fazer uma revisão pontual e tentar de novo em 2 dias";
+          reforcoBtn.style.marginRight = "6px";
+          reforcoBtn.addEventListener("click", function(){ completarRevisaoReforco(r); });
+          tdAcoes.appendChild(reforcoBtn);
+        } else {
+          var doneBtn = document.createElement("button");
+          doneBtn.className = "btn small";
+          doneBtn.textContent = "Marcar feita";
+          doneBtn.style.marginRight = "6px";
+          doneBtn.addEventListener("click", function(){
+            r.feita = true;
+            saveState();
+            renderAll();
+          });
+          tdAcoes.appendChild(doneBtn);
+          var adiarBtn = document.createElement("button");
+          adiarBtn.className = "btn small";
+          adiarBtn.textContent = "Adiar 7 dias";
+          adiarBtn.style.marginRight = "6px";
+          adiarBtn.addEventListener("click", function(){
+            r.data = addDaysISO(r.data, 7);
+            saveState();
+            renderAll();
+          });
+          tdAcoes.appendChild(adiarBtn);
+        }
+      }
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn small danger";
+      delBtn.textContent = "Excluir";
+      delBtn.addEventListener("click", function(){
+        state.revisoes = state.revisoes.filter(function(x){ return x.id !== r.id; });
+        saveState();
+        renderAll();
+      });
+      tdAcoes.appendChild(delBtn);
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ---------------- EDITAL ---------------- */
+  function renderEdital(){
+    var view = document.getElementById("editalView");
+    var meta = document.getElementById("editalMeta");
+    if(state.edital.texto){
+      view.textContent = state.edital.texto;
+      meta.textContent = state.edital.atualizadoEm ? ("Última atualização: " + formatDateBR(state.edital.atualizadoEm)) : "";
+    } else {
+      view.innerHTML = "<span style='color:var(--text-faint)'>Nenhum edital cadastrado ainda. Clique em Editar edital para colar o texto assim que ele for publicado.</span>";
+      meta.textContent = "";
+    }
+  }
+
+  /* ---------------- SUB-ABAS (usadas no Edital) ---------------- */
+  document.querySelectorAll(".subtab-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var parent = btn.closest("section");
+      parent.querySelectorAll(".subtab-btn").forEach(function(b){ b.classList.remove("active"); });
+      parent.querySelectorAll(".subtab-pane").forEach(function(p){ p.classList.remove("active"); });
+      btn.classList.add("active");
+      parent.querySelector("#pane-"+btn.dataset.subtab).classList.add("active");
+    });
+  });
+
+  /* ---------------- EDITAL VERTICALIZADO (CHECKLIST) ---------------- */
+  var ETAPAS_EDITAL = [
+    { key:"teoria", label:"Teoria" },
+    { key:"resumo", label:"Resumo" },
+    { key:"questoes", label:"Questões" },
+    { key:"revisado", label:"Revisado" }
+  ];
+
+  document.getElementById("btnAddTopicoEdital").addEventListener("click", function(){
+    var input = document.getElementById("novoTopicoEditalInput");
+    var nome = input.value.trim();
+    if(!nome){ showToast("Digite o nome do tópico."); return; }
+    state.editalTopicos.push({ id: uid(), nome: nome, teoria:false, resumo:false, questoes:false, revisado:false });
+    input.value = "";
+    saveState();
+    renderEditalChecklist();
+    showToast("Tópico adicionado ao edital.");
+  });
+  document.getElementById("novoTopicoEditalInput").addEventListener("keydown", function(e){
+    if(e.key === "Enter") document.getElementById("btnAddTopicoEdital").click();
+  });
+
+  function renderEditalChecklist(){
+    var tbody = document.querySelector("#editalTopicosTable tbody");
+    tbody.innerHTML = "";
+    var topicos = state.editalTopicos;
+    document.getElementById("editalTopicosEmpty").style.display = topicos.length ? "none" : "block";
+
+    var totalCaixas = topicos.length * ETAPAS_EDITAL.length;
+    var marcadas = 0;
+    topicos.forEach(function(t){
+      ETAPAS_EDITAL.forEach(function(e){ if(t[e.key]) marcadas++; });
+    });
+    var pct = totalCaixas > 0 ? Math.round((marcadas/totalCaixas)*100) : 0;
+    document.getElementById("editalProgressoBar").style.width = pct + "%";
+    document.getElementById("editalProgressoTexto").textContent = pct + "%";
+
+    topicos.forEach(function(t){
+      var tr = document.createElement("tr");
+      var tdNome = document.createElement("td");
+      tdNome.textContent = t.nome;
+      tr.appendChild(tdNome);
+
+      ETAPAS_EDITAL.forEach(function(e){
+        var td = document.createElement("td");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = !!t[e.key];
+        cb.addEventListener("change", function(){
+          t[e.key] = cb.checked;
+          saveState();
+          renderEditalChecklist();
+        });
+        td.appendChild(cb);
+        tr.appendChild(td);
+      });
+
+      var tdDel = document.createElement("td");
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn small danger";
+      delBtn.textContent = "Excluir";
+      delBtn.addEventListener("click", function(){
+        if(!confirm('Excluir o tópico "'+t.nome+'" do edital verticalizado?')) return;
+        state.editalTopicos = state.editalTopicos.filter(function(x){ return x.id !== t.id; });
+        saveState();
+        renderEditalChecklist();
+      });
+      tdDel.appendChild(delBtn);
+      tr.appendChild(tdDel);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* ---------------- CONCURSO / CONTAGEM REGRESSIVA ---------------- */
+  /* ---------------- GRADE DE ESTUDOS DA SEMANA ---------------- */
+  var DIAS_SEMANA_GRADE = [
+    { key:"seg", label:"Segunda-feira" },
+    { key:"ter", label:"Terça-feira" },
+    { key:"qua", label:"Quarta-feira" },
+    { key:"qui", label:"Quinta-feira" },
+    { key:"sex", label:"Sexta-feira" },
+    { key:"sab", label:"Sábado" },
+    { key:"dom", label:"Domingo" }
+  ];
+
+  var DIAS_SEMANA_KEYS = ["dom","seg","ter","qua","qui","sex","sab"];
+
+  function renderGradeHoraria(){
+    var container = document.getElementById("gradeHorariaContainer");
+    container.innerHTML = "";
+    if(!state.gradeHoraria) state.gradeHoraria = { dom:[], seg:[], ter:[], qua:[], qui:[], sex:[], sab:[] };
+    var hojeKey = DIAS_SEMANA_KEYS[new Date(todayISO()+"T00:00:00").getDay()];
+
+    DIAS_SEMANA_GRADE.forEach(function(dia){
+      if(!state.gradeHoraria[dia.key]) state.gradeHoraria[dia.key] = [];
+      var idsNoDia = state.gradeHoraria[dia.key];
+
+      var row = document.createElement("div");
+      row.className = "dia-row" + (dia.key === hojeKey ? " dia-hoje" : "");
+
+      var topRow = document.createElement("div");
+      topRow.className = "dia-row-top";
+
+      var label = document.createElement("div");
+      label.className = "dia-label";
+      label.textContent = dia.label + (dia.key === hojeKey ? " · hoje" : "");
+      topRow.appendChild(label);
+
+      var addSelect = document.createElement("select");
+      addSelect.className = "dia-add-select";
+      addSelect.innerHTML = "<option value=''>+ adicionar matéria</option>";
+      state.materias.forEach(function(m){
+        if(idsNoDia.indexOf(m.id) !== -1) return;
+        var o = document.createElement("option");
+        o.value = m.id; o.textContent = m.nome;
+        o.style.color = m.cor || "";
+        addSelect.appendChild(o);
+      });
+      addSelect.addEventListener("change", function(){
+        if(!this.value) return;
+        state.gradeHoraria[dia.key].push(this.value);
+        saveState();
+        renderGradeHoraria();
+      });
+      topRow.appendChild(addSelect);
+      row.appendChild(topRow);
+
+      var chipsWrap = document.createElement("div");
+      chipsWrap.className = "dia-chips";
+
+      idsNoDia.forEach(function(materiaId){
+        var m = findMateria(materiaId);
+        if(!m) return;
+        var chip = document.createElement("span");
+        chip.className = "materia-chip";
+        chip.innerHTML = colorDotHtml(m.cor) + escapeHtml(m.nome) + " <span class='chip-x'>×</span>";
+        chip.querySelector(".chip-x").addEventListener("click", function(){
+          state.gradeHoraria[dia.key] = state.gradeHoraria[dia.key].filter(function(id){ return id !== materiaId; });
+          saveState();
+          renderGradeHoraria();
+        });
+        chipsWrap.appendChild(chip);
+      });
+
+      if(idsNoDia.length > 0) row.appendChild(chipsWrap);
+      container.appendChild(row);
+    });
+  }
+
+  function renderConcurso(){
+    var view = document.getElementById("concursoView");
+    var c = state.concurso || { nome:"", dataProva:null };
+    var html = "";
+    if(c.nome || c.dataProva || c.cargo){
+      html += "<div style='font-family:var(--font-head);font-size:16px;margin-bottom:4px;'>"+(c.nome ? escapeHtml(c.nome) : "Concurso")+"</div>";
+      if(c.cargo){
+        html += "<div style='font-size:13px;color:var(--accent-sky);margin-bottom:4px;'>"+escapeHtml(c.cargo)+"</div>";
+      }
+      if(c.dataProva){
+        var hoje = todayISO();
+        var diff = Math.ceil((new Date(c.dataProva+"T00:00:00") - new Date(hoje+"T00:00:00")) / 86400000);
+        if(diff > 0){
+          html += "<div style='font-size:13.5px;color:var(--text-muted);'>Faltam <strong style='color:var(--accent-brass);font-size:16px;'>"+diff+"</strong> dia"+(diff>1?"s":"")+" para a prova ("+formatDateBR(c.dataProva)+")</div>";
+        } else if(diff === 0){
+          html += "<div style='font-size:13.5px;color:var(--warn);'>A prova é hoje! Boa sorte!</div>";
+        } else {
+          html += "<div style='font-size:13.5px;color:var(--text-faint);'>A prova foi em "+formatDateBR(c.dataProva)+".</div>";
+        }
+      } else {
+        html += "<div style='font-size:13px;color:var(--text-faint);'>Data da prova ainda não definida.</div>";
+      }
+    } else {
+      html += "<div style='font-size:13.5px;color:var(--text-faint);'>Configure o nome do concurso e a data da prova para acompanhar a contagem regressiva.</div>";
+    }
+    html += "<button class='btn small' id='btnEditarConcurso' style='margin-top:10px;'>Editar</button>";
+    view.innerHTML = html;
+    document.getElementById("btnEditarConcurso").addEventListener("click", function(){
+      document.getElementById("concursoNomeInput").value = c.nome || "";
+      document.getElementById("concursoCargoInput").value = c.cargo || "";
+      document.getElementById("concursoDataInput").value = c.dataProva || "";
+      document.getElementById("concursoView").style.display = "none";
+      document.getElementById("concursoEdit").style.display = "block";
+    });
+  }
+  document.getElementById("btnSalvarConcurso").addEventListener("click", function(){
+    state.concurso = {
+      nome: document.getElementById("concursoNomeInput").value.trim(),
+      cargo: document.getElementById("concursoCargoInput").value.trim(),
+      dataProva: document.getElementById("concursoDataInput").value || null
+    };
+    saveState();
+    document.getElementById("concursoView").style.display = "block";
+    document.getElementById("concursoEdit").style.display = "none";
+    renderConcurso();
+    showToast("Concurso atualizado.");
+  });
+  document.getElementById("btnCancelarConcurso").addEventListener("click", function(){
+    document.getElementById("concursoView").style.display = "block";
+    document.getElementById("concursoEdit").style.display = "none";
+  });
+
+  /* ---------------- META DIÁRIA ---------------- */
+  document.getElementById("metaDiariaInput").addEventListener("change", function(){
+    var v = parseInt(this.value, 10);
+    state.metaDiariaMin = isNaN(v) || v < 0 ? 0 : v;
+    saveState();
+    renderPainelDashboard();
+  });
+
+  function renderMetaDiaria(totalHojeSec){
+    var input = document.getElementById("metaDiariaInput");
+    if(document.activeElement !== input) input.value = state.metaDiariaMin;
+    var metaSec = (state.metaDiariaMin || 0) * 60;
+    var pct = metaSec > 0 ? Math.min(100, Math.round((totalHojeSec/metaSec)*100)) : 0;
+    var bar = document.getElementById("metaDiariaBar");
+    bar.style.width = pct + "%";
+    bar.style.background = pct >= 100 ? "var(--success)" : "var(--accent-sky)";
+    var texto = document.getElementById("metaDiariaTexto");
+    if(metaSec > 0){
+      texto.textContent = formatDuration(totalHojeSec) + " de " + formatDuration(metaSec) + " (" + pct + "%)" + (pct>=100 ? " — meta batida!" : "");
+    } else {
+      texto.textContent = "Defina uma meta diária em minutos para acompanhar o progresso.";
+    }
+  }
+
+  /* ---------------- CHECK-IN EXTRA ---------------- */
+  function checkinsDoDia(dataISO){
+    var v = state.checkins[dataISO];
+    if(!v) return [];
+    if(Array.isArray(v)){
+      return v.map(function(it, idx){ return it.id ? it : Object.assign({}, it, {id:"legacy-"+idx}); });
+    }
+    if(typeof v === "object"){
+      return [Object.assign({}, v, {id: v.id || "legacy-0"})];
+    }
+    return [];
+  }
+
+  var checkinEditandoId = null;
+
+  function abrirFormCheckin(entradaExistente){
+    document.getElementById("checkinForm").style.display = "block";
+    document.getElementById("btnAbrirCheckinForm").style.display = "none";
+    checkinEditandoId = entradaExistente ? entradaExistente.id : null;
+    document.getElementById("checkinDescricaoInput").value = entradaExistente ? (entradaExistente.descricao || "") : "";
+    document.getElementById("checkinMinutosInput").value = (entradaExistente && entradaExistente.minutos) ? entradaExistente.minutos : "";
+  }
+  function fecharFormCheckin(){
+    document.getElementById("checkinForm").style.display = "none";
+    document.getElementById("btnAbrirCheckinForm").style.display = "block";
+    document.getElementById("checkinDescricaoInput").value = "";
+    document.getElementById("checkinMinutosInput").value = "";
+    checkinEditandoId = null;
+  }
+
+  document.getElementById("btnAbrirCheckinForm").addEventListener("click", function(){ abrirFormCheckin(null); });
+  document.getElementById("btnCancelarCheckin").addEventListener("click", fecharFormCheckin);
+
+  document.getElementById("btnSalvarCheckin").addEventListener("click", function(){
+    var hoje = todayISO();
+    var descricao = document.getElementById("checkinDescricaoInput").value.trim();
+    var minutos = parseInt(document.getElementById("checkinMinutosInput").value, 10);
+    if(isNaN(minutos) || minutos < 0) minutos = 0;
+    if(!descricao && minutos === 0){ showToast("Descreva o que estudou ou informe os minutos."); return; }
+    var lista = checkinsDoDia(hoje).slice();
+    if(checkinEditandoId){
+      lista = lista.map(function(it){
+        return it.id === checkinEditandoId ? { id: it.id, descricao: descricao, minutos: minutos } : it;
+      });
+    } else {
+      lista.push({ id: uid(), descricao: descricao, minutos: minutos });
+    }
+    state.checkins[hoje] = lista;
+    saveState();
+    fecharFormCheckin();
+    renderCheckin();
+    showToast("Check-in salvo.");
+  });
+
+  function renderCheckin(){
+    var hoje = todayISO();
+    var lista = checkinsDoDia(hoje);
+    var container = document.getElementById("checkinLista");
+    container.innerHTML = "";
+
+    lista.forEach(function(entrada){
+      var item = document.createElement("div");
+      item.style.cssText = "margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-subtle);";
+      var descricaoTxt = entrada.descricao ? escapeHtml(entrada.descricao) : "Feito";
+      var minutosTxt = entrada.minutos ? entrada.minutos+" min · " : "";
+      item.innerHTML =
+        "<div style='font-size:13px;color:var(--success);'>✓ <strong>"+minutosTxt+descricaoTxt+"</strong></div>"+
+        "<div style='display:flex;gap:8px;margin-top:6px;'>"+
+        "<button class='btn small editarCheckinBtn'>Editar</button>"+
+        "<button class='btn small danger removerCheckinBtn'>Remover</button>"+
+        "</div>";
+      item.querySelector(".editarCheckinBtn").addEventListener("click", function(){ abrirFormCheckin(entrada); });
+      item.querySelector(".removerCheckinBtn").addEventListener("click", function(){
+        state.checkins[hoje] = checkinsDoDia(hoje).filter(function(it){ return it.id !== entrada.id; });
+        saveState();
+        renderCheckin();
+      });
+      container.appendChild(item);
+    });
+
+    var mesAtual = hoje.slice(0,7);
+    var diasNoMes = 0, minutosNoMes = 0;
+    Object.keys(state.checkins).forEach(function(d){
+      if(d.slice(0,7) === mesAtual){
+        var itens = checkinsDoDia(d);
+        if(itens.length > 0){
+          diasNoMes++;
+          itens.forEach(function(it){ minutosNoMes += (it.minutos||0); });
+        }
+      }
+    });
+    document.getElementById("checkinMesTexto").textContent =
+      diasNoMes + " dia"+(diasNoMes!==1?"s":"")+" com estudo extra este mês" +
+      (minutosNoMes > 0 ? " · "+formatDuration(minutosNoMes*60)+" no total" : "") + ".";
+  }
+
+  function editarCheckinDoHistorico(dataISO, entrada){
+    var novaDescricao = prompt("Editar descrição:", entrada.descricao || "");
+    if(novaDescricao === null) return;
+    var novoMinutosStr = prompt("Editar minutos:", entrada.minutos || 0);
+    if(novoMinutosStr === null) return;
+    var novoMinutos = parseInt(novoMinutosStr, 10);
+    if(isNaN(novoMinutos) || novoMinutos < 0) novoMinutos = 0;
+    var lista = checkinsDoDia(dataISO).map(function(it){
+      return it.id === entrada.id ? { id: it.id, descricao: novaDescricao.trim(), minutos: novoMinutos } : it;
+    });
+    state.checkins[dataISO] = lista;
+    saveState();
+    renderCheckin();
+    renderCheckinHistorico();
+    showToast("Check-in atualizado.");
+  }
+
+  function removerCheckinDoHistorico(dataISO, entrada){
+    state.checkins[dataISO] = checkinsDoDia(dataISO).filter(function(it){ return it.id !== entrada.id; });
+    saveState();
+    renderCheckin();
+    renderCheckinHistorico();
+  }
+
+  function renderCheckinHistorico(){
+    var lista = document.getElementById("checkinHistoricoList");
+    lista.innerHTML = "";
+    var datas = Object.keys(state.checkins)
+      .filter(function(d){ return checkinsDoDia(d).length > 0; })
+      .sort(function(a,b){ return b.localeCompare(a); });
+
+    document.getElementById("checkinHistoricoEmpty").style.display = datas.length ? "none" : "block";
+
+    var totalGeralDias = datas.length;
+    var totalGeralMinutos = 0;
+    var hojeStr = todayISO();
+    var mesAtualStr = hojeStr.slice(0,7);
+    var minutosMesAtual = 0;
+
+    datas.forEach(function(d){
+      var itensDoDia = checkinsDoDia(d);
+      var totalDoDia = itensDoDia.reduce(function(s,it){ return s+(it.minutos||0); }, 0);
+      totalGeralMinutos += totalDoDia;
+      if(d.slice(0,7) === mesAtualStr) minutosMesAtual += totalDoDia;
+
+      var bloco = document.createElement("div");
+      bloco.className = "caderno-item";
+      var cabecalho = document.createElement("div");
+      cabecalho.className = "caderno-head";
+      cabecalho.innerHTML =
+        "<span>"+formatDateBR(d)+(d===hojeStr?" · hoje":"")+"</span>"+
+        "<span style='font-family:var(--font-mono);color:var(--accent-brass);'>"+formatDuration(totalDoDia*60)+"</span>";
+      bloco.appendChild(cabecalho);
+
+      itensDoDia.forEach(function(entrada){
+        var linha = document.createElement("div");
+        linha.style.cssText = "display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;font-size:13px;";
+        var descricaoTxt = entrada.descricao ? escapeHtml(entrada.descricao) : "Feito";
+        var minutosTxt = entrada.minutos ? entrada.minutos+" min · " : "";
+        linha.innerHTML =
+          "<span style='color:var(--text-primary);'>"+minutosTxt+descricaoTxt+"</span>"+
+          "<span style='display:flex;gap:6px;flex-shrink:0;'>"+
+          "<button class='btn small editarHistBtn'>Editar</button>"+
+          "<button class='btn small danger removerHistBtn'>Remover</button>"+
+          "</span>";
+        linha.querySelector(".editarHistBtn").addEventListener("click", function(){ editarCheckinDoHistorico(d, entrada); });
+        linha.querySelector(".removerHistBtn").addEventListener("click", function(){ removerCheckinDoHistorico(d, entrada); });
+        bloco.appendChild(linha);
+      });
+
+      lista.appendChild(bloco);
+    });
+
+    var mediaPorDia = totalGeralDias > 0 ? Math.round(totalGeralMinutos/totalGeralDias) : 0;
+    var statsGrid = document.getElementById("checkinStatsGrid");
+    var statsCheckin = [
+      { valor: String(totalGeralDias), label: "Dias com check-in" },
+      { valor: formatDuration(totalGeralMinutos*60), label: "Tempo total" },
+      { valor: formatDuration(minutosMesAtual*60), label: "Este mês" },
+      { valor: mediaPorDia+" min", label: "Média por dia" }
+    ];
+    statsGrid.innerHTML = "";
+    statsCheckin.forEach(function(s){
+      var card = document.createElement("div");
+      card.className = "stat-card";
+      card.innerHTML =
+        "<span class='stat-label-top'>"+s.label+"</span>"+
+        "<span class='status-pill' style='background:var(--accent-sky);'>"+s.valor+"</span>";
+      statsGrid.appendChild(card);
+    });
+  }
+
+  /* ---------------- RENDERIZAÇÃO DOS GUIAS RÁPIDOS ---------------- */
+  var guiaAbertoIds = {};
+  var guiaModoEdicao = {};
+
+  var GUIA_CORES = ["amarelo","verde","vermelho","azul","rosa","laranja","roxo","cinza","marrom","branco"];
+
+  function renderGuiaTexto(texto){
+    var escapado = escapeHtml(texto);
+    var re = /\{\{(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)\|([\s\S]*?)\}\}/g;
+    var comCores = escapado.replace(re, function(match, cor, conteudo){
+      return "<span class='guia-cor-"+cor+"'>"+conteudo+"</span>";
+    });
+    return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  function alternarNegritoSelecao(textareaEl){
+    var inicio = textareaEl.selectionStart;
+    var fim = textareaEl.selectionEnd;
+    if(inicio === fim){
+      showToast("Selecione o trecho que você quer deixar em negrito.");
+      return;
+    }
+    var valor = textareaEl.value;
+    var selecionado = valor.slice(inicio, fim);
+
+    // Caso 1: a seleção inclui os ** dos dois lados -> remove o negrito
+    if(selecionado.length > 4 && selecionado.slice(0,2) === "**" && selecionado.slice(-2) === "**"){
+      var interno = selecionado.slice(2, -2);
+      var novoValor = valor.slice(0, inicio) + interno + valor.slice(fim);
+      textareaEl.value = novoValor;
+      textareaEl.focus();
+      textareaEl.setSelectionRange(inicio, inicio + interno.length);
+      return;
+    }
+
+    // Caso 2: a seleção está "por dentro" de ** já existentes -> remove os ** ao redor
+    if(valor.slice(Math.max(0, inicio-2), inicio) === "**" && valor.slice(fim, fim+2) === "**"){
+      var novoValor2 = valor.slice(0, inicio-2) + selecionado + valor.slice(fim+2);
+      textareaEl.value = novoValor2;
+      textareaEl.focus();
+      textareaEl.setSelectionRange(inicio-2, inicio-2 + selecionado.length);
+      return;
+    }
+
+    // Caso 3: ainda não tem negrito -> adiciona
+    var novoValor3 = valor.slice(0, inicio) + "**" + selecionado + "**" + valor.slice(fim);
+    textareaEl.value = novoValor3;
+    textareaEl.focus();
+    textareaEl.setSelectionRange(inicio+2, inicio+2+selecionado.length);
+  }
+
+  function envolverSelecaoComCor(textareaEl, cor){
+    var inicio = textareaEl.selectionStart;
+    var fim = textareaEl.selectionEnd;
+    if(inicio === fim){
+      showToast("Selecione o termo que você quer colorir antes de clicar na cor.");
+      return;
+    }
+    var valor = textareaEl.value;
+    var selecionado = valor.slice(inicio, fim);
+    var padraoCor = new RegExp("\\{\\{(" + GUIA_CORES.join("|") + ")\\|$");
+
+    // Caso 1: a seleção está "por dentro" de um marcador já existente (ex: selecionou só o texto visível) -> troca a cor
+    var antes = valor.slice(0, inicio);
+    var marcadorAntes = antes.match(padraoCor);
+    var marcadorDepois = valor.slice(fim, fim + 2) === "}}";
+    if(marcadorAntes && marcadorDepois){
+      var novoInicio = inicio - marcadorAntes[0].length;
+      var novoValor = valor.slice(0, novoInicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim + 2);
+      textareaEl.value = novoValor;
+      var posFinal = novoInicio + cor.length + 3 + selecionado.length + 2;
+      textareaEl.focus();
+      textareaEl.setSelectionRange(posFinal, posFinal);
+      return;
+    }
+
+    // Caso 2: a seleção inclui o marcador inteiro (com {{cor| e }}) -> troca a cor
+    var padraoCompleto = new RegExp("^\\{\\{(" + GUIA_CORES.join("|") + ")\\|([\\s\\S]*)\\}\\}$");
+    var marcadorCompleto = selecionado.match(padraoCompleto);
+    if(marcadorCompleto){
+      var conteudoInterno = marcadorCompleto[2];
+      var novoValor2 = valor.slice(0, inicio) + "{{" + cor + "|" + conteudoInterno + "}}" + valor.slice(fim);
+      textareaEl.value = novoValor2;
+      var posFinal2 = inicio + cor.length + 3 + conteudoInterno.length + 2;
+      textareaEl.focus();
+      textareaEl.setSelectionRange(posFinal2, posFinal2);
+      return;
+    }
+
+    // Caso 3: texto sem cor nenhuma ainda -> envolve normalmente
+    var novoValor3 = valor.slice(0, inicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim);
+    textareaEl.value = novoValor3;
+    var posFinal3 = inicio + cor.length + 3 + selecionado.length + 2;
+    textareaEl.focus();
+    textareaEl.setSelectionRange(posFinal3, posFinal3);
+  }
+
+  function renderGuiasRapidos(){
+    var container = document.getElementById("guiasContainer");
+    container.innerHTML = "";
+    var existeAssunto = state.materias.some(function(m){ return m.assuntos.length > 0; });
+    document.getElementById("guiasEmpty").style.display = existeAssunto ? "none" : "block";
+    if(!existeAssunto) return;
+
+    state.materias.forEach(function(m){
+      if(m.assuntos.length === 0) return;
+
+      var bloco = document.createElement("div");
+      bloco.className = "guia-materia-block panel";
+      bloco.style.borderLeft = "4px solid "+m.cor;
+
+      var header = document.createElement("div");
+      header.className = "materia-head";
+      header.innerHTML = "<h3>"+colorDotHtml(m.cor)+escapeHtml(m.nome)+"</h3>";
+      bloco.appendChild(header);
+
+      m.assuntos.forEach(function(a){
+        var guia = guias[a.id];
+        var temGuia = !!(guia && guia.texto);
+
+        var row = document.createElement("div");
+        row.className = "guia-assunto-row";
+
+        var topo = document.createElement("div");
+        topo.className = "guia-assunto-topo";
+        topo.innerHTML =
+          "<span class='guia-assunto-nome'>"+escapeHtml(a.nome)+"</span>"+
+          "<span style='display:flex;align-items:center;gap:10px;'>"+
+          "<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
+          (temGuia?"<button class='btn small editarGuiaDiretoBtn'>Editar</button>":"")+
+          "<button class='btn small toggleGuiaBtn'>"+(guiaAbertoIds[a.id]?"Fechar":(temGuia?"Ver guia":"Adicionar guia"))+"</button>"+
+          "</span>";
+        topo.querySelector(".toggleGuiaBtn").addEventListener("click", function(){
+          guiaAbertoIds[a.id] = !guiaAbertoIds[a.id];
+          renderGuiasRapidos();
+        });
+        if(temGuia){
+          topo.querySelector(".editarGuiaDiretoBtn").addEventListener("click", function(){
+            guiaAbertoIds[a.id] = true;
+            guiaModoEdicao[a.id] = true;
+            renderGuiasRapidos();
+          });
+        }
+        row.appendChild(topo);
+
+        if(guiaAbertoIds[a.id]){
+          var painel = document.createElement("div");
+          painel.className = "guia-painel";
+
+          if(temGuia && !guiaModoEdicao[a.id]){
+            painel.innerHTML =
+              "<div class='guia-texto-leitura'>"+renderGuiaTexto(guia.texto)+"</div>"+
+              "<div class='guia-meta'>"+(guia.nomeArquivo?escapeHtml(guia.nomeArquivo)+" · ":"")+"Atualizado em "+formatDateBR(guia.atualizadoEm||todayISO())+"</div>";
+            var acoesLeitura = document.createElement("div");
+            acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;";
+            var btnEditarGuia = document.createElement("button");
+            btnEditarGuia.className = "btn small"; btnEditarGuia.textContent = "Editar";
+            btnEditarGuia.addEventListener("click", function(){ guiaModoEdicao[a.id] = true; renderGuiasRapidos(); });
+            var btnExcluirGuia = document.createElement("button");
+            btnExcluirGuia.className = "btn small danger"; btnExcluirGuia.textContent = "Excluir guia";
+            btnExcluirGuia.addEventListener("click", function(){
+              if(!confirm('Excluir o guia rápido de "'+a.nome+'"?')) return;
+              excluirGuiaRemota(a.id);
+              renderGuiasRapidos();
+              showToast("Guia excluído.");
+            });
+            acoesLeitura.appendChild(btnEditarGuia);
+            acoesLeitura.appendChild(btnExcluirGuia);
+            painel.appendChild(acoesLeitura);
+          } else {
+            var wrapImport = document.createElement("div");
+            wrapImport.innerHTML =
+              "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Importar arquivo (.pdf, .docx, .html, .txt)</label>"+
+              "<input type='file' class='guiaFileInput' accept='.pdf,.docx,.html,.htm,.txt'>"+
+              "<p style='font-size:11px;color:var(--text-faint);margin:6px 0 12px;'>A leitura de PDF/.docx precisa de internet no momento da importação.</p>"+
+              "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Ou cole/edite o texto aqui</label>"+
+              "<textarea class='guiaTextarea' style='min-height:180px;'></textarea>"+
+              "<div class='guia-toolbar-cores'>"+
+              "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
+              "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
+              "<span class='guia-toolbar-divisor'></span>"+
+              "<button type='button' class='guia-cor-btn cor-amarelo' data-cor='amarelo'>Amarelo</button>"+
+              "<button type='button' class='guia-cor-btn cor-verde' data-cor='verde'>Verde</button>"+
+              "<button type='button' class='guia-cor-btn cor-vermelho' data-cor='vermelho'>Vermelho</button>"+
+              "<button type='button' class='guia-cor-btn cor-azul' data-cor='azul'>Azul</button>"+
+              "<button type='button' class='guia-cor-btn cor-rosa' data-cor='rosa'>Rosa</button>"+
+              "<button type='button' class='guia-cor-btn cor-laranja' data-cor='laranja'>Laranja</button>"+
+              "<button type='button' class='guia-cor-btn cor-roxo' data-cor='roxo'>Roxo</button>"+
+              "<button type='button' class='guia-cor-btn cor-cinza' data-cor='cinza'>Cinza</button>"+
+              "<button type='button' class='guia-cor-btn cor-marrom' data-cor='marrom'>Marrom</button>"+
+              "<button type='button' class='guia-cor-btn cor-branco' data-cor='branco'>Branco (remover cor)</button>"+
+              "</div>"+
+              "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa cor pra destacar (dá pra combinar os dois). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique em \"Branco\".</p>";
+            painel.appendChild(wrapImport);
+
+            var textareaEl = painel.querySelector(".guiaTextarea");
+            textareaEl.value = temGuia ? guia.texto : "";
+            var fileInputEl = painel.querySelector(".guiaFileInput");
+
+            wrapImport.querySelector("#guiaBtnNegrito").addEventListener("click", function(){
+              alternarNegritoSelecao(textareaEl);
+            });
+
+            wrapImport.querySelectorAll(".guia-cor-btn").forEach(function(botaoCor){
+              botaoCor.addEventListener("click", function(){
+                envolverSelecaoComCor(textareaEl, botaoCor.getAttribute("data-cor"));
+              });
+            });
+
+            var acoesImport = document.createElement("div");
+            acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;";
+            var btnSalvarGuia = document.createElement("button");
+            btnSalvarGuia.className = "btn primary small"; btnSalvarGuia.textContent = "Salvar guia";
+            var btnCancelarGuia = document.createElement("button");
+            btnCancelarGuia.className = "btn small"; btnCancelarGuia.textContent = "Cancelar";
+            acoesImport.appendChild(btnSalvarGuia);
+            acoesImport.appendChild(btnCancelarGuia);
+            painel.appendChild(acoesImport);
+
+            fileInputEl.addEventListener("change", function(e){
+              var file = e.target.files[0];
+              if(!file) return;
+              showToast("Lendo arquivo...");
+              extrairTextoArquivo(file).then(function(texto){
+                textareaEl.value = texto.trim();
+                showToast("Texto extraído! Revise antes de salvar.");
+              }).catch(function(err){
+                console.error(err);
+                showToast(err.message || "Não foi possível ler esse arquivo.");
+              });
+            });
+
+            btnCancelarGuia.addEventListener("click", function(){
+              guiaModoEdicao[a.id] = false;
+              if(!temGuia) guiaAbertoIds[a.id] = false;
+              renderGuiasRapidos();
+            });
+
+            btnSalvarGuia.addEventListener("click", function(){
+              var texto = textareaEl.value.trim();
+              if(!texto){ showToast("Cole ou importe algum texto antes de salvar."); return; }
+              var novoGuia = {
+                texto: texto,
+                nomeArquivo: (fileInputEl.files[0] ? fileInputEl.files[0].name : (guia ? guia.nomeArquivo : "")) || "",
+                atualizadoEm: todayISO()
+              };
+              salvarGuiaRemota(a.id, novoGuia);
+              guiaModoEdicao[a.id] = false;
+              renderGuiasRapidos();
+              showToast("Guia salvo.");
+            });
+          }
+
+          row.appendChild(painel);
+        }
+
+        bloco.appendChild(row);
+      });
+
+      container.appendChild(bloco);
+    });
+  }
+
+  /* ---------------- CADERNO DE ERROS ---------------- */
+  function populateCadernoSelects(){
+    var selM = document.getElementById("cadMateria");
+    var selA = document.getElementById("cadAssunto");
+    var prevM = selM.value;
+    var prevA = selA.value;
+    selM.innerHTML = '<option value="">Selecione</option>';
+    state.materias.forEach(function(m){
+      var o = document.createElement("option");
+      o.value = m.id; o.textContent = m.nome;
+      o.style.color = m.cor || "";
+      selM.appendChild(o);
+    });
+    if(prevM) selM.value = prevM;
+    populateAssuntoSelectFor(selA, selM.value, prevA);
+    selA.querySelector("option").textContent = "Selecione";
+  }
+  document.getElementById("cadMateria").addEventListener("change", function(){
+    populateAssuntoSelectFor(document.getElementById("cadAssunto"), this.value, "");
+    document.getElementById("cadAssunto").querySelector("option").textContent = "Selecione";
+  });
+
+  function abrirCadernoComPreset(materiaId, assuntoId){
+    var btnCaderno = document.querySelector('nav.tabs button[data-tab="caderno"]');
+    if(btnCaderno) btnCaderno.click();
+    populateCadernoSelects();
+    document.getElementById("cadMateria").value = materiaId;
+    populateAssuntoSelectFor(document.getElementById("cadAssunto"), materiaId, assuntoId);
+    document.getElementById("cadAssunto").querySelector("option").textContent = "Selecione";
+    if(!document.getElementById("cadData").value) document.getElementById("cadData").value = todayISO();
+    document.getElementById("cadEnunciado").focus();
+  }
+
+  document.getElementById("btnAddErro").addEventListener("click", function(){
+    var materiaId = document.getElementById("cadMateria").value;
+    var assuntoId = document.getElementById("cadAssunto").value;
+    var data = document.getElementById("cadData").value || todayISO();
+    var banca = document.getElementById("cadBanca").value.trim();
+    var tipoErro = document.getElementById("cadTipoErro").value.trim();
+    var enunciado = document.getElementById("cadEnunciado").value.trim();
+    var anotacao = document.getElementById("cadAnotacao").value.trim();
+    if(!materiaId){ showToast("Selecione a matéria."); return; }
+    if(!enunciado){ showToast("Descreva a questão que você errou."); return; }
+    state.cadernoErros.push({
+      id: uid(), materiaId: materiaId, assuntoId: assuntoId || "",
+      data: data, banca: banca, tipoErro: tipoErro,
+      enunciado: enunciado, anotacao: anotacao, resolvida: false
+    });
+    saveState();
+    document.getElementById("cadBanca").value = "";
+    document.getElementById("cadTipoErro").value = "";
+    document.getElementById("cadEnunciado").value = "";
+    document.getElementById("cadAnotacao").value = "";
+    renderCaderno();
+    showToast("Questão adicionada ao caderno.");
+  });
+
+  document.getElementById("cadBusca").addEventListener("input", renderCaderno);
+  document.getElementById("cadFiltroStatus").addEventListener("change", renderCaderno);
+
+  function renderCaderno(){
+    populateCadernoSelects();
+    var container = document.getElementById("cadernoList");
+    container.innerHTML = "";
+    var busca = (document.getElementById("cadBusca").value || "").trim().toLowerCase();
+    var filtroStatus = document.getElementById("cadFiltroStatus").value;
+    var lista = state.cadernoErros.slice().sort(function(a,b){ return (b.data||"").localeCompare(a.data||""); });
+
+    lista = lista.filter(function(item){
+      if(filtroStatus === "pendentes" && item.resolvida) return false;
+      if(filtroStatus === "revisados" && !item.resolvida) return false;
+      if(busca){
+        var m = findMateria(item.materiaId);
+        var a = m ? findAssunto(m.id, item.assuntoId) : null;
+        var textoBusca = [
+          item.enunciado, item.anotacao, item.banca, item.tipoErro,
+          m ? m.nome : "", a ? a.nome : ""
+        ].join(" ").toLowerCase();
+        if(textoBusca.indexOf(busca) === -1) return false;
+      }
+      return true;
+    });
+
+    document.getElementById("cadernoEmpty").style.display = lista.length ? "none" : "block";
+    lista.forEach(function(item){
+      var m = findMateria(item.materiaId);
+      var a = m ? findAssunto(m.id, item.assuntoId) : null;
+      var div = document.createElement("div");
+      div.className = "caderno-item";
+
+      var head = document.createElement("div");
+      head.className = "caderno-head";
+      var infoSpan = document.createElement("span");
+      var etiquetas = [];
+      if(item.banca) etiquetas.push(escapeHtml(item.banca));
+      if(item.tipoErro) etiquetas.push(escapeHtml(item.tipoErro));
+      infoSpan.innerHTML = formatDateBR(item.data) + " · " + (m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—") + (a ? " · "+escapeHtml(a.nome) : "") + (etiquetas.length ? " · "+etiquetas.join(" · ") : "");
+      head.appendChild(infoSpan);
+      var tagSpan = document.createElement("span");
+      tagSpan.className = "tag" + (item.resolvida ? " concluido" : "");
+      tagSpan.textContent = item.resolvida ? "Revisado" : "Pendente";
+      head.appendChild(tagSpan);
+      div.appendChild(head);
+
+      var enun = document.createElement("div");
+      enun.className = "caderno-enunciado";
+      enun.textContent = item.enunciado;
+      div.appendChild(enun);
+
+      if(item.anotacao){
+        var anot = document.createElement("div");
+        anot.className = "caderno-anotacao";
+        anot.textContent = item.anotacao;
+        div.appendChild(anot);
+      }
+
+      var acoes = document.createElement("div");
+      acoes.style.cssText = "display:flex;gap:8px;";
+      var toggleBtn = document.createElement("button");
+      toggleBtn.className = "btn small";
+      toggleBtn.textContent = item.resolvida ? "Marcar como pendente" : "Marcar como revisado";
+      toggleBtn.addEventListener("click", function(){
+        item.resolvida = !item.resolvida;
+        saveState();
+        renderCaderno();
+      });
+      var delBtn = document.createElement("button");
+      delBtn.className = "btn small danger";
+      delBtn.textContent = "Excluir";
+      delBtn.addEventListener("click", function(){
+        state.cadernoErros = state.cadernoErros.filter(function(x){ return x.id !== item.id; });
+        saveState();
+        renderCaderno();
+      });
+      acoes.appendChild(toggleBtn);
+      acoes.appendChild(delBtn);
+      div.appendChild(acoes);
+
+
+      container.appendChild(div);
+    });
+  }
+
+  document.getElementById("btnEditEdital").addEventListener("click", function(){
+    document.getElementById("editalTextarea").value = state.edital.texto || "";
+    document.getElementById("editalReadMode").style.display = "none";
+    document.getElementById("editalEditMode").style.display = "block";
+  });
+  document.getElementById("btnCancelEdital").addEventListener("click", function(){
+    document.getElementById("editalReadMode").style.display = "block";
+    document.getElementById("editalEditMode").style.display = "none";
+  });
+  document.getElementById("btnSaveEdital").addEventListener("click", function(){
+    state.edital.texto = document.getElementById("editalTextarea").value;
+    state.edital.atualizadoEm = todayISO();
+    saveState();
+    document.getElementById("editalReadMode").style.display = "block";
+    document.getElementById("editalEditMode").style.display = "none";
+    renderEdital();
+    showToast("Edital salvo.");
+  });
+  function reconstruirTextoComLinhas(items){
+    if(items.length === 0) return "";
+    var tolerancia = 2;
+    var linhas = [];
+    items.forEach(function(item){
+      var y = item.transform[5];
+      var linhaExistente = null;
+      for(var i=0;i<linhas.length;i++){
+        if(Math.abs(linhas[i].y - y) <= tolerancia){ linhaExistente = linhas[i]; break; }
+      }
+      if(linhaExistente){
+        linhaExistente.itens.push(item);
+      } else {
+        linhas.push({ y: y, itens: [item] });
+      }
+    });
+    linhas.sort(function(a,b){ return b.y - a.y; });
+    return linhas.map(function(linha){
+      linha.itens.sort(function(a,b){ return a.transform[4] - b.transform[4]; });
+      var partes = [];
+      var xAnterior = null;
+      linha.itens.forEach(function(item){
+        var x = item.transform[4];
+        if(xAnterior !== null && (x - xAnterior) > 20){
+          partes.push("   ");
+        }
+        partes.push(item.str);
+        xAnterior = x + (item.width || 0);
+      });
+      return partes.join("");
+    }).join("\n");
+  }
+
+  function extrairTextoPDF(file){
+    return file.arrayBuffer().then(function(buffer){
+      return pdfjsLib.getDocument({ data: buffer }).promise;
+    }).then(function(pdf){
+      var paginas = [];
+      for(var i=1;i<=pdf.numPages;i++){ paginas.push(i); }
+      return paginas.reduce(function(promessa, numPagina){
+        return promessa.then(function(textoAcumulado){
+          return pdf.getPage(numPagina).then(function(page){
+            return page.getTextContent();
+          }).then(function(content){
+            var textoPagina = reconstruirTextoComLinhas(content.items);
+            return textoAcumulado + textoPagina + "\n\n";
+          });
+        });
+      }, Promise.resolve(""));
+    });
+  }
+
+  document.getElementById("editalFileInput").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var ehPDF = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if(ehPDF){
+      showToast("Lendo PDF, aguarde...");
+      extrairTextoPDF(file).then(function(texto){
+        document.getElementById("editalTextarea").value = texto.trim();
+        showToast("PDF importado! Revise o texto antes de salvar.");
+      }).catch(function(err){
+        console.error(err);
+        showToast("Não foi possível ler esse PDF. Tente copiar e colar o texto manualmente.");
+      });
+    } else {
+      var reader = new FileReader();
+      reader.onload = function(evt){
+        document.getElementById("editalTextarea").value = evt.target.result;
+      };
+      reader.readAsText(file, "UTF-8");
+    }
+  });
+
+  /* ---------------- PAINEL / DASHBOARD ---------------- */
+  function gerarGraficoLinha(dias7){
+    var w = 340, h = 150, padTop = 20, padBottom = 26, padX = 16;
+    var innerW = w - padX*2;
+    var innerH = h - padTop - padBottom;
+    var max = Math.max.apply(null, dias7.map(function(d){ return d.total; }).concat([1]));
+    var stepX = dias7.length>1 ? innerW/(dias7.length-1) : 0;
+    var diasSemana = ["dom","seg","ter","qua","qui","sex","sáb"];
+    var pontos = dias7.map(function(d,i){
+      var x = padX + stepX*i;
+      var y = padTop + innerH - (max>0 ? (d.total/max)*innerH : 0);
+      return { x:x, y:y, d:d };
+    });
+    var linhaPath = pontos.map(function(p,i){ return (i===0?"M":"L")+p.x.toFixed(1)+","+p.y.toFixed(1); }).join(" ");
+    var areaPath = linhaPath + " L"+pontos[pontos.length-1].x.toFixed(1)+","+(padTop+innerH)+
+      " L"+pontos[0].x.toFixed(1)+","+(padTop+innerH)+" Z";
+
+    var idxMaior = -1, maiorValor = -1;
+    dias7.forEach(function(d, idx){
+      if(d.total > maiorValor){ maiorValor = d.total; idxMaior = idx; }
+    });
+
+    var pontosSvg = pontos.map(function(p, idx){
+      var ehHoje = p.d.ehHoje;
+      var r = ehHoje ? 4.5 : 3;
+      var corPonto = ehHoje ? "var(--accent-brass)" : "var(--accent-sky)";
+      var mostrarValor = p.d.total > 0 && (ehHoje || idx === idxMaior);
+      var valorLabel = mostrarValor ?
+        "<text x='"+p.x.toFixed(1)+"' y='"+(p.y-10).toFixed(1)+"' text-anchor='middle' style='font-size:9px;fill:var(--text-faint);font-family:var(--font-mono);'>"+formatDuration(p.d.total)+"</text>" : "";
+      return "<circle cx='"+p.x.toFixed(1)+"' cy='"+p.y.toFixed(1)+"' r='"+r+"' style='fill:"+corPonto+";'/>"+valorLabel;
+    }).join("");
+
+    var labelsSvg = pontos.map(function(p){
+      var diaIdx = new Date(p.d.data+"T00:00:00").getDay();
+      var corLabel = p.d.ehHoje ? "var(--accent-brass)" : "var(--text-muted)";
+      return "<text x='"+p.x.toFixed(1)+"' y='"+(h-8)+"' text-anchor='middle' style='font-size:10px;fill:"+corLabel+";font-family:var(--font-body);'>"+diasSemana[diaIdx]+"</text>";
+    }).join("");
+
+    return "<svg viewBox='0 0 "+w+" "+h+"' style='width:100%;height:auto;display:block;overflow:visible;'>"+
+      "<defs><linearGradient id='areaGrad' x1='0' y1='0' x2='0' y2='1'>"+
+        "<stop offset='0%' style='stop-color:var(--accent-sky);stop-opacity:0.35;'/>"+
+        "<stop offset='100%' style='stop-color:var(--accent-sky);stop-opacity:0;'/>"+
+      "</linearGradient></defs>"+
+      "<path d='"+areaPath+"' style='fill:url(#areaGrad);stroke:none;'/>"+
+      "<path d='"+linhaPath+"' style='fill:none;stroke:var(--accent-sky);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;'/>"+
+      pontosSvg + labelsSvg +
+    "</svg>";
+  }
+
+  function gerarMiniBarras(dias7){
+    var w=88, h=26;
+    var slot = w/dias7.length;
+    var barW = slot*0.55;
+    var max = Math.max.apply(null, dias7.map(function(d){ return d.total; }).concat([1]));
+    var bars = dias7.map(function(d,i){
+      var x = i*slot + (slot-barW)/2;
+      var bh = max>0 ? Math.max((d.total/max)*h, d.total>0?3:1) : 1;
+      var y = h-bh;
+      var cor = d.ehHoje ? "var(--accent-brass)" : "var(--accent-sky)";
+      var op = d.ehHoje ? 1 : 0.5;
+      return "<rect x='"+x.toFixed(1)+"' y='"+y.toFixed(1)+"' width='"+barW.toFixed(1)+"' height='"+bh.toFixed(1)+"' rx='1.5' style='fill:"+cor+";opacity:"+op+";'/>";
+    }).join("");
+    return "<svg viewBox='0 0 "+w+" "+h+"' style='width:76px;height:22px;display:block;margin-top:8px;'>"+bars+"</svg>";
+  }
+
+  function gerarGraficoDonut(porMateria){
+    var total = porMateria.reduce(function(s,p){ return s+p.total; },0);
+    if(total <= 0) return "";
+    var cx=110, cy=110, r=76, largura=44;
+    var circunferencia = 2*Math.PI*r;
+    var anguloAcumulado = -90;
+    var arcos = porMateria.map(function(p){
+      var fracao = p.total/total;
+      var comprimento = fracao*circunferencia;
+      var gap = circunferencia - comprimento;
+      var rotacao = anguloAcumulado;
+      anguloAcumulado += fracao*360;
+      return "<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' style='fill:none;stroke:"+p.cor+";stroke-width:"+largura+";' "+
+        "stroke-dasharray='"+comprimento.toFixed(2)+" "+gap.toFixed(2)+"' "+
+        "transform='rotate("+rotacao.toFixed(2)+" "+cx+" "+cy+")'/>";
+    }).join("");
+    return "<svg viewBox='0 0 220 220' style='width:220px;height:220px;flex-shrink:0;'>"+
+      arcos+
+      "<circle cx='"+cx+"' cy='"+cy+"' r='"+(r-largura/2-3)+"' style='fill:var(--bg-panel);'/>"+
+    "</svg>";
+  }
+
+  function renderPainelDashboard(){
+    var hoje = todayISO();
+    var seteDiasAtras = addDaysISO(hoje, -7);
+
+    var totalGeral = state.sessions.reduce(function(a,s){ return a+s.duracaoSec; },0);
+    var totalHoje = state.sessions.filter(function(s){ return s.data===hoje; })
+      .reduce(function(a,s){ return a+s.duracaoSec; },0);
+    var totalSemana = state.sessions.filter(function(s){ return s.data>=seteDiasAtras; })
+      .reduce(function(a,s){ return a+s.duracaoSec; },0);
+    var revisoesPendentes = state.revisoes.filter(function(r){ return !r.feita && r.data<=hoje; }).length;
+    var errosPendentes = state.cadernoErros.filter(function(e){ return !e.resolvida; }).length;
+
+    var diasSemanaLabels = ["dom","seg","ter","qua","qui","sex","sáb"];
+    var dias7 = [];
+    for(var i=6;i>=0;i--){
+      var diaISO = addDaysISO(hoje, -i);
+      var totalDia = state.sessions.filter(function(s){ return s.data===diaISO; })
+        .reduce(function(a,s){ return a+s.duracaoSec; },0);
+      dias7.push({ data: diaISO, total: totalDia, ehHoje: diaISO===hoje });
+    }
+
+    renderMetaDiaria(totalHoje);
+
+    var totalCertas = 0, totalErradas = 0;
+    state.materias.forEach(function(m){
+      m.assuntos.forEach(function(a){
+        totalCertas += (a.questoesCertas || 0);
+        totalErradas += (a.questoesErradas || 0);
+      });
+    });
+    var totalQuestoes = totalCertas + totalErradas;
+    var aproveitamentoNum = totalQuestoes > 0 ? Math.round((totalCertas/totalQuestoes)*100) : null;
+
+    var ICONS = {
+      clock: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg>",
+      calendar: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='16' rx='2'/><path d='M3 10h18'/><path d='M8 3v4M16 3v4'/></svg>",
+      calendarCheck: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='5' width='18' height='16' rx='2'/><path d='M3 10h18'/><path d='M8 3v4M16 3v4'/><path d='M9 15l2 2 4-4'/></svg>",
+      book: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z'/><path d='M4 5.5v15'/></svg>",
+      checkCircle: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg>",
+      alert: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l10 18H2z'/><path d='M12 9v5'/><path d='M12 17h.01'/></svg>",
+      percent: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><line x1='19' y1='5' x2='5' y2='19'/><circle cx='6.5' cy='6.5' r='2.7'/><circle cx='17.5' cy='17.5' r='2.7'/></svg>"
+    };
+
+    var grid = document.getElementById("statGrid");
+    grid.innerHTML = "";
+    var statsConfig = [
+      { icon:"clock", color:"var(--accent-sky)", value: formatDuration(totalGeral), label:"Tempo líquido total" },
+      { icon:"clock", color:"var(--accent-brass)", value: formatDuration(totalHoje), label:"Hoje" },
+      { icon:"calendar", color:"var(--accent-sky)", value: formatDuration(totalSemana), label:"Últimos 7 dias" },
+      { icon:"calendarCheck", color: revisoesPendentes>0 ? "var(--warn)" : "var(--success)", value: String(revisoesPendentes), label:"Revisões pendentes" },
+      { icon:"book", color:"var(--accent-brass)", value: String(state.materias.length), label:"Matérias cadastradas" },
+      { icon:"checkCircle", color:"var(--success)", value: String(totalQuestoes), label:"Questões resolvidas" },
+      { icon:"percent", color: aproveitamentoNum===null ? "var(--border-soft)" : (aproveitamentoNum>=70?"var(--success)":(aproveitamentoNum>=40?"var(--warn)":"var(--danger)")), value: aproveitamentoNum===null ? "—" : aproveitamentoNum+"%", label:"Aproveitamento" },
+      { icon:"alert", color: errosPendentes>0 ? "var(--danger)" : "var(--success)", value: String(errosPendentes), label:"Erros pendentes no caderno" }
+    ];
+    statsConfig.forEach(function(s, idx){
+      var card = document.createElement("div");
+      card.className = "stat-card";
+      card.innerHTML =
+        "<span class='stat-icon-big'>"+ICONS[s.icon]+"</span>"+
+        "<span class='stat-label-top'>"+s.label+"</span>"+
+        "<span class='status-pill' style='background:"+s.color+"'>"+s.value+"</span>"+
+        (idx===0 ? gerarMiniBarras(dias7) : "");
+      grid.appendChild(card);
+    });
+
+    var weekChart = document.getElementById("weekChart");
+    weekChart.innerHTML = gerarGraficoLinha(dias7);
+
+    var barList = document.getElementById("barList");
+    barList.innerHTML = "";
+    var porMateria = state.materias.map(function(m){
+      var total = state.sessions.filter(function(s){ return s.materiaId===m.id; })
+        .reduce(function(a,s){ return a+s.duracaoSec; },0);
+      return { nome: m.nome, total: total, cor: m.cor };
+    }).filter(function(x){ return x.total > 0; })
+      .sort(function(a,b){ return b.total - a.total; });
+
+    var donutWrap = document.getElementById("materiaDonutWrap");
+    donutWrap.innerHTML = gerarGraficoDonut(porMateria);
+    donutWrap.style.display = porMateria.length > 0 ? "flex" : "none";
+
+    if(porMateria.length === 0){
+      barList.className = "";
+      barList.innerHTML = "<div class='empty-state'>Ainda não há sessões registradas. Use o cronômetro para começar.</div>";
+    } else {
+      barList.className = "materia-legenda-lista";
+      barList.style.cssText = "";
+      porMateria.forEach(function(p){
+        var item = document.createElement("div");
+        item.className = "materia-legenda-linha";
+        item.innerHTML =
+          colorDotHtml(p.cor)+
+          "<span class='materia-legenda-nome'>"+escapeHtml(p.nome)+"</span>"+
+          "<span style='font-family:var(--font-mono);font-size:13.5px;font-weight:600;color:"+p.cor+";'>"+formatDuration(p.total)+"</span>";
+        barList.appendChild(item);
+      });
+    }
+
+    var assuntoBarList = document.getElementById("assuntoBarList");
+    assuntoBarList.innerHTML = "";
+    var existeAlgumAssunto = state.materias.some(function(m){ return m.assuntos.length > 0; });
+
+    if(!existeAlgumAssunto){
+      assuntoBarList.innerHTML = "<div class='empty-state'>Cadastre assuntos dentro das matérias para ver esse comparativo.</div>";
+    } else {
+      state.materias.forEach(function(m){
+        if(m.assuntos.length === 0) return;
+
+        var assuntosDaMateria = m.assuntos.map(function(a){
+          var total = state.sessions
+            .filter(function(s){ return s.materiaId===m.id && s.assuntoId===a.id; })
+            .reduce(function(acc,s){ return acc+s.duracaoSec; },0);
+          var certas = a.questoesCertas || 0;
+          var erradas = a.questoesErradas || 0;
+          var totalQ = certas + erradas;
+          var aproveitamento = totalQ > 0 ? Math.round((certas/totalQ)*100) : null;
+          return { assuntoNome: a.nome, total: total, aproveitamento: aproveitamento };
+        });
+
+        var grupoHeader = document.createElement("div");
+        grupoHeader.className = "assunto-grupo-header";
+        grupoHeader.style.color = m.cor;
+        grupoHeader.innerHTML = colorDotHtml(m.cor)+escapeHtml(m.nome);
+        assuntoBarList.appendChild(grupoHeader);
+
+        assuntosDaMateria.forEach(function(p){
+          var row = document.createElement("div");
+          row.className = "assunto-tempo-row";
+          var corAprov = p.aproveitamento===null ? "var(--text-faint)" : (p.aproveitamento>=70?"var(--success)":(p.aproveitamento>=40?"var(--warn)":"var(--danger)"));
+          row.innerHTML =
+            "<div class='assunto-tempo-nome'>"+escapeHtml(p.assuntoNome)+"</div>"+
+            "<div class='assunto-tempo-aprov' style='color:"+corAprov+";' title='Aproveitamento em questões'>"+(p.aproveitamento===null?"—":p.aproveitamento+"%")+"</div>"+
+            "<div class='assunto-tempo-valor' style='color:"+(p.total>0?m.cor:"var(--text-faint)")+";'>"+(p.total>0?formatDuration(p.total):"—")+"</div>";
+          assuntoBarList.appendChild(row);
+        });
+      });
+    }
+  }
+
+  function escapeHtml(str){
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ---------------- BACKUP ---------------- */
+  document.getElementById("btnExportBackup").addEventListener("click", function(){
+    try{
+      var dadosCompletos = Object.assign({}, state, { guias: guias });
+      var dataStr = JSON.stringify(dadosCompletos, null, 2);
+      var blob = new Blob([dataStr], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "backup-painel-estudos-" + todayISO() + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      document.getElementById("backupMeta").textContent = "Último backup exportado agora, em " + new Date().toLocaleString("pt-BR") + ".";
+      showToast("Backup exportado.");
+    }catch(e){
+      console.error(e);
+      showToast("Não foi possível exportar o backup.");
+    }
+  });
+
+  document.getElementById("importBackupInput").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        var parsed = JSON.parse(evt.target.result);
+        if(!parsed || typeof parsed !== "object" || !Array.isArray(parsed.materias)){
+          showToast("Arquivo inválido: não parece um backup deste painel.");
+          return;
+        }
+        if(!confirm("Importar este backup vai substituir todos os dados atuais do painel (matérias, sessões, revisões, edital e guias rápidos). Deseja continuar?")) return;
+        var d = defaultState();
+        state = {
+          materias: parsed.materias || [],
+          sessions: parsed.sessions || [],
+          revisoes: parsed.revisoes || [],
+          cadernoErros: parsed.cadernoErros || [],
+          edital: parsed.edital || d.edital,
+          editalTopicos: parsed.editalTopicos || [],
+          concurso: parsed.concurso || d.concurso,
+          metaDiariaMin: (parsed.metaDiariaMin!==undefined && parsed.metaDiariaMin!==null) ? parsed.metaDiariaMin : d.metaDiariaMin,
+          checkins: parsed.checkins || {},
+          gradeHoraria: parsed.gradeHoraria || d.gradeHoraria,
+          timer: d.timer
+        };
+        saveState();
+        guias = parsed.guias || {};
+        try{ localStorage.setItem(STORAGE_KEY+"_guias", JSON.stringify(guias)); }catch(e){}
+        Object.keys(guias).forEach(function(assuntoId){
+          salvarGuiaRemota(assuntoId, guias[assuntoId]);
+        });
+        renderAll();
+        document.getElementById("backupMeta").textContent = "Backup importado em " + new Date().toLocaleString("pt-BR") + ".";
+        showToast("Backup importado com sucesso.");
+      }catch(err){
+        console.error(err);
+        showToast("Não foi possível ler o arquivo. Verifique se é um backup válido.");
+      }
+      e.target.value = "";
+    };
+    reader.readAsText(file, "UTF-8");
+  });
+
+  /* ---------------- RENDER ALL ---------------- */
+  function renderAll(){
+    populateTimerSelects();
+    refreshTimerControls();
+    updateTimerDisplay();
+    renderCronometroSessions();
+    renderMaterias();
+    renderRevisoes();
+    renderCaderno();
+    renderEdital();
+    renderEditalChecklist();
+    renderConcurso();
+    renderGradeHoraria();
+    renderCheckin();
+    renderCheckinHistorico();
+    renderGuiasRapidos();
+    renderPainelDashboard();
+  }
+
+  function mostrarModalRevisoesDoDia(){
+    var hoje = todayISO();
+    var pendentesHoje = state.revisoes.filter(function(r){ return !r.feita && r.data === hoje; });
+    var atrasadas = state.revisoes.filter(function(r){ return !r.feita && r.data < hoje; });
+    if(pendentesHoje.length === 0 && atrasadas.length === 0) return;
+
+    var body = document.getElementById("revisoesModalBody");
+    body.innerHTML = "";
+
+    function bloco(titulo, lista, corTitulo){
+      if(lista.length === 0) return;
+      var h = document.createElement("div");
+      h.style.cssText = "font-family:var(--font-head);font-weight:600;font-size:13px;margin:12px 0 4px;color:"+corTitulo+";";
+      h.textContent = titulo;
+      body.appendChild(h);
+      lista.forEach(function(r){
+        var m = findMateria(r.materiaId);
+        var a = m ? findAssunto(m.id, r.assuntoId) : null;
+        var etapaObj = ETAPAS.find(function(e){ return e.key===r.etapa; });
+        var item = document.createElement("div");
+        item.className = "modal-item";
+        item.innerHTML =
+          "<span>"+(etapaObj ? "<strong>["+etapaObj.label+"]</strong> " : "")+
+          (m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+
+          (a ? " — "+escapeHtml(a.nome) : "")+"</span>";
+        body.appendChild(item);
+      });
+    }
+
+    bloco("Hoje", pendentesHoje, "var(--accent-sky)");
+    bloco("Atrasadas", atrasadas, "var(--danger)");
+
+    document.getElementById("revisoesModalOverlay").style.display = "flex";
+  }
+
+  document.getElementById("btnFecharModal").addEventListener("click", function(){
+    document.getElementById("revisoesModalOverlay").style.display = "none";
+  });
+  document.getElementById("btnIrRevisoesModal").addEventListener("click", function(){
+    document.getElementById("revisoesModalOverlay").style.display = "none";
+    var btnRev = document.querySelector('nav.tabs button[data-tab="revisoes"]');
+    if(btnRev) btnRev.click();
+  });
+
+  Promise.all([carregarEstado(), carregarGuias()]).then(function(resultados){
+    state = resultados[0];
+    guias = resultados[1] || {};
+    var overlay = document.getElementById("loadingOverlay");
+    if(overlay) overlay.style.display = "none";
+    renderAll();
+    mostrarModalRevisoesDoDia();
+  }).catch(function(e){
+    console.error("Falha ao carregar estado", e);
+    var overlay = document.getElementById("loadingOverlay");
+    if(overlay) overlay.style.display = "none";
+    renderAll();
+  });
+
+  window.addEventListener("beforeunload", function(){
+    if(state.timer.rodando){
+      state.timer.acumulado = currentElapsedSeconds();
+      state.timer.inicio = Date.now();
+      saveState();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
