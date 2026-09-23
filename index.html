@@ -355,6 +355,55 @@
     align-items:center;
   }
   .assunto-grupo-header:first-child{margin-top:0;}
+
+  .assunto-subgrupo-header{
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:12.5px;color:var(--text-muted);
+    margin:10px 0 4px;
+    padding-left:4px;
+  }
+  .sessao-row{
+    display:flex;align-items:center;gap:12px;
+    padding:7px 0 7px 16px;
+    border-bottom:1px solid var(--border-subtle, var(--border-soft));
+  }
+  .sessao-row .sessao-duracao{
+    font-family:var(--font-mono);font-size:12.5px;color:var(--text-primary);
+    width:64px;flex-shrink:0;
+  }
+  .sessao-row .sessao-data{
+    font-family:var(--font-mono);font-size:12.5px;color:var(--text-primary);
+    min-width:82px;flex-shrink:0;cursor:pointer;
+    border-bottom:1px dashed var(--border-soft);
+    width:fit-content;
+  }
+  .sessao-row .sessao-data:hover{color:var(--accent-brass);border-color:var(--accent-brass);}
+  .sessao-row .btn{margin-left:auto;}
+
+  .revisao-card{
+    padding:14px 4px;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .revisao-card:last-child{border-bottom:none;}
+  .revisao-cab{
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+    margin-bottom:10px;
+  }
+  .revisao-cab .rev-data{font-family:var(--font-mono);font-size:12.5px;color:var(--text-muted);flex-shrink:0;}
+  .revisao-cab .rev-materia{display:flex;align-items:center;gap:4px;font-size:13px;flex-shrink:0;}
+  .revisao-cab .rev-assunto{font-size:13px;color:var(--text-primary);flex:1;min-width:120px;}
+  .revisao-cab .rev-marco{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);flex-shrink:0;}
+  .revisao-acoes{display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
+  .revisao-questoes-grupo{display:flex;flex-wrap:wrap;align-items:center;gap:14px;}
+  .revisao-pct{
+    font-family:var(--font-mono);font-size:12.5px;font-weight:600;
+    padding:3px 9px;border-radius:10px;border:1px solid var(--border-soft);
+    color:var(--text-muted);flex-shrink:0;
+  }
+  .revisao-pct.ok{color:var(--success);border-color:var(--success-dim);background:rgba(52,211,153,0.08);}
+  .revisao-pct.alerta{color:var(--danger);border-color:var(--danger-dim);background:rgba(251,113,133,0.08);}
+  .revisao-alerta-texto{font-size:11.5px;color:var(--danger);flex-basis:100%;}
+  .revisao-botoes-simples{display:flex;flex-wrap:wrap;gap:6px;}
   .assunto-tempo-row{
     display:flex;
     align-items:center;
@@ -650,12 +699,36 @@
   }
   .acoes-assunto-wrap .btn{width:100%;}
 
+  .subassuntos-tr td{ border-top:none; padding-top:0; padding-bottom:12px; background:var(--bg-panel-alt); }
+  .subassuntos-wrap{ padding:8px 6px 2px 26px; }
+  .subassuntos-lista{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .subassunto-chip{
+    display:inline-flex; align-items:center; gap:4px;
+    background:var(--bg-panel); border:1px solid var(--border-soft);
+    border-radius:12px; padding:3px 6px 3px 10px;
+    font-size:12px; color:var(--text-primary);
+  }
+  .subassunto-add{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .subassunto-add input{
+    flex:1; min-width:160px; max-width:320px;
+    background:var(--bg-input); border:1px solid var(--border-soft);
+    color:var(--text-primary); border-radius:8px; padding:6px 10px; font-size:12.5px;
+    font-family:var(--font-body);
+  }
+
   .guia-materia-block{margin-bottom:22px;}
   .guia-assunto-row{
     border-bottom:1px solid var(--border-subtle);
     padding:12px 0;
   }
   .guia-assunto-row:last-child{border-bottom:none;}
+  .guia-assunto-row.guia-subassunto-row{
+    padding-left:22px;
+    border-bottom:1px dashed var(--border-subtle);
+  }
+  .guia-assunto-row.guia-subassunto-row .guia-assunto-nome{
+    font-size:12.5px;color:var(--text-muted);
+  }
   .guia-assunto-topo{
     display:flex;
     justify-content:space-between;
@@ -689,6 +762,46 @@
     max-height:420px;
     overflow-y:auto;
     padding-right:6px;
+  }
+  .guia-fullscreen{
+    position:fixed;inset:0;z-index:999;
+    background:var(--bg-deep);
+    display:none;flex-direction:column;
+  }
+  .guia-fullscreen.aberto{display:flex;}
+  .guia-fullscreen-barra{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 20px;
+    padding-top:calc(14px + env(safe-area-inset-top,0px));
+    border-bottom:1px solid var(--border-soft);
+    flex-shrink:0;
+    background:var(--bg-panel);
+  }
+  .guia-fullscreen-titulos{min-width:0;}
+  .guia-fullscreen-assunto{
+    font-family:var(--font-head);font-weight:600;font-size:15px;color:var(--text-primary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .guia-fullscreen-materia{
+    font-size:12px;color:var(--text-muted);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .guia-fullscreen-conteudo{
+    flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:32px 24px calc(60px + env(safe-area-inset-bottom,0px));
+  }
+  .guia-fullscreen-corpo{
+    max-width:760px;margin:0 auto;
+    font-family:var(--font-body);
+    font-size:19px;line-height:1.85;
+    color:var(--text-primary);
+    white-space:pre-wrap;word-wrap:break-word;
+  }
+  .guia-fullscreen-rodape{
+    max-width:760px;margin:26px auto 0;
+    font-size:12px;color:var(--text-muted);
+    border-top:1px solid var(--border-subtle);
+    padding-top:12px;
   }
   .guia-cor-amarelo{color:var(--accent-ouro);font-weight:600;}
   .guia-cor-verde{color:var(--success);font-weight:600;}
@@ -937,10 +1050,7 @@
       </div>
       <div class="panel">
         <h2 class="section-title" style="margin-bottom:14px;">Sessões registradas</h2>
-        <table id="sessionsTable">
-          <thead><tr><th>Data</th><th>Matéria</th><th>Assunto</th><th>Duração</th><th></th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div id="sessionsGrouped"></div>
         <div class="empty-state" id="sessionsEmpty" style="display:none;">Nenhuma sessão registrada ainda.</div>
       </div>
     </section>
@@ -973,7 +1083,7 @@
     <!-- REVISOES -->
     <section class="tab" id="tab-revisoes">
       <h2 class="section-title">Revisões</h2>
-      <p class="section-sub">Ao marcar um assunto como concluído, ele entra na fila de revisão com marcos em 24h, 7, 14, 21 e 28 dias. Ao completar bem a etapa de 28 dias, o ciclo reinicia do zero. Você também pode adicionar revisões manualmente.</p>
+      <p class="section-sub">Ao marcar um assunto como concluído, ele entra na fila de revisão com marcos em 24h, 7, 14, 21 e 28 dias. Ao completar bem a etapa de 28 dias, o ciclo reinicia do zero. A revisão é feita resolvendo questões: registre certas e erradas e o painel decide sozinho — 85% ou mais avança de etapa, abaixo disso agenda reforço em 2 dias. Você também pode adicionar revisões manualmente.</p>
 
       <div class="panel">
         <div class="add-form">
@@ -996,12 +1106,7 @@
       </div>
 
       <div class="panel">
-        <div class="table-scroll">
-        <table id="revisoesTable">
-          <thead><tr><th>Data</th><th>Matéria</th><th>Assunto</th><th>Marco</th><th>Status</th><th></th></tr></thead>
-          <tbody></tbody>
-        </table>
-        </div>
+        <div id="revisoesList"></div>
         <div class="empty-state" id="revisoesEmpty" style="display:none;">Nenhuma revisão agendada.</div>
       </div>
     </section>
@@ -1182,6 +1287,20 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div id="guiaFullscreen" class="guia-fullscreen">
+  <div class="guia-fullscreen-barra">
+    <button id="btnFecharTelaCheia" class="btn small">✕ Fechar</button>
+    <div class="guia-fullscreen-titulos">
+      <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
+      <div class="guia-fullscreen-materia" id="tfcMateria"></div>
+    </div>
+  </div>
+  <div class="guia-fullscreen-conteudo">
+    <div class="guia-fullscreen-corpo" id="tfcCorpo"></div>
+    <div class="guia-fullscreen-rodape" id="tfcRodape"></div>
+  </div>
+</div>
 
 
 <div class="modal-overlay" id="revisoesModalOverlay" style="display:none;">
@@ -1461,6 +1580,44 @@
     setTimeout(function(){ t.classList.remove("show"); }, 2200);
   }
 
+  function criarLinhaContadorQuestoes(tipo, valorAtual, onMudar){
+    var row = document.createElement("div");
+    row.className = "qtd-controls";
+    var label = tipo === "certas" ? "Certas" : "Erradas";
+    var labelClasse = tipo === "certas" ? "qtd-correct" : "qtd-wrong";
+    row.innerHTML = "<span class='"+labelClasse+"'>"+label+"</span>";
+
+    var minus = document.createElement("button");
+    minus.className = "qtd-btn"; minus.textContent = "–";
+    var val = document.createElement("input");
+    val.type = "number"; val.min = "0";
+    val.className = "qtd-value-input"; val.value = valorAtual;
+    var plus = document.createElement("button");
+    plus.className = "qtd-btn"; plus.textContent = "+";
+
+    minus.addEventListener("click", function(){ onMudar(Math.max(0, valorAtual - 1)); });
+    plus.addEventListener("click", function(){ onMudar(valorAtual + 1); });
+    val.addEventListener("change", function(){
+      var novo = parseInt(this.value, 10);
+      if(isNaN(novo) || novo < 0) novo = 0;
+      onMudar(novo);
+    });
+
+    var somar = document.createElement("button");
+    somar.className = "qtd-btn-somar"; somar.textContent = "+ lote";
+    somar.title = "Somar uma quantidade ao total de "+label.toLowerCase()+", sem precisar calcular";
+    somar.addEventListener("click", function(){
+      var v = prompt("Quantas questões "+label.toUpperCase()+" você fez agora? (será somado ao total atual: "+valorAtual+")", "");
+      if(v === null) return;
+      var num = parseInt(v, 10);
+      if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
+      onMudar(valorAtual + num);
+    });
+
+    row.appendChild(minus); row.appendChild(val); row.appendChild(plus); row.appendChild(somar);
+    return row;
+  }
+
   function findMateria(id){
     for(var i=0;i<state.materias.length;i++){ if(state.materias[i].id===id) return state.materias[i]; }
     return null;
@@ -1621,45 +1778,98 @@
   }
   timerInterval = setInterval(timerLoop, 1000);
 
-  function renderCronometroSessions(){
-    var tbody = document.querySelector("#sessionsTable tbody");
-    tbody.innerHTML = "";
-    var sessions = state.sessions.slice().sort(function(a,b){ return (b.data||"").localeCompare(a.data||""); });
-    document.getElementById("sessionsEmpty").style.display = sessions.length ? "none" : "block";
-    sessions.forEach(function(s){
-      var m = findMateria(s.materiaId);
-      var a = m ? findAssunto(m.id, s.assuntoId) : null;
-      var tr = document.createElement("tr");
-      tr.innerHTML =
-        "<td></td>"+
-        "<td>"+(m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+"</td>"+
-        "<td>"+(a ? escapeHtml(a.nome) : "—")+"</td>"+
-        "<td style='font-family:var(--font-mono);'>"+formatDuration(s.duracaoSec)+"</td>"+
-        "<td></td>";
-      var tdData = tr.firstElementChild;
-      var inputData = document.createElement("input");
-      inputData.type = "date";
-      inputData.value = s.data;
-      inputData.style.minWidth = "130px";
-      inputData.addEventListener("change", function(){
-        if(!this.value) return;
-        s.data = this.value;
-        saveState();
+  function criarLinhaSessao(s){
+    var row = document.createElement("div");
+    row.className = "sessao-row";
+
+    var dataSpan = document.createElement("span");
+    dataSpan.className = "sessao-data";
+    dataSpan.textContent = formatDateBR(s.data);
+    dataSpan.title = "Clique para editar a data";
+    dataSpan.addEventListener("click", function(){
+      var inputTemp = document.createElement("input");
+      inputTemp.type = "date";
+      inputTemp.value = s.data;
+      inputTemp.className = "sessao-data-input-temp";
+      row.replaceChild(inputTemp, dataSpan);
+      inputTemp.focus();
+      if(inputTemp.showPicker){ try{ inputTemp.showPicker(); }catch(e){} }
+      inputTemp.addEventListener("change", function(){
+        if(this.value){ s.data = this.value; saveState(); }
         renderAll();
       });
-      tdData.appendChild(inputData);
-      var tdBtn = tr.lastElementChild;
-      var btn = document.createElement("button");
-      btn.className = "btn small danger";
-      btn.textContent = "Excluir";
-      btn.addEventListener("click", function(){
-        state.sessions = state.sessions.filter(function(x){ return x.id !== s.id; });
-        saveState();
-        renderAll();
-      });
-      tdBtn.appendChild(btn);
-      tbody.appendChild(tr);
+      inputTemp.addEventListener("blur", function(){ renderAll(); });
     });
+
+    var duracaoSpan = document.createElement("span");
+    duracaoSpan.className = "sessao-duracao";
+    duracaoSpan.textContent = formatDuration(s.duracaoSec);
+
+    var btn = document.createElement("button");
+    btn.className = "btn small danger";
+    btn.textContent = "Excluir";
+    btn.addEventListener("click", function(){
+      state.sessions = state.sessions.filter(function(x){ return x.id !== s.id; });
+      saveState();
+      renderAll();
+    });
+
+    row.appendChild(dataSpan);
+    row.appendChild(duracaoSpan);
+    row.appendChild(btn);
+    return row;
+  }
+
+  function renderCronometroSessions(){
+    var container = document.getElementById("sessionsGrouped");
+    container.innerHTML = "";
+    var sessions = state.sessions.slice();
+    document.getElementById("sessionsEmpty").style.display = sessions.length ? "none" : "block";
+    if(!sessions.length) return;
+
+    state.materias.forEach(function(m){
+      var sessoesDaMateria = sessions.filter(function(s){ return s.materiaId === m.id; });
+      if(!sessoesDaMateria.length) return;
+
+      var totalMateria = sessoesDaMateria.reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
+      var grupoHeader = document.createElement("div");
+      grupoHeader.className = "assunto-grupo-header";
+      grupoHeader.style.color = m.cor;
+      grupoHeader.innerHTML =
+        "<span style='display:flex;align-items:center;flex:1;'>"+colorDotHtml(m.cor)+escapeHtml(m.nome)+"</span>"+
+        "<span style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+formatDuration(totalMateria)+"</span>";
+      container.appendChild(grupoHeader);
+
+      var idsAssuntos = (m.assuntos||[]).map(function(a){ return a.id; }).concat([""]);
+      idsAssuntos.forEach(function(assuntoId){
+        var sessoesDoAssunto = sessoesDaMateria.filter(function(s){ return (s.assuntoId||"") === assuntoId; });
+        if(!sessoesDoAssunto.length) return;
+        var a = assuntoId ? findAssunto(m.id, assuntoId) : null;
+        var totalAssunto = sessoesDoAssunto.reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
+
+        var subHeader = document.createElement("div");
+        subHeader.className = "assunto-subgrupo-header";
+        subHeader.innerHTML =
+          "<span>"+(a ? escapeHtml(a.nome) : "Sem assunto específico")+"</span>"+
+          "<span style='font-family:var(--font-mono);'>"+formatDuration(totalAssunto)+"</span>";
+        container.appendChild(subHeader);
+
+        sessoesDoAssunto
+          .sort(function(x,y){ return (y.data||"").localeCompare(x.data||""); })
+          .forEach(function(s){ container.appendChild(criarLinhaSessao(s)); });
+      });
+    });
+
+    var sessoesOrfas = sessions.filter(function(s){ return !findMateria(s.materiaId); });
+    if(sessoesOrfas.length){
+      var grupoOrfaos = document.createElement("div");
+      grupoOrfaos.className = "assunto-grupo-header";
+      grupoOrfaos.textContent = "Sem matéria (excluída)";
+      container.appendChild(grupoOrfaos);
+      sessoesOrfas
+        .sort(function(x,y){ return (y.data||"").localeCompare(x.data||""); })
+        .forEach(function(s){ container.appendChild(criarLinhaSessao(s)); });
+    }
   }
 
   /* ---------------- MATERIAS ---------------- */
@@ -1871,7 +2081,7 @@
       function addAssunto(){
         var nome = input.value.trim();
         if(!nome){ showToast("Digite o nome do assunto."); return; }
-        m.assuntos.push({ id: uid(), nome: nome, status: "nao_iniciado", dataConclusao: null, dataInicio: todayISO(), questoesCertas: 0, questoesErradas: 0, ciclo: 1 });
+        m.assuntos.push({ id: uid(), nome: nome, status: "nao_iniciado", dataConclusao: null, dataInicio: todayISO(), questoesCertas: 0, questoesErradas: 0, ciclo: 1, subassuntos: [] });
         input.value = "";
         saveState();
         renderAll();
@@ -1899,6 +2109,9 @@
 
           function excluirAssunto(){
             if(!confirm('Excluir o assunto "'+a.nome+'"?')) return;
+            (a.subassuntos||[]).forEach(function(sub){
+              if(guias[sub.id]) excluirGuiaRemota(sub.id);
+            });
             m.assuntos = m.assuntos.filter(function(x){ return x.id !== a.id; });
             state.revisoes = state.revisoes.filter(function(r){ return r.assuntoId !== a.id; });
             if(guias[a.id]) excluirGuiaRemota(a.id);
@@ -2000,85 +2213,18 @@
           var qtdWrap = document.createElement("div");
           qtdWrap.style.cssText = "display:flex;flex-direction:column;gap:4px;";
 
-          var certaRow = document.createElement("div");
-          certaRow.className = "qtd-controls";
-          certaRow.innerHTML = "<span class='qtd-correct'>Certas</span>";
-          var certaMinus = document.createElement("button");
-          certaMinus.className = "qtd-btn"; certaMinus.textContent = "–";
-          var certaVal = document.createElement("input");
-          certaVal.type = "number"; certaVal.min = "0";
-          certaVal.className = "qtd-value-input"; certaVal.value = a.questoesCertas;
-          var certaPlus = document.createElement("button");
-          certaPlus.className = "qtd-btn"; certaPlus.textContent = "+";
-          certaMinus.addEventListener("click", function(){
-            a.questoesCertas = Math.max(0, a.questoesCertas - 1);
-            saveState(); renderAll();
-          });
-          certaPlus.addEventListener("click", function(){
-            a.questoesCertas = a.questoesCertas + 1;
-            saveState(); renderAll();
-          });
-          certaVal.addEventListener("change", function(){
-            var novo = parseInt(this.value, 10);
-            if(isNaN(novo) || novo < 0) novo = 0;
+          var certaRow = criarLinhaContadorQuestoes("certas", a.questoesCertas, function(novo){
             a.questoesCertas = novo;
             saveState(); renderAll();
           });
-          var certaSomar = document.createElement("button");
-          certaSomar.className = "qtd-btn-somar"; certaSomar.textContent = "+ lote";
-          certaSomar.title = "Somar uma quantidade ao total de certas, sem precisar calcular";
-          certaSomar.addEventListener("click", function(){
-            var val = prompt("Quantas questões CERTAS você fez agora? (será somado ao total atual: "+a.questoesCertas+")", "");
-            if(val === null) return;
-            var num = parseInt(val, 10);
-            if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
-            a.questoesCertas = a.questoesCertas + num;
-            saveState(); renderAll();
-            showToast("Somado +"+num+" certas. Novo total: "+a.questoesCertas+".");
-          });
-          certaRow.appendChild(certaMinus); certaRow.appendChild(certaVal); certaRow.appendChild(certaPlus); certaRow.appendChild(certaSomar);
 
-          var erradaRow = document.createElement("div");
-          erradaRow.className = "qtd-controls";
-          erradaRow.innerHTML = "<span class='qtd-wrong'>Erradas</span>";
-          var erradaMinus = document.createElement("button");
-          erradaMinus.className = "qtd-btn"; erradaMinus.textContent = "–";
-          var erradaVal = document.createElement("input");
-          erradaVal.type = "number"; erradaVal.min = "0";
-          erradaVal.className = "qtd-value-input"; erradaVal.value = a.questoesErradas;
-          var erradaPlus = document.createElement("button");
-          erradaPlus.className = "qtd-btn"; erradaPlus.textContent = "+";
-          erradaMinus.addEventListener("click", function(){
-            a.questoesErradas = Math.max(0, a.questoesErradas - 1);
-            saveState(); renderAll();
-          });
-          erradaPlus.addEventListener("click", function(){
-            a.questoesErradas = a.questoesErradas + 1;
-            saveState(); renderAll();
-            abrirCadernoComPreset(m.id, a.id);
-          });
-          erradaVal.addEventListener("change", function(){
-            var novo = parseInt(this.value, 10);
-            if(isNaN(novo) || novo < 0) novo = 0;
-            var delta = novo - a.questoesErradas;
+          var valorErradasAntes = a.questoesErradas;
+          var erradaRow = criarLinhaContadorQuestoes("erradas", a.questoesErradas, function(novo){
+            var aumentou = novo > valorErradasAntes;
             a.questoesErradas = novo;
             saveState(); renderAll();
-            if(delta > 0){ abrirCadernoComPreset(m.id, a.id); }
+            if(aumentou) abrirCadernoComPreset(m.id, a.id);
           });
-          var erradaSomar = document.createElement("button");
-          erradaSomar.className = "qtd-btn-somar"; erradaSomar.textContent = "+ lote";
-          erradaSomar.title = "Somar uma quantidade ao total de erradas, sem precisar calcular";
-          erradaSomar.addEventListener("click", function(){
-            var val = prompt("Quantas questões ERRADAS você fez agora? (será somado ao total atual: "+a.questoesErradas+")", "");
-            if(val === null) return;
-            var num = parseInt(val, 10);
-            if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
-            a.questoesErradas = a.questoesErradas + num;
-            saveState(); renderAll();
-            showToast("Somado +"+num+" erradas. Novo total: "+a.questoesErradas+".");
-            abrirCadernoComPreset(m.id, a.id);
-          });
-          erradaRow.appendChild(erradaMinus); erradaRow.appendChild(erradaVal); erradaRow.appendChild(erradaPlus); erradaRow.appendChild(erradaSomar);
 
           qtdWrap.appendChild(certaRow);
           qtdWrap.appendChild(erradaRow);
@@ -2103,6 +2249,71 @@
 
           tr.appendChild(tdNome); tr.appendChild(tdInicio); tr.appendChild(tdTempo); tr.appendChild(tdStatus); tr.appendChild(tdQtd); tr.appendChild(tdDel);
           tbody.appendChild(tr);
+
+          if(a.subassuntos === undefined) a.subassuntos = [];
+          var trSub = document.createElement("tr");
+          trSub.className = "subassuntos-tr";
+          var tdSub = document.createElement("td");
+          tdSub.colSpan = 6;
+          var subWrap = document.createElement("div");
+          subWrap.className = "subassuntos-wrap";
+
+          if(a.subassuntos.length){
+            var subLista = document.createElement("div");
+            subLista.className = "subassuntos-lista";
+            a.subassuntos.forEach(function(sub){
+              var chip = document.createElement("span");
+              chip.className = "subassunto-chip";
+              chip.innerHTML = "<span class='subassunto-nome'>"+escapeHtml(sub.nome)+"</span>";
+              var editSub = document.createElement("button");
+              editSub.className = "mini-edit-btn"; editSub.title = "Editar sub-assunto"; editSub.textContent = "✎";
+              editSub.addEventListener("click", function(){
+                var novo = prompt("Editar nome do sub-assunto:", sub.nome);
+                if(novo === null) return;
+                novo = novo.trim();
+                if(!novo){ showToast("O nome não pode ficar vazio."); return; }
+                sub.nome = novo;
+                saveState(); renderAll();
+              });
+              var delSub = document.createElement("button");
+              delSub.className = "mini-del-btn"; delSub.title = "Excluir sub-assunto"; delSub.textContent = "×";
+              delSub.addEventListener("click", function(){
+                if(!confirm('Excluir o sub-assunto "'+sub.nome+'"?')) return;
+                a.subassuntos = a.subassuntos.filter(function(x){ return x.id !== sub.id; });
+                if(guias[sub.id]) excluirGuiaRemota(sub.id);
+                saveState(); renderAll();
+              });
+              chip.appendChild(editSub);
+              chip.appendChild(delSub);
+              subLista.appendChild(chip);
+            });
+            subWrap.appendChild(subLista);
+          }
+
+          var subAddWrap = document.createElement("div");
+          subAddWrap.className = "subassunto-add";
+          var subInput = document.createElement("input");
+          subInput.type = "text";
+          subInput.placeholder = "+ sub-assunto (ex: Orações substantivas)";
+          var subAddBtn = document.createElement("button");
+          subAddBtn.className = "btn small";
+          subAddBtn.textContent = "Adicionar";
+          function addSubassunto(){
+            var nomeSub = subInput.value.trim();
+            if(!nomeSub) return;
+            a.subassuntos.push({ id: uid(), nome: nomeSub });
+            saveState();
+            renderAll();
+          }
+          subAddBtn.addEventListener("click", addSubassunto);
+          subInput.addEventListener("keydown", function(e){ if(e.key==="Enter") addSubassunto(); });
+          subAddWrap.appendChild(subInput);
+          subAddWrap.appendChild(subAddBtn);
+          subWrap.appendChild(subAddWrap);
+
+          tdSub.appendChild(subWrap);
+          trSub.appendChild(tdSub);
+          tbody.appendChild(trSub);
         });
         table.appendChild(tbody);
         tableWrap.appendChild(table);
@@ -2148,82 +2359,176 @@
     showToast("Revisão adicionada.");
   });
 
+  function criarCardRevisao(r, hoje, m, a){
+    if(r.questoesCertas === undefined) r.questoesCertas = 0;
+    if(r.questoesErradas === undefined) r.questoesErradas = 0;
+
+    var etapaObj = ETAPAS.find(function(e){ return e.key===r.etapa; });
+    var atrasada = !r.feita && r.data < hoje;
+    var tag = r.feita ? "<span class='tag concluido'>Concluída</span>"
+            : atrasada ? "<span class='tag atrasada'>Atrasada</span>"
+            : "<span class='tag'>Pendente</span>";
+    var marcoTxt = etapaObj ? etapaObj.label + (r.ciclo ? " · ciclo "+r.ciclo : "") : "—";
+
+    var card = document.createElement("div");
+    card.className = "revisao-card";
+
+    var cab = document.createElement("div");
+    cab.className = "revisao-cab";
+    cab.innerHTML =
+      "<span class='rev-data'>"+formatDateBR(r.data)+"</span>"+
+      "<span class='rev-marco'>"+marcoTxt+"</span>"+
+      tag;
+    card.appendChild(cab);
+
+    var acoes = document.createElement("div");
+    acoes.className = "revisao-acoes";
+
+    if(!r.feita){
+      if(r.etapa){
+        var grupoQ = document.createElement("div");
+        grupoQ.className = "revisao-questoes-grupo";
+
+        var certaRowRev = criarLinhaContadorQuestoes("certas", r.questoesCertas, function(novo){
+          r.questoesCertas = novo; saveState(); renderAll();
+        });
+        var erradaRowRev = criarLinhaContadorQuestoes("erradas", r.questoesErradas, function(novo){
+          r.questoesErradas = novo; saveState(); renderAll();
+        });
+        grupoQ.appendChild(certaRowRev);
+        grupoQ.appendChild(erradaRowRev);
+
+        var totalQ = r.questoesCertas + r.questoesErradas;
+        var pct = totalQ > 0 ? Math.round((r.questoesCertas/totalQ)*100) : null;
+        var pctSpan = document.createElement("span");
+        pctSpan.className = "revisao-pct" + (pct===null ? "" : (pct>=85 ? " ok" : " alerta"));
+        pctSpan.textContent = pct===null ? "— % aproveitamento" : pct+"% aproveitamento";
+        grupoQ.appendChild(pctSpan);
+
+        var concluirBtn = document.createElement("button");
+        concluirBtn.className = "btn small primary";
+        concluirBtn.textContent = "Concluir revisão";
+        concluirBtn.addEventListener("click", function(){
+          var total = r.questoesCertas + r.questoesErradas;
+          if(total === 0){
+            showToast("Registre pelo menos uma questão (certa ou errada) antes de concluir.");
+            return;
+          }
+          var pctFinal = r.questoesCertas / total;
+          var certasDaVez = r.questoesCertas, erradasDaVez = r.questoesErradas;
+          if(a){
+            a.questoesCertas = (a.questoesCertas||0) + certasDaVez;
+            a.questoesErradas = (a.questoesErradas||0) + erradasDaVez;
+          }
+          r.questoesCertas = 0; r.questoesErradas = 0;
+          var pctPercent = Math.round(pctFinal*100);
+          if(pctFinal >= 0.85){
+            completarRevisaoBom(r);
+            showToast("Mandou bem! "+pctPercent+"% de aproveitamento ("+certasDaVez+"/"+total+"). Avançando de etapa.");
+          } else {
+            completarRevisaoReforco(r);
+            showToast("Atenção: "+pctPercent+"% de aproveitamento, abaixo de 85%. Reforço agendado para daqui a 2 dias.");
+          }
+        });
+        grupoQ.appendChild(concluirBtn);
+        acoes.appendChild(grupoQ);
+
+        if(pct !== null && pct < 85){
+          var alertaTexto = document.createElement("div");
+          alertaTexto.className = "revisao-alerta-texto";
+          alertaTexto.textContent = "Abaixo de 85% — ao concluir, essa revisão será reagendada como reforço em 2 dias.";
+          acoes.appendChild(alertaTexto);
+        }
+      } else {
+        var botoesSimples = document.createElement("div");
+        botoesSimples.className = "revisao-botoes-simples";
+        var doneBtn = document.createElement("button");
+        doneBtn.className = "btn small";
+        doneBtn.textContent = "Marcar feita";
+        doneBtn.addEventListener("click", function(){
+          r.feita = true;
+          saveState();
+          renderAll();
+        });
+        botoesSimples.appendChild(doneBtn);
+        var adiarBtn = document.createElement("button");
+        adiarBtn.className = "btn small";
+        adiarBtn.textContent = "Adiar 7 dias";
+        adiarBtn.addEventListener("click", function(){
+          r.data = addDaysISO(r.data, 7);
+          saveState();
+          renderAll();
+        });
+        botoesSimples.appendChild(adiarBtn);
+        acoes.appendChild(botoesSimples);
+      }
+    }
+
+    var delBtn = document.createElement("button");
+    delBtn.className = "btn small danger";
+    delBtn.textContent = "Excluir";
+    delBtn.style.marginLeft = "auto";
+    delBtn.addEventListener("click", function(){
+      state.revisoes = state.revisoes.filter(function(x){ return x.id !== r.id; });
+      saveState();
+      renderAll();
+    });
+    acoes.appendChild(delBtn);
+
+    card.appendChild(acoes);
+    return card;
+  }
+
   function renderRevisoes(){
     populateRevisaoSelects();
-    var tbody = document.querySelector("#revisoesTable tbody");
-    tbody.innerHTML = "";
+    var container = document.getElementById("revisoesList");
+    container.innerHTML = "";
     var hoje = todayISO();
-    var lista = state.revisoes.slice().sort(function(a,b){ return (a.data||"").localeCompare(b.data||""); });
+    var lista = state.revisoes.slice();
     document.getElementById("revisoesEmpty").style.display = lista.length ? "none" : "block";
-    lista.forEach(function(r){
-      var m = findMateria(r.materiaId);
-      var a = m ? findAssunto(m.id, r.assuntoId) : null;
-      var etapaObj = ETAPAS.find(function(e){ return e.key===r.etapa; });
-      var tr = document.createElement("tr");
-      var atrasada = !r.feita && r.data < hoje;
-      var tag = r.feita ? "<span class='tag concluido'>Concluída</span>"
-              : atrasada ? "<span class='tag atrasada'>Atrasada</span>"
-              : "<span class='tag'>Pendente</span>";
-      var marcoTxt = etapaObj ? etapaObj.label + (r.ciclo ? " · ciclo "+r.ciclo : "") : "—";
-      tr.innerHTML =
-        "<td>"+formatDateBR(r.data)+"</td>"+
-        "<td>"+(m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+"</td>"+
-        "<td>"+(a ? escapeHtml(a.nome) : "—")+"</td>"+
-        "<td style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+marcoTxt+"</td>"+
-        "<td>"+tag+"</td>"+
-        "<td></td>";
-      var tdAcoes = tr.lastElementChild;
-      if(!r.feita){
-        if(r.etapa){
-          var bomBtn = document.createElement("button");
-          bomBtn.className = "btn small";
-          bomBtn.textContent = "Fui bem (80%+)";
-          bomBtn.title = "Concluir o bloco de questões com bom desempenho e avançar de etapa";
-          bomBtn.style.marginRight = "6px";
-          bomBtn.addEventListener("click", function(){ completarRevisaoBom(r); });
-          tdAcoes.appendChild(bomBtn);
+    if(!lista.length) return;
 
-          var reforcoBtn = document.createElement("button");
-          reforcoBtn.className = "btn small";
-          reforcoBtn.textContent = "Preciso reforçar";
-          reforcoBtn.title = "Rendimento baixo: fazer uma revisão pontual e tentar de novo em 2 dias";
-          reforcoBtn.style.marginRight = "6px";
-          reforcoBtn.addEventListener("click", function(){ completarRevisaoReforco(r); });
-          tdAcoes.appendChild(reforcoBtn);
-        } else {
-          var doneBtn = document.createElement("button");
-          doneBtn.className = "btn small";
-          doneBtn.textContent = "Marcar feita";
-          doneBtn.style.marginRight = "6px";
-          doneBtn.addEventListener("click", function(){
-            r.feita = true;
-            saveState();
-            renderAll();
-          });
-          tdAcoes.appendChild(doneBtn);
-          var adiarBtn = document.createElement("button");
-          adiarBtn.className = "btn small";
-          adiarBtn.textContent = "Adiar 7 dias";
-          adiarBtn.style.marginRight = "6px";
-          adiarBtn.addEventListener("click", function(){
-            r.data = addDaysISO(r.data, 7);
-            saveState();
-            renderAll();
-          });
-          tdAcoes.appendChild(adiarBtn);
-        }
-      }
-      var delBtn = document.createElement("button");
-      delBtn.className = "btn small danger";
-      delBtn.textContent = "Excluir";
-      delBtn.addEventListener("click", function(){
-        state.revisoes = state.revisoes.filter(function(x){ return x.id !== r.id; });
-        saveState();
-        renderAll();
+    state.materias.forEach(function(m){
+      var revisoesDaMateria = lista.filter(function(r){ return r.materiaId === m.id; });
+      if(!revisoesDaMateria.length) return;
+
+      var grupoHeader = document.createElement("div");
+      grupoHeader.className = "assunto-grupo-header";
+      grupoHeader.style.color = m.cor;
+      grupoHeader.innerHTML =
+        "<span style='display:flex;align-items:center;flex:1;'>"+colorDotHtml(m.cor)+escapeHtml(m.nome)+"</span>"+
+        "<span style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+revisoesDaMateria.length+" revisão"+(revisoesDaMateria.length>1?"ões":"")+"</span>";
+      container.appendChild(grupoHeader);
+
+      var idsAssuntos = (m.assuntos||[]).map(function(a){ return a.id; }).concat([""]);
+      idsAssuntos.forEach(function(assuntoId){
+        var revisoesDoAssunto = revisoesDaMateria.filter(function(r){ return (r.assuntoId||"") === assuntoId; });
+        if(!revisoesDoAssunto.length) return;
+        var a = assuntoId ? findAssunto(m.id, assuntoId) : null;
+
+        var subHeader = document.createElement("div");
+        subHeader.className = "assunto-subgrupo-header";
+        subHeader.innerHTML =
+          "<span>"+(a ? escapeHtml(a.nome) : "Sem assunto específico")+"</span>"+
+          "<span>"+revisoesDoAssunto.length+"</span>";
+        container.appendChild(subHeader);
+
+        revisoesDoAssunto
+          .sort(function(x,y){ return (x.data||"").localeCompare(y.data||""); })
+          .forEach(function(r){ container.appendChild(criarCardRevisao(r, hoje, m, a)); });
       });
-      tdAcoes.appendChild(delBtn);
-      tbody.appendChild(tr);
     });
+
+    var revisoesOrfas = lista.filter(function(r){ return !findMateria(r.materiaId); });
+    if(revisoesOrfas.length){
+      var grupoOrfaos = document.createElement("div");
+      grupoOrfaos.className = "assunto-grupo-header";
+      grupoOrfaos.textContent = "Sem matéria (excluída)";
+      container.appendChild(grupoOrfaos);
+      revisoesOrfas
+        .sort(function(x,y){ return (x.data||"").localeCompare(y.data||""); })
+        .forEach(function(r){ container.appendChild(criarCardRevisao(r, hoje, null, null)); });
+    }
   }
 
   /* ---------------- EDITAL ---------------- */
@@ -2715,6 +3020,26 @@
     textareaEl.setSelectionRange(inicio+2, inicio+2+selecionado.length);
   }
 
+  function abrirTelaCheiaGuia(materiaNome, assuntoNome, guia){
+    document.getElementById("tfcAssunto").textContent = assuntoNome;
+    document.getElementById("tfcMateria").textContent = materiaNome;
+    document.getElementById("tfcCorpo").innerHTML = renderGuiaTexto(guia.texto || "");
+    document.getElementById("tfcRodape").textContent =
+      (guia.nomeArquivo ? guia.nomeArquivo + " · " : "") + "Atualizado em " + formatDateBR(guia.atualizadoEm || todayISO());
+    var overlay = document.getElementById("guiaFullscreen");
+    overlay.classList.add("aberto");
+    overlay.querySelector(".guia-fullscreen-conteudo").scrollTop = 0;
+  }
+  function fecharTelaCheiaGuia(){
+    document.getElementById("guiaFullscreen").classList.remove("aberto");
+  }
+  document.getElementById("btnFecharTelaCheia").addEventListener("click", fecharTelaCheiaGuia);
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Escape" && document.getElementById("guiaFullscreen").classList.contains("aberto")){
+      fecharTelaCheiaGuia();
+    }
+  });
+
   function envolverSelecaoComCor(textareaEl, cor){
     var inicio = textareaEl.selectionStart;
     var fim = textareaEl.selectionEnd;
@@ -2761,6 +3086,153 @@
     textareaEl.setSelectionRange(posFinal3, posFinal3);
   }
 
+  function criarLinhaGuia(item, materiaNome, classeExtra){
+    var guia = guias[item.id];
+    var temGuia = !!(guia && guia.texto);
+
+    var row = document.createElement("div");
+    row.className = "guia-assunto-row" + (classeExtra ? " "+classeExtra : "");
+
+    var topo = document.createElement("div");
+    topo.className = "guia-assunto-topo";
+    topo.innerHTML =
+      "<span class='guia-assunto-nome'>"+(classeExtra?"↳ ":"")+escapeHtml(item.nome)+"</span>"+
+      "<span style='display:flex;align-items:center;gap:10px;'>"+
+      "<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
+      (temGuia?"<button class='btn small editarGuiaDiretoBtn'>Editar</button>":"")+
+      "<button class='btn small toggleGuiaBtn'>"+(guiaAbertoIds[item.id]?"Fechar":(temGuia?"Ver guia":"Adicionar guia"))+"</button>"+
+      "</span>";
+    topo.querySelector(".toggleGuiaBtn").addEventListener("click", function(){
+      guiaAbertoIds[item.id] = !guiaAbertoIds[item.id];
+      renderGuiasRapidos();
+    });
+    if(temGuia){
+      topo.querySelector(".editarGuiaDiretoBtn").addEventListener("click", function(){
+        guiaAbertoIds[item.id] = true;
+        guiaModoEdicao[item.id] = true;
+        renderGuiasRapidos();
+      });
+    }
+    row.appendChild(topo);
+
+    if(guiaAbertoIds[item.id]){
+      var painel = document.createElement("div");
+      painel.className = "guia-painel";
+
+      if(temGuia && !guiaModoEdicao[item.id]){
+        painel.innerHTML =
+          "<div class='guia-texto-leitura'>"+renderGuiaTexto(guia.texto)+"</div>"+
+          "<div class='guia-meta'>"+(guia.nomeArquivo?escapeHtml(guia.nomeArquivo)+" · ":"")+"Atualizado em "+formatDateBR(guia.atualizadoEm||todayISO())+"</div>";
+        var acoesLeitura = document.createElement("div");
+        acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;";
+        var btnTelaCheiaGuia = document.createElement("button");
+        btnTelaCheiaGuia.className = "btn small primary"; btnTelaCheiaGuia.textContent = "⛶ Tela cheia";
+        btnTelaCheiaGuia.addEventListener("click", function(){ abrirTelaCheiaGuia(materiaNome, item.nome, guia); });
+        var btnEditarGuia = document.createElement("button");
+        btnEditarGuia.className = "btn small"; btnEditarGuia.textContent = "Editar";
+        btnEditarGuia.addEventListener("click", function(){ guiaModoEdicao[item.id] = true; renderGuiasRapidos(); });
+        var btnExcluirGuia = document.createElement("button");
+        btnExcluirGuia.className = "btn small danger"; btnExcluirGuia.textContent = "Excluir guia";
+        btnExcluirGuia.addEventListener("click", function(){
+          if(!confirm('Excluir o guia rápido de "'+item.nome+'"?')) return;
+          excluirGuiaRemota(item.id);
+          renderGuiasRapidos();
+          showToast("Guia excluído.");
+        });
+        acoesLeitura.appendChild(btnTelaCheiaGuia);
+        acoesLeitura.appendChild(btnEditarGuia);
+        acoesLeitura.appendChild(btnExcluirGuia);
+        painel.appendChild(acoesLeitura);
+      } else {
+        var wrapImport = document.createElement("div");
+        wrapImport.innerHTML =
+          "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Importar arquivo (.pdf, .docx, .html, .txt)</label>"+
+          "<input type='file' class='guiaFileInput' accept='.pdf,.docx,.html,.htm,.txt'>"+
+          "<p style='font-size:11px;color:var(--text-faint);margin:6px 0 12px;'>A leitura de PDF/.docx precisa de internet no momento da importação.</p>"+
+          "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Ou cole/edite o texto aqui</label>"+
+          "<textarea class='guiaTextarea' style='min-height:180px;'></textarea>"+
+          "<div class='guia-toolbar-cores'>"+
+          "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
+          "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
+          "<span class='guia-toolbar-divisor'></span>"+
+          "<button type='button' class='guia-cor-btn cor-amarelo' data-cor='amarelo'>Amarelo</button>"+
+          "<button type='button' class='guia-cor-btn cor-verde' data-cor='verde'>Verde</button>"+
+          "<button type='button' class='guia-cor-btn cor-vermelho' data-cor='vermelho'>Vermelho</button>"+
+          "<button type='button' class='guia-cor-btn cor-azul' data-cor='azul'>Azul</button>"+
+          "<button type='button' class='guia-cor-btn cor-rosa' data-cor='rosa'>Rosa</button>"+
+          "<button type='button' class='guia-cor-btn cor-laranja' data-cor='laranja'>Laranja</button>"+
+          "<button type='button' class='guia-cor-btn cor-roxo' data-cor='roxo'>Roxo</button>"+
+          "<button type='button' class='guia-cor-btn cor-cinza' data-cor='cinza'>Cinza</button>"+
+          "<button type='button' class='guia-cor-btn cor-marrom' data-cor='marrom'>Marrom</button>"+
+          "<button type='button' class='guia-cor-btn cor-branco' data-cor='branco'>Branco (remover cor)</button>"+
+          "</div>"+
+          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa cor pra destacar (dá pra combinar os dois). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique em \"Branco\".</p>";
+        painel.appendChild(wrapImport);
+
+        var textareaEl = painel.querySelector(".guiaTextarea");
+        textareaEl.value = temGuia ? guia.texto : "";
+        var fileInputEl = painel.querySelector(".guiaFileInput");
+
+        wrapImport.querySelector("#guiaBtnNegrito").addEventListener("click", function(){
+          alternarNegritoSelecao(textareaEl);
+        });
+
+        wrapImport.querySelectorAll(".guia-cor-btn").forEach(function(botaoCor){
+          botaoCor.addEventListener("click", function(){
+            envolverSelecaoComCor(textareaEl, botaoCor.getAttribute("data-cor"));
+          });
+        });
+
+        var acoesImport = document.createElement("div");
+        acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;";
+        var btnSalvarGuia = document.createElement("button");
+        btnSalvarGuia.className = "btn primary small"; btnSalvarGuia.textContent = "Salvar guia";
+        var btnCancelarGuia = document.createElement("button");
+        btnCancelarGuia.className = "btn small"; btnCancelarGuia.textContent = "Cancelar";
+        acoesImport.appendChild(btnSalvarGuia);
+        acoesImport.appendChild(btnCancelarGuia);
+        painel.appendChild(acoesImport);
+
+        fileInputEl.addEventListener("change", function(e){
+          var file = e.target.files[0];
+          if(!file) return;
+          showToast("Lendo arquivo...");
+          extrairTextoArquivo(file).then(function(texto){
+            textareaEl.value = texto.trim();
+            showToast("Texto extraído! Revise antes de salvar.");
+          }).catch(function(err){
+            console.error(err);
+            showToast(err.message || "Não foi possível ler esse arquivo.");
+          });
+        });
+
+        btnCancelarGuia.addEventListener("click", function(){
+          guiaModoEdicao[item.id] = false;
+          if(!temGuia) guiaAbertoIds[item.id] = false;
+          renderGuiasRapidos();
+        });
+
+        btnSalvarGuia.addEventListener("click", function(){
+          var texto = textareaEl.value.trim();
+          if(!texto){ showToast("Cole ou importe algum texto antes de salvar."); return; }
+          var novoGuia = {
+            texto: texto,
+            nomeArquivo: (fileInputEl.files[0] ? fileInputEl.files[0].name : (guia ? guia.nomeArquivo : "")) || "",
+            atualizadoEm: todayISO()
+          };
+          salvarGuiaRemota(item.id, novoGuia);
+          guiaModoEdicao[item.id] = false;
+          renderGuiasRapidos();
+          showToast("Guia salvo.");
+        });
+      }
+
+      row.appendChild(painel);
+    }
+
+    return row;
+  }
+
   function renderGuiasRapidos(){
     var container = document.getElementById("guiasContainer");
     container.innerHTML = "";
@@ -2781,146 +3253,11 @@
       bloco.appendChild(header);
 
       m.assuntos.forEach(function(a){
-        var guia = guias[a.id];
-        var temGuia = !!(guia && guia.texto);
-
-        var row = document.createElement("div");
-        row.className = "guia-assunto-row";
-
-        var topo = document.createElement("div");
-        topo.className = "guia-assunto-topo";
-        topo.innerHTML =
-          "<span class='guia-assunto-nome'>"+escapeHtml(a.nome)+"</span>"+
-          "<span style='display:flex;align-items:center;gap:10px;'>"+
-          "<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
-          (temGuia?"<button class='btn small editarGuiaDiretoBtn'>Editar</button>":"")+
-          "<button class='btn small toggleGuiaBtn'>"+(guiaAbertoIds[a.id]?"Fechar":(temGuia?"Ver guia":"Adicionar guia"))+"</button>"+
-          "</span>";
-        topo.querySelector(".toggleGuiaBtn").addEventListener("click", function(){
-          guiaAbertoIds[a.id] = !guiaAbertoIds[a.id];
-          renderGuiasRapidos();
+        if(a.subassuntos === undefined) a.subassuntos = [];
+        bloco.appendChild(criarLinhaGuia(a, m.nome, ""));
+        a.subassuntos.forEach(function(sub){
+          bloco.appendChild(criarLinhaGuia(sub, m.nome, "guia-subassunto-row"));
         });
-        if(temGuia){
-          topo.querySelector(".editarGuiaDiretoBtn").addEventListener("click", function(){
-            guiaAbertoIds[a.id] = true;
-            guiaModoEdicao[a.id] = true;
-            renderGuiasRapidos();
-          });
-        }
-        row.appendChild(topo);
-
-        if(guiaAbertoIds[a.id]){
-          var painel = document.createElement("div");
-          painel.className = "guia-painel";
-
-          if(temGuia && !guiaModoEdicao[a.id]){
-            painel.innerHTML =
-              "<div class='guia-texto-leitura'>"+renderGuiaTexto(guia.texto)+"</div>"+
-              "<div class='guia-meta'>"+(guia.nomeArquivo?escapeHtml(guia.nomeArquivo)+" · ":"")+"Atualizado em "+formatDateBR(guia.atualizadoEm||todayISO())+"</div>";
-            var acoesLeitura = document.createElement("div");
-            acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;";
-            var btnEditarGuia = document.createElement("button");
-            btnEditarGuia.className = "btn small"; btnEditarGuia.textContent = "Editar";
-            btnEditarGuia.addEventListener("click", function(){ guiaModoEdicao[a.id] = true; renderGuiasRapidos(); });
-            var btnExcluirGuia = document.createElement("button");
-            btnExcluirGuia.className = "btn small danger"; btnExcluirGuia.textContent = "Excluir guia";
-            btnExcluirGuia.addEventListener("click", function(){
-              if(!confirm('Excluir o guia rápido de "'+a.nome+'"?')) return;
-              excluirGuiaRemota(a.id);
-              renderGuiasRapidos();
-              showToast("Guia excluído.");
-            });
-            acoesLeitura.appendChild(btnEditarGuia);
-            acoesLeitura.appendChild(btnExcluirGuia);
-            painel.appendChild(acoesLeitura);
-          } else {
-            var wrapImport = document.createElement("div");
-            wrapImport.innerHTML =
-              "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Importar arquivo (.pdf, .docx, .html, .txt)</label>"+
-              "<input type='file' class='guiaFileInput' accept='.pdf,.docx,.html,.htm,.txt'>"+
-              "<p style='font-size:11px;color:var(--text-faint);margin:6px 0 12px;'>A leitura de PDF/.docx precisa de internet no momento da importação.</p>"+
-              "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Ou cole/edite o texto aqui</label>"+
-              "<textarea class='guiaTextarea' style='min-height:180px;'></textarea>"+
-              "<div class='guia-toolbar-cores'>"+
-              "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
-              "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
-              "<span class='guia-toolbar-divisor'></span>"+
-              "<button type='button' class='guia-cor-btn cor-amarelo' data-cor='amarelo'>Amarelo</button>"+
-              "<button type='button' class='guia-cor-btn cor-verde' data-cor='verde'>Verde</button>"+
-              "<button type='button' class='guia-cor-btn cor-vermelho' data-cor='vermelho'>Vermelho</button>"+
-              "<button type='button' class='guia-cor-btn cor-azul' data-cor='azul'>Azul</button>"+
-              "<button type='button' class='guia-cor-btn cor-rosa' data-cor='rosa'>Rosa</button>"+
-              "<button type='button' class='guia-cor-btn cor-laranja' data-cor='laranja'>Laranja</button>"+
-              "<button type='button' class='guia-cor-btn cor-roxo' data-cor='roxo'>Roxo</button>"+
-              "<button type='button' class='guia-cor-btn cor-cinza' data-cor='cinza'>Cinza</button>"+
-              "<button type='button' class='guia-cor-btn cor-marrom' data-cor='marrom'>Marrom</button>"+
-              "<button type='button' class='guia-cor-btn cor-branco' data-cor='branco'>Branco (remover cor)</button>"+
-              "</div>"+
-              "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa cor pra destacar (dá pra combinar os dois). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique em \"Branco\".</p>";
-            painel.appendChild(wrapImport);
-
-            var textareaEl = painel.querySelector(".guiaTextarea");
-            textareaEl.value = temGuia ? guia.texto : "";
-            var fileInputEl = painel.querySelector(".guiaFileInput");
-
-            wrapImport.querySelector("#guiaBtnNegrito").addEventListener("click", function(){
-              alternarNegritoSelecao(textareaEl);
-            });
-
-            wrapImport.querySelectorAll(".guia-cor-btn").forEach(function(botaoCor){
-              botaoCor.addEventListener("click", function(){
-                envolverSelecaoComCor(textareaEl, botaoCor.getAttribute("data-cor"));
-              });
-            });
-
-            var acoesImport = document.createElement("div");
-            acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;";
-            var btnSalvarGuia = document.createElement("button");
-            btnSalvarGuia.className = "btn primary small"; btnSalvarGuia.textContent = "Salvar guia";
-            var btnCancelarGuia = document.createElement("button");
-            btnCancelarGuia.className = "btn small"; btnCancelarGuia.textContent = "Cancelar";
-            acoesImport.appendChild(btnSalvarGuia);
-            acoesImport.appendChild(btnCancelarGuia);
-            painel.appendChild(acoesImport);
-
-            fileInputEl.addEventListener("change", function(e){
-              var file = e.target.files[0];
-              if(!file) return;
-              showToast("Lendo arquivo...");
-              extrairTextoArquivo(file).then(function(texto){
-                textareaEl.value = texto.trim();
-                showToast("Texto extraído! Revise antes de salvar.");
-              }).catch(function(err){
-                console.error(err);
-                showToast(err.message || "Não foi possível ler esse arquivo.");
-              });
-            });
-
-            btnCancelarGuia.addEventListener("click", function(){
-              guiaModoEdicao[a.id] = false;
-              if(!temGuia) guiaAbertoIds[a.id] = false;
-              renderGuiasRapidos();
-            });
-
-            btnSalvarGuia.addEventListener("click", function(){
-              var texto = textareaEl.value.trim();
-              if(!texto){ showToast("Cole ou importe algum texto antes de salvar."); return; }
-              var novoGuia = {
-                texto: texto,
-                nomeArquivo: (fileInputEl.files[0] ? fileInputEl.files[0].name : (guia ? guia.nomeArquivo : "")) || "",
-                atualizadoEm: todayISO()
-              };
-              salvarGuiaRemota(a.id, novoGuia);
-              guiaModoEdicao[a.id] = false;
-              renderGuiasRapidos();
-              showToast("Guia salvo.");
-            });
-          }
-
-          row.appendChild(painel);
-        }
-
-        bloco.appendChild(row);
       });
 
       container.appendChild(bloco);
@@ -2987,13 +3324,70 @@
   document.getElementById("cadBusca").addEventListener("input", renderCaderno);
   document.getElementById("cadFiltroStatus").addEventListener("change", renderCaderno);
 
+  function criarItemCaderno(item){
+    var m = findMateria(item.materiaId);
+    var a = m ? findAssunto(m.id, item.assuntoId) : null;
+    var div = document.createElement("div");
+    div.className = "caderno-item";
+
+    var head = document.createElement("div");
+    head.className = "caderno-head";
+    var infoSpan = document.createElement("span");
+    var etiquetas = [];
+    if(item.banca) etiquetas.push(escapeHtml(item.banca));
+    if(item.tipoErro) etiquetas.push(escapeHtml(item.tipoErro));
+    infoSpan.innerHTML = formatDateBR(item.data) + (etiquetas.length ? " · "+etiquetas.join(" · ") : "");
+    head.appendChild(infoSpan);
+    var tagSpan = document.createElement("span");
+    tagSpan.className = "tag" + (item.resolvida ? " concluido" : "");
+    tagSpan.textContent = item.resolvida ? "Revisado" : "Pendente";
+    head.appendChild(tagSpan);
+    div.appendChild(head);
+
+    var enun = document.createElement("div");
+    enun.className = "caderno-enunciado";
+    enun.textContent = item.enunciado;
+    div.appendChild(enun);
+
+    if(item.anotacao){
+      var anot = document.createElement("div");
+      anot.className = "caderno-anotacao";
+      anot.textContent = item.anotacao;
+      div.appendChild(anot);
+    }
+
+    var acoes = document.createElement("div");
+    acoes.style.cssText = "display:flex;gap:8px;";
+    var toggleBtn = document.createElement("button");
+    toggleBtn.className = "btn small";
+    toggleBtn.textContent = item.resolvida ? "Marcar como pendente" : "Marcar como revisado";
+    toggleBtn.addEventListener("click", function(){
+      item.resolvida = !item.resolvida;
+      saveState();
+      renderCaderno();
+    });
+    var delBtn = document.createElement("button");
+    delBtn.className = "btn small danger";
+    delBtn.textContent = "Excluir";
+    delBtn.addEventListener("click", function(){
+      state.cadernoErros = state.cadernoErros.filter(function(x){ return x.id !== item.id; });
+      saveState();
+      renderCaderno();
+    });
+    acoes.appendChild(toggleBtn);
+    acoes.appendChild(delBtn);
+    div.appendChild(acoes);
+
+    return div;
+  }
+
   function renderCaderno(){
     populateCadernoSelects();
     var container = document.getElementById("cadernoList");
     container.innerHTML = "";
     var busca = (document.getElementById("cadBusca").value || "").trim().toLowerCase();
     var filtroStatus = document.getElementById("cadFiltroStatus").value;
-    var lista = state.cadernoErros.slice().sort(function(a,b){ return (b.data||"").localeCompare(a.data||""); });
+    var lista = state.cadernoErros.slice();
 
     lista = lista.filter(function(item){
       if(filtroStatus === "pendentes" && item.resolvida) return false;
@@ -3011,63 +3405,49 @@
     });
 
     document.getElementById("cadernoEmpty").style.display = lista.length ? "none" : "block";
-    lista.forEach(function(item){
-      var m = findMateria(item.materiaId);
-      var a = m ? findAssunto(m.id, item.assuntoId) : null;
-      var div = document.createElement("div");
-      div.className = "caderno-item";
+    if(!lista.length) return;
 
-      var head = document.createElement("div");
-      head.className = "caderno-head";
-      var infoSpan = document.createElement("span");
-      var etiquetas = [];
-      if(item.banca) etiquetas.push(escapeHtml(item.banca));
-      if(item.tipoErro) etiquetas.push(escapeHtml(item.tipoErro));
-      infoSpan.innerHTML = formatDateBR(item.data) + " · " + (m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—") + (a ? " · "+escapeHtml(a.nome) : "") + (etiquetas.length ? " · "+etiquetas.join(" · ") : "");
-      head.appendChild(infoSpan);
-      var tagSpan = document.createElement("span");
-      tagSpan.className = "tag" + (item.resolvida ? " concluido" : "");
-      tagSpan.textContent = item.resolvida ? "Revisado" : "Pendente";
-      head.appendChild(tagSpan);
-      div.appendChild(head);
+    state.materias.forEach(function(m){
+      var itensDaMateria = lista.filter(function(item){ return item.materiaId === m.id; });
+      if(!itensDaMateria.length) return;
 
-      var enun = document.createElement("div");
-      enun.className = "caderno-enunciado";
-      enun.textContent = item.enunciado;
-      div.appendChild(enun);
+      var grupoHeader = document.createElement("div");
+      grupoHeader.className = "assunto-grupo-header";
+      grupoHeader.style.color = m.cor;
+      grupoHeader.innerHTML =
+        "<span style='display:flex;align-items:center;flex:1;'>"+colorDotHtml(m.cor)+escapeHtml(m.nome)+"</span>"+
+        "<span style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+itensDaMateria.length+" registro"+(itensDaMateria.length>1?"s":"")+"</span>";
+      container.appendChild(grupoHeader);
 
-      if(item.anotacao){
-        var anot = document.createElement("div");
-        anot.className = "caderno-anotacao";
-        anot.textContent = item.anotacao;
-        div.appendChild(anot);
-      }
+      var idsAssuntos = (m.assuntos||[]).map(function(a){ return a.id; }).concat([""]);
+      idsAssuntos.forEach(function(assuntoId){
+        var itensDoAssunto = itensDaMateria.filter(function(item){ return (item.assuntoId||"") === assuntoId; });
+        if(!itensDoAssunto.length) return;
+        var a = assuntoId ? findAssunto(m.id, assuntoId) : null;
 
-      var acoes = document.createElement("div");
-      acoes.style.cssText = "display:flex;gap:8px;";
-      var toggleBtn = document.createElement("button");
-      toggleBtn.className = "btn small";
-      toggleBtn.textContent = item.resolvida ? "Marcar como pendente" : "Marcar como revisado";
-      toggleBtn.addEventListener("click", function(){
-        item.resolvida = !item.resolvida;
-        saveState();
-        renderCaderno();
+        var subHeader = document.createElement("div");
+        subHeader.className = "assunto-subgrupo-header";
+        subHeader.innerHTML =
+          "<span>"+(a ? escapeHtml(a.nome) : "Sem assunto específico")+"</span>"+
+          "<span>"+itensDoAssunto.length+" registro"+(itensDoAssunto.length>1?"s":"")+"</span>";
+        container.appendChild(subHeader);
+
+        itensDoAssunto
+          .sort(function(x,y){ return (y.data||"").localeCompare(x.data||""); })
+          .forEach(function(item){ container.appendChild(criarItemCaderno(item)); });
       });
-      var delBtn = document.createElement("button");
-      delBtn.className = "btn small danger";
-      delBtn.textContent = "Excluir";
-      delBtn.addEventListener("click", function(){
-        state.cadernoErros = state.cadernoErros.filter(function(x){ return x.id !== item.id; });
-        saveState();
-        renderCaderno();
-      });
-      acoes.appendChild(toggleBtn);
-      acoes.appendChild(delBtn);
-      div.appendChild(acoes);
-
-
-      container.appendChild(div);
     });
+
+    var itensOrfaos = lista.filter(function(item){ return !findMateria(item.materiaId); });
+    if(itensOrfaos.length){
+      var grupoOrfaos = document.createElement("div");
+      grupoOrfaos.className = "assunto-grupo-header";
+      grupoOrfaos.textContent = "Sem matéria (excluída)";
+      container.appendChild(grupoOrfaos);
+      itensOrfaos
+        .sort(function(x,y){ return (y.data||"").localeCompare(x.data||""); })
+        .forEach(function(item){ container.appendChild(criarItemCaderno(item)); });
+    }
   }
 
   document.getElementById("btnEditEdital").addEventListener("click", function(){
@@ -3550,3 +3930,5 @@
 </script>
 </body>
 </html>
+painel-estudos(1) (1).html
+Sugestões atualizadasExibindo painel-estudos(1) (1).html.
