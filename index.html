@@ -829,27 +829,36 @@
   .guia-toolbar-cores span.guia-toolbar-label{
     font-size:11.5px;color:var(--text-muted);margin-right:2px;
   }
-  .guia-cor-btn{
+  .guia-cor-dot{
+    width:22px;height:22px;flex-shrink:0;
+    border-radius:50%;
     border:1px solid var(--border-soft);
-    background:var(--bg-panel-alt);
-    padding:3px 10px;
-    font-size:11.5px;
-    font-family:var(--font-body);
-    border-radius:10px;
+    padding:0;
     cursor:pointer;
+    position:relative;
+    transition:transform .1s ease, border-color .1s ease;
   }
-  .guia-cor-btn.cor-amarelo{color:var(--accent-ouro);}
-  .guia-cor-btn.cor-verde{color:var(--success);}
-  .guia-cor-btn.cor-vermelho{color:var(--danger);}
-  .guia-cor-btn.cor-azul{color:var(--accent-sky);}
-  .guia-cor-btn.cor-rosa{color:var(--accent-rosa);}
-  .guia-cor-btn.cor-laranja{color:#fb923c;}
-  .guia-cor-btn.cor-roxo{color:#a78bfa;}
-  .guia-cor-btn.cor-cinza{color:#9ca3af;}
-  .guia-cor-btn.cor-marrom{color:#c9a074;}
-  .guia-cor-btn.cor-branco{color:var(--text-primary);}
-  .guia-cor-btn:hover{border-color:currentColor;}
-  .guia-cor-btn.limpar{color:var(--text-muted);}
+  .guia-cor-dot:hover{ transform:scale(1.15); border-color:var(--text-primary); }
+  .guia-cor-dot.cor-amarelo{background:var(--accent-ouro);}
+  .guia-cor-dot.cor-verde{background:var(--success);}
+  .guia-cor-dot.cor-vermelho{background:var(--danger);}
+  .guia-cor-dot.cor-azul{background:var(--accent-sky);}
+  .guia-cor-dot.cor-rosa{background:var(--accent-rosa);}
+  .guia-cor-dot.cor-laranja{background:#fb923c;}
+  .guia-cor-dot.cor-roxo{background:#a78bfa;}
+  .guia-cor-dot.cor-cinza{background:#9ca3af;}
+  .guia-cor-dot.cor-marrom{background:#c9a074;}
+  .guia-cor-dot.cor-branco{
+    background:var(--bg-panel-alt);
+    border:1px dashed var(--text-muted);
+  }
+  .guia-cor-dot.cor-branco::after{
+    content:"";
+    position:absolute; left:50%; top:50%;
+    width:150%; height:1px;
+    background:var(--text-muted);
+    transform:translate(-50%,-50%) rotate(-45deg);
+  }
   .guia-negrito-btn{
     height:20px;line-height:18px;padding:0 10px;
     border:1px solid var(--border-soft);background:var(--bg-panel-alt);
@@ -858,6 +867,13 @@
   }
   .guia-negrito-btn:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
   .guia-toolbar-divisor{width:1px;height:16px;background:var(--border-soft);margin:0 2px;}
+  .guia-preview-live{
+    border:1px solid var(--border-soft);
+    border-radius:8px;
+    padding:12px;
+    background:var(--bg-panel-alt);
+    max-height:220px;
+  }
   .guia-meta{color:var(--text-faint);font-size:11px;margin-top:10px;}
 
   .caderno-item{
@@ -2993,6 +3009,15 @@
     return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
   }
 
+  function posicionarTextarea(textareaEl, novoValor, selStart, selEnd, scrollTopAntes){
+    textareaEl.value = novoValor;
+    textareaEl.setSelectionRange(selStart, selEnd);
+    try{ textareaEl.focus({preventScroll:true}); }catch(e){ textareaEl.focus(); }
+    textareaEl.scrollTop = scrollTopAntes;
+    setTimeout(function(){ textareaEl.scrollTop = scrollTopAntes; }, 0);
+    textareaEl.dispatchEvent(new Event("input", {bubbles:true}));
+  }
+
   function alternarNegritoSelecao(textareaEl){
     var inicio = textareaEl.selectionStart;
     var fim = textareaEl.selectionEnd;
@@ -3000,6 +3025,7 @@
       showToast("Selecione o trecho que você quer deixar em negrito.");
       return;
     }
+    var scrollTopAntes = textareaEl.scrollTop;
     var valor = textareaEl.value;
     var selecionado = valor.slice(inicio, fim);
 
@@ -3007,26 +3033,20 @@
     if(selecionado.length > 4 && selecionado.slice(0,2) === "**" && selecionado.slice(-2) === "**"){
       var interno = selecionado.slice(2, -2);
       var novoValor = valor.slice(0, inicio) + interno + valor.slice(fim);
-      textareaEl.value = novoValor;
-      textareaEl.focus();
-      textareaEl.setSelectionRange(inicio, inicio + interno.length);
+      posicionarTextarea(textareaEl, novoValor, inicio, inicio + interno.length, scrollTopAntes);
       return;
     }
 
     // Caso 2: a seleção está "por dentro" de ** já existentes -> remove os ** ao redor
     if(valor.slice(Math.max(0, inicio-2), inicio) === "**" && valor.slice(fim, fim+2) === "**"){
       var novoValor2 = valor.slice(0, inicio-2) + selecionado + valor.slice(fim+2);
-      textareaEl.value = novoValor2;
-      textareaEl.focus();
-      textareaEl.setSelectionRange(inicio-2, inicio-2 + selecionado.length);
+      posicionarTextarea(textareaEl, novoValor2, inicio-2, inicio-2 + selecionado.length, scrollTopAntes);
       return;
     }
 
     // Caso 3: ainda não tem negrito -> adiciona
     var novoValor3 = valor.slice(0, inicio) + "**" + selecionado + "**" + valor.slice(fim);
-    textareaEl.value = novoValor3;
-    textareaEl.focus();
-    textareaEl.setSelectionRange(inicio+2, inicio+2+selecionado.length);
+    posicionarTextarea(textareaEl, novoValor3, inicio+2, inicio+2+selecionado.length, scrollTopAntes);
   }
 
   function abrirTelaCheiaGuia(materiaNome, assuntoNome, guia){
@@ -3056,6 +3076,7 @@
       showToast("Selecione o termo que você quer colorir antes de clicar na cor.");
       return;
     }
+    var scrollTopAntes = textareaEl.scrollTop;
     var valor = textareaEl.value;
     var selecionado = valor.slice(inicio, fim);
     var padraoCor = new RegExp("\\{\\{(" + GUIA_CORES.join("|") + ")\\|$");
@@ -3067,10 +3088,8 @@
     if(marcadorAntes && marcadorDepois){
       var novoInicio = inicio - marcadorAntes[0].length;
       var novoValor = valor.slice(0, novoInicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim + 2);
-      textareaEl.value = novoValor;
       var posFinal = novoInicio + cor.length + 3 + selecionado.length + 2;
-      textareaEl.focus();
-      textareaEl.setSelectionRange(posFinal, posFinal);
+      posicionarTextarea(textareaEl, novoValor, posFinal, posFinal, scrollTopAntes);
       return;
     }
 
@@ -3080,19 +3099,15 @@
     if(marcadorCompleto){
       var conteudoInterno = marcadorCompleto[2];
       var novoValor2 = valor.slice(0, inicio) + "{{" + cor + "|" + conteudoInterno + "}}" + valor.slice(fim);
-      textareaEl.value = novoValor2;
       var posFinal2 = inicio + cor.length + 3 + conteudoInterno.length + 2;
-      textareaEl.focus();
-      textareaEl.setSelectionRange(posFinal2, posFinal2);
+      posicionarTextarea(textareaEl, novoValor2, posFinal2, posFinal2, scrollTopAntes);
       return;
     }
 
     // Caso 3: texto sem cor nenhuma ainda -> envolve normalmente
     var novoValor3 = valor.slice(0, inicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim);
-    textareaEl.value = novoValor3;
     var posFinal3 = inicio + cor.length + 3 + selecionado.length + 2;
-    textareaEl.focus();
-    textareaEl.setSelectionRange(posFinal3, posFinal3);
+    posicionarTextarea(textareaEl, novoValor3, posFinal3, posFinal3, scrollTopAntes);
   }
 
   function criarLinhaGuia(item, materiaNome, classeExtra){
@@ -3164,29 +3179,39 @@
           "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
           "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
           "<span class='guia-toolbar-divisor'></span>"+
-          "<button type='button' class='guia-cor-btn cor-amarelo' data-cor='amarelo'>Amarelo</button>"+
-          "<button type='button' class='guia-cor-btn cor-verde' data-cor='verde'>Verde</button>"+
-          "<button type='button' class='guia-cor-btn cor-vermelho' data-cor='vermelho'>Vermelho</button>"+
-          "<button type='button' class='guia-cor-btn cor-azul' data-cor='azul'>Azul</button>"+
-          "<button type='button' class='guia-cor-btn cor-rosa' data-cor='rosa'>Rosa</button>"+
-          "<button type='button' class='guia-cor-btn cor-laranja' data-cor='laranja'>Laranja</button>"+
-          "<button type='button' class='guia-cor-btn cor-roxo' data-cor='roxo'>Roxo</button>"+
-          "<button type='button' class='guia-cor-btn cor-cinza' data-cor='cinza'>Cinza</button>"+
-          "<button type='button' class='guia-cor-btn cor-marrom' data-cor='marrom'>Marrom</button>"+
-          "<button type='button' class='guia-cor-btn cor-branco' data-cor='branco'>Branco (remover cor)</button>"+
+          "<button type='button' class='guia-cor-dot cor-amarelo' data-cor='amarelo' title='Amarelo'></button>"+
+          "<button type='button' class='guia-cor-dot cor-verde' data-cor='verde' title='Verde'></button>"+
+          "<button type='button' class='guia-cor-dot cor-vermelho' data-cor='vermelho' title='Vermelho'></button>"+
+          "<button type='button' class='guia-cor-dot cor-azul' data-cor='azul' title='Azul'></button>"+
+          "<button type='button' class='guia-cor-dot cor-rosa' data-cor='rosa' title='Rosa'></button>"+
+          "<button type='button' class='guia-cor-dot cor-laranja' data-cor='laranja' title='Laranja'></button>"+
+          "<button type='button' class='guia-cor-dot cor-roxo' data-cor='roxo' title='Roxo'></button>"+
+          "<button type='button' class='guia-cor-dot cor-cinza' data-cor='cinza' title='Cinza'></button>"+
+          "<button type='button' class='guia-cor-dot cor-marrom' data-cor='marrom' title='Marrom'></button>"+
+          "<button type='button' class='guia-cor-dot cor-branco' data-cor='branco' title='Remover cor'></button>"+
           "</div>"+
-          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa cor pra destacar (dá pra combinar os dois). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique em \"Branco\".</p>";
+          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa bolinha de cor pra destacar (passe o mouse pra ver o nome, dá pra combinar cor com negrito). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique na bolinha riscada (remover cor).</p>"+
+          "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin:14px 0 5px;'>Pré-visualização (atualiza sozinha)</label>"+
+          "<div class='guia-preview-live guia-texto-leitura' id='guiaPreviewLive'></div>";
         painel.appendChild(wrapImport);
 
         var textareaEl = painel.querySelector(".guiaTextarea");
         textareaEl.value = temGuia ? guia.texto : "";
         var fileInputEl = painel.querySelector(".guiaFileInput");
+        var previewEl = painel.querySelector("#guiaPreviewLive");
+
+        function atualizarPreviewGuia(){
+          var texto = textareaEl.value.trim();
+          previewEl.innerHTML = texto ? renderGuiaTexto(textareaEl.value) : "<span style='color:var(--text-faint);'>Comece a digitar pra ver a pré-visualização aqui.</span>";
+        }
+        atualizarPreviewGuia();
+        textareaEl.addEventListener("input", atualizarPreviewGuia);
 
         wrapImport.querySelector("#guiaBtnNegrito").addEventListener("click", function(){
           alternarNegritoSelecao(textareaEl);
         });
 
-        wrapImport.querySelectorAll(".guia-cor-btn").forEach(function(botaoCor){
+        wrapImport.querySelectorAll(".guia-cor-dot").forEach(function(botaoCor){
           botaoCor.addEventListener("click", function(){
             envolverSelecaoComCor(textareaEl, botaoCor.getAttribute("data-cor"));
           });
@@ -3208,6 +3233,7 @@
           showToast("Lendo arquivo...");
           extrairTextoArquivo(file).then(function(texto){
             textareaEl.value = texto.trim();
+            atualizarPreviewGuia();
             showToast("Texto extraído! Revise antes de salvar.");
           }).catch(function(err){
             console.error(err);
