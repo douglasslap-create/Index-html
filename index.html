@@ -867,12 +867,26 @@
   }
   .guia-negrito-btn:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
   .guia-toolbar-divisor{width:1px;height:16px;background:var(--border-soft);margin:0 2px;}
-  .guia-preview-live{
+  .guia-editor-editavel{
+    min-height:180px;
+    max-height:420px;
+    overflow-y:auto;
     border:1px solid var(--border-soft);
     border-radius:8px;
     padding:12px;
-    background:var(--bg-panel-alt);
-    max-height:220px;
+    background:var(--bg-input);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    font-size:14px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    word-wrap:break-word;
+    outline:none;
+  }
+  .guia-editor-editavel:focus{ border-color:var(--accent-brass); }
+  .guia-editor-editavel:empty::before{
+    content: attr(data-placeholder);
+    color:var(--text-faint);
   }
   .guia-meta{color:var(--text-faint);font-size:11px;margin-top:10px;}
 
@@ -3009,46 +3023,6 @@
     return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
   }
 
-  function posicionarTextarea(textareaEl, novoValor, selStart, selEnd, scrollTopAntes){
-    textareaEl.value = novoValor;
-    textareaEl.setSelectionRange(selStart, selEnd);
-    try{ textareaEl.focus({preventScroll:true}); }catch(e){ textareaEl.focus(); }
-    textareaEl.scrollTop = scrollTopAntes;
-    setTimeout(function(){ textareaEl.scrollTop = scrollTopAntes; }, 0);
-    textareaEl.dispatchEvent(new Event("input", {bubbles:true}));
-  }
-
-  function alternarNegritoSelecao(textareaEl){
-    var inicio = textareaEl.selectionStart;
-    var fim = textareaEl.selectionEnd;
-    if(inicio === fim){
-      showToast("Selecione o trecho que você quer deixar em negrito.");
-      return;
-    }
-    var scrollTopAntes = textareaEl.scrollTop;
-    var valor = textareaEl.value;
-    var selecionado = valor.slice(inicio, fim);
-
-    // Caso 1: a seleção inclui os ** dos dois lados -> remove o negrito
-    if(selecionado.length > 4 && selecionado.slice(0,2) === "**" && selecionado.slice(-2) === "**"){
-      var interno = selecionado.slice(2, -2);
-      var novoValor = valor.slice(0, inicio) + interno + valor.slice(fim);
-      posicionarTextarea(textareaEl, novoValor, inicio, inicio + interno.length, scrollTopAntes);
-      return;
-    }
-
-    // Caso 2: a seleção está "por dentro" de ** já existentes -> remove os ** ao redor
-    if(valor.slice(Math.max(0, inicio-2), inicio) === "**" && valor.slice(fim, fim+2) === "**"){
-      var novoValor2 = valor.slice(0, inicio-2) + selecionado + valor.slice(fim+2);
-      posicionarTextarea(textareaEl, novoValor2, inicio-2, inicio-2 + selecionado.length, scrollTopAntes);
-      return;
-    }
-
-    // Caso 3: ainda não tem negrito -> adiciona
-    var novoValor3 = valor.slice(0, inicio) + "**" + selecionado + "**" + valor.slice(fim);
-    posicionarTextarea(textareaEl, novoValor3, inicio+2, inicio+2+selecionado.length, scrollTopAntes);
-  }
-
   function abrirTelaCheiaGuia(materiaNome, assuntoNome, guia){
     document.getElementById("tfcAssunto").textContent = assuntoNome;
     document.getElementById("tfcMateria").textContent = materiaNome;
@@ -3069,45 +3043,67 @@
     }
   });
 
-  function envolverSelecaoComCor(textareaEl, cor){
-    var inicio = textareaEl.selectionStart;
-    var fim = textareaEl.selectionEnd;
-    if(inicio === fim){
+  function removerSpansDeCor(fragmentoOuElemento){
+    var spans = fragmentoOuElemento.querySelectorAll ? fragmentoOuElemento.querySelectorAll("span[class*='guia-cor-']") : [];
+    spans.forEach(function(span){
+      while(span.firstChild) span.parentNode.insertBefore(span.firstChild, span);
+      span.parentNode.removeChild(span);
+    });
+  }
+
+  function aplicarCorNaSelecaoEditor(editorEl, cor){
+    var sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0 || sel.isCollapsed){
       showToast("Selecione o termo que você quer colorir antes de clicar na cor.");
       return;
     }
-    var scrollTopAntes = textareaEl.scrollTop;
-    var valor = textareaEl.value;
-    var selecionado = valor.slice(inicio, fim);
-    var padraoCor = new RegExp("\\{\\{(" + GUIA_CORES.join("|") + ")\\|$");
-
-    // Caso 1: a seleção está "por dentro" de um marcador já existente (ex: selecionou só o texto visível) -> troca a cor
-    var antes = valor.slice(0, inicio);
-    var marcadorAntes = antes.match(padraoCor);
-    var marcadorDepois = valor.slice(fim, fim + 2) === "}}";
-    if(marcadorAntes && marcadorDepois){
-      var novoInicio = inicio - marcadorAntes[0].length;
-      var novoValor = valor.slice(0, novoInicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim + 2);
-      var posFinal = novoInicio + cor.length + 3 + selecionado.length + 2;
-      posicionarTextarea(textareaEl, novoValor, posFinal, posFinal, scrollTopAntes);
+    var range = sel.getRangeAt(0);
+    if(!editorEl.contains(range.commonAncestorContainer)){
+      showToast("Selecione o termo que você quer colorir antes de clicar na cor.");
       return;
     }
 
-    // Caso 2: a seleção inclui o marcador inteiro (com {{cor| e }}) -> troca a cor
-    var padraoCompleto = new RegExp("^\\{\\{(" + GUIA_CORES.join("|") + ")\\|([\\s\\S]*)\\}\\}$");
-    var marcadorCompleto = selecionado.match(padraoCompleto);
-    if(marcadorCompleto){
-      var conteudoInterno = marcadorCompleto[2];
-      var novoValor2 = valor.slice(0, inicio) + "{{" + cor + "|" + conteudoInterno + "}}" + valor.slice(fim);
-      var posFinal2 = inicio + cor.length + 3 + conteudoInterno.length + 2;
-      posicionarTextarea(textareaEl, novoValor2, posFinal2, posFinal2, scrollTopAntes);
-      return;
-    }
+    var conteudo = range.extractContents();
+    removerSpansDeCor(conteudo);
+    var novoSpan = document.createElement("span");
+    novoSpan.className = "guia-cor-" + cor;
+    novoSpan.appendChild(conteudo);
+    range.insertNode(novoSpan);
 
-    // Caso 3: texto sem cor nenhuma ainda -> envolve normalmente
-    var novoValor3 = valor.slice(0, inicio) + "{{" + cor + "|" + selecionado + "}}" + valor.slice(fim);
-    var posFinal3 = inicio + cor.length + 3 + selecionado.length + 2;
-    posicionarTextarea(textareaEl, novoValor3, posFinal3, posFinal3, scrollTopAntes);
+    var novoRange = document.createRange();
+    novoRange.setStartAfter(novoSpan);
+    novoRange.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(novoRange);
+
+    editorEl.focus();
+  }
+
+  function serializarEditorParaMarkup(node){
+    var resultado = "";
+    node.childNodes.forEach(function(filho){
+      if(filho.nodeType === Node.TEXT_NODE){
+        resultado += filho.textContent;
+      } else if(filho.nodeType === Node.ELEMENT_NODE){
+        var tag = filho.tagName.toLowerCase();
+        if(tag === "br"){
+          resultado += "\n";
+        } else if(tag === "div" || tag === "p"){
+          if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
+          resultado += serializarEditorParaMarkup(filho) + "\n";
+        } else if(tag === "strong" || tag === "b"){
+          var innerNegrito = serializarEditorParaMarkup(filho);
+          if(innerNegrito) resultado += "**"+innerNegrito+"**";
+        } else if(tag === "span" && filho.className && /guia-cor-(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)/.test(filho.className)){
+          var cor = filho.className.match(/guia-cor-(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)/)[1];
+          var innerCor = serializarEditorParaMarkup(filho);
+          if(innerCor) resultado += "{{"+cor+"|"+innerCor+"}}";
+        } else {
+          resultado += serializarEditorParaMarkup(filho);
+        }
+      }
+    });
+    return resultado;
   }
 
   function criarLinhaGuia(item, materiaNome, classeExtra){
@@ -3173,8 +3169,6 @@
           "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Importar arquivo (.pdf, .docx, .html, .txt)</label>"+
           "<input type='file' class='guiaFileInput' accept='.pdf,.docx,.html,.htm,.txt'>"+
           "<p style='font-size:11px;color:var(--text-faint);margin:6px 0 12px;'>A leitura de PDF/.docx precisa de internet no momento da importação.</p>"+
-          "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Ou cole/edite o texto aqui</label>"+
-          "<textarea class='guiaTextarea' style='min-height:180px;'></textarea>"+
           "<div class='guia-toolbar-cores'>"+
           "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
           "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
@@ -3190,30 +3184,31 @@
           "<button type='button' class='guia-cor-dot cor-marrom' data-cor='marrom' title='Marrom'></button>"+
           "<button type='button' class='guia-cor-dot cor-branco' data-cor='branco' title='Remover cor'></button>"+
           "</div>"+
-          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 0;'>Selecione um trecho no texto acima: clique em <b>N</b> pra negrito, ou numa bolinha de cor pra destacar (passe o mouse pra ver o nome, dá pra combinar cor com negrito). Pra tirar a cor de um termo já colorido, selecione ele de novo e clique na bolinha riscada (remover cor).</p>"+
-          "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin:14px 0 5px;'>Pré-visualização (atualiza sozinha)</label>"+
-          "<div class='guia-preview-live guia-texto-leitura' id='guiaPreviewLive'></div>";
+          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 10px;'>Selecione um trecho do texto abaixo: clique em <b>N</b> pra negrito, ou numa bolinha de cor pra destacar. A mudança já aparece na hora, direto no texto — sem código.</p>"+
+          "<div class='guia-editor-editavel' id='guiaEditorEditavel' contenteditable='true' data-placeholder='Cole ou digite o conteúdo do guia aqui...'></div>";
         painel.appendChild(wrapImport);
 
-        var textareaEl = painel.querySelector(".guiaTextarea");
-        textareaEl.value = temGuia ? guia.texto : "";
-        var fileInputEl = painel.querySelector(".guiaFileInput");
-        var previewEl = painel.querySelector("#guiaPreviewLive");
+        var editorEl = wrapImport.querySelector("#guiaEditorEditavel");
+        editorEl.innerHTML = temGuia ? renderGuiaTexto(guia.texto) : "";
+        var fileInputEl = wrapImport.querySelector(".guiaFileInput");
 
-        function atualizarPreviewGuia(){
-          var texto = textareaEl.value.trim();
-          previewEl.innerHTML = texto ? renderGuiaTexto(textareaEl.value) : "<span style='color:var(--text-faint);'>Comece a digitar pra ver a pré-visualização aqui.</span>";
-        }
-        atualizarPreviewGuia();
-        textareaEl.addEventListener("input", atualizarPreviewGuia);
+        editorEl.addEventListener("paste", function(e){
+          e.preventDefault();
+          var texto = (e.clipboardData || window.clipboardData).getData("text/plain");
+          document.execCommand("insertText", false, texto);
+        });
 
-        wrapImport.querySelector("#guiaBtnNegrito").addEventListener("click", function(){
-          alternarNegritoSelecao(textareaEl);
+        var btnNegritoGuia = wrapImport.querySelector("#guiaBtnNegrito");
+        btnNegritoGuia.addEventListener("mousedown", function(e){ e.preventDefault(); });
+        btnNegritoGuia.addEventListener("click", function(){
+          editorEl.focus();
+          document.execCommand("bold");
         });
 
         wrapImport.querySelectorAll(".guia-cor-dot").forEach(function(botaoCor){
+          botaoCor.addEventListener("mousedown", function(e){ e.preventDefault(); });
           botaoCor.addEventListener("click", function(){
-            envolverSelecaoComCor(textareaEl, botaoCor.getAttribute("data-cor"));
+            aplicarCorNaSelecaoEditor(editorEl, botaoCor.getAttribute("data-cor"));
           });
         });
 
@@ -3232,8 +3227,7 @@
           if(!file) return;
           showToast("Lendo arquivo...");
           extrairTextoArquivo(file).then(function(texto){
-            textareaEl.value = texto.trim();
-            atualizarPreviewGuia();
+            editorEl.textContent = texto.trim();
             showToast("Texto extraído! Revise antes de salvar.");
           }).catch(function(err){
             console.error(err);
@@ -3248,7 +3242,7 @@
         });
 
         btnSalvarGuia.addEventListener("click", function(){
-          var texto = textareaEl.value.trim();
+          var texto = serializarEditorParaMarkup(editorEl).replace(/\n{3,}/g, "\n\n").trim();
           if(!texto){ showToast("Cole ou importe algum texto antes de salvar."); return; }
           var novoGuia = {
             texto: texto,
