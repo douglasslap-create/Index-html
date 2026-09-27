@@ -771,6 +771,7 @@
     max-height:420px;
     overflow-y:auto;
     padding-right:6px;
+    outline:none;
   }
   .guia-fullscreen{
     position:fixed;inset:0;z-index:999;
@@ -795,6 +796,15 @@
     font-size:12px;color:var(--text-muted);
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
+  .guia-fullscreen-salvo{
+    font-size:11px;color:var(--success);
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .3s ease;
+    flex-shrink:0;
+  }
+  .guia-fullscreen-salvo.mostrar{opacity:1;}
+  .guia-fullscreen-corpo{outline:none;}
   .guia-fullscreen-conteudo{
     flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
     padding:32px 24px calc(60px + env(safe-area-inset-bottom,0px));
@@ -822,12 +832,43 @@
   .guia-cor-cinza{color:#9ca3af;font-weight:600;}
   .guia-cor-marrom{color:#c9a074;font-weight:600;}
   .guia-cor-branco{color:var(--text-primary);font-weight:400;}
-  .guia-toolbar-cores{
-    display:flex;align-items:center;flex-wrap:wrap;gap:6px;
-    margin-bottom:8px;
+  .guia-flutuante-wrap{
+    position:fixed;
+    transform:translate(-50%,-100%);
+    z-index:1050;
+    display:none;
+    padding-bottom:8px;
   }
-  .guia-toolbar-cores span.guia-toolbar-label{
-    font-size:11.5px;color:var(--text-muted);margin-right:2px;
+  .guia-flutuante-wrap.visivel{ display:block; }
+  .guia-flutuante-lapis{
+    width:34px;height:34px;flex-shrink:0;
+    border-radius:50%;
+    border:1px solid var(--border-soft);
+    background:rgba(20,20,26,0.6);
+    color:var(--text-primary);
+    font-size:15px;
+    cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    backdrop-filter:blur(3px);
+  }
+  .guia-flutuante-lapis:hover{ background:rgba(20,20,26,0.92); }
+  .guia-flutuante-popover{
+    position:absolute;
+    bottom:calc(100% + 8px);
+    left:50%;
+    transform:translateX(-50%);
+    display:none;
+    align-items:center;
+    flex-wrap:wrap; gap:8px;
+    width:190px;
+    background:var(--bg-panel); border:1px solid var(--border-soft);
+    border-radius:10px; padding:10px;
+    box-shadow:0 10px 28px rgba(0,0,0,0.45);
+  }
+  .guia-flutuante-popover.aberto{ display:flex; }
+  .guia-flutuante-popover.abaixo{
+    bottom:auto;
+    top:calc(100% + 8px);
   }
   .guia-cor-dot{
     width:22px;height:22px;flex-shrink:0;
@@ -1334,10 +1375,29 @@
       <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
       <div class="guia-fullscreen-materia" id="tfcMateria"></div>
     </div>
+    <span class="guia-fullscreen-salvo" id="tfcStatusSalvo"></span>
   </div>
   <div class="guia-fullscreen-conteudo">
-    <div class="guia-fullscreen-corpo" id="tfcCorpo"></div>
+    <div class="guia-fullscreen-corpo" id="tfcCorpo" contenteditable="true" spellcheck="false"></div>
     <div class="guia-fullscreen-rodape" id="tfcRodape"></div>
+  </div>
+</div>
+
+<div class="guia-flutuante-wrap" id="guiaFlutuanteWrap">
+  <button type="button" class="guia-flutuante-lapis" id="guiaFlutuanteLapis" title="Formatar seleção">✎</button>
+  <div class="guia-flutuante-popover" id="guiaFlutuantePopover">
+    <button type="button" class="guia-negrito-btn" id="guiaFlutuanteNegrito">N</button>
+    <span class="guia-toolbar-divisor"></span>
+    <button type="button" class="guia-cor-dot cor-amarelo" data-cor="amarelo" title="Amarelo"></button>
+    <button type="button" class="guia-cor-dot cor-verde" data-cor="verde" title="Verde"></button>
+    <button type="button" class="guia-cor-dot cor-vermelho" data-cor="vermelho" title="Vermelho"></button>
+    <button type="button" class="guia-cor-dot cor-azul" data-cor="azul" title="Azul"></button>
+    <button type="button" class="guia-cor-dot cor-rosa" data-cor="rosa" title="Rosa"></button>
+    <button type="button" class="guia-cor-dot cor-laranja" data-cor="laranja" title="Laranja"></button>
+    <button type="button" class="guia-cor-dot cor-roxo" data-cor="roxo" title="Roxo"></button>
+    <button type="button" class="guia-cor-dot cor-cinza" data-cor="cinza" title="Cinza"></button>
+    <button type="button" class="guia-cor-dot cor-marrom" data-cor="marrom" title="Marrom"></button>
+    <button type="button" class="guia-cor-dot cor-branco" data-cor="branco" title="Remover cor"></button>
   </div>
 </div>
 
@@ -3023,10 +3083,13 @@
     return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
   }
 
-  function abrirTelaCheiaGuia(materiaNome, assuntoNome, guia){
-    document.getElementById("tfcAssunto").textContent = assuntoNome;
+  function abrirTelaCheiaGuia(materiaNome, item, guia){
+    document.getElementById("tfcAssunto").textContent = item.nome;
     document.getElementById("tfcMateria").textContent = materiaNome;
-    document.getElementById("tfcCorpo").innerHTML = renderGuiaTexto(guia.texto || "");
+    var corpoEl = document.getElementById("tfcCorpo");
+    corpoEl.innerHTML = renderGuiaTexto(guia.texto || "");
+    corpoEl.dataset.itemId = item.id;
+    corpoEl.dataset.nomeArquivo = guia.nomeArquivo || "";
     document.getElementById("tfcRodape").textContent =
       (guia.nomeArquivo ? guia.nomeArquivo + " · " : "") + "Atualizado em " + formatDateBR(guia.atualizadoEm || todayISO());
     var overlay = document.getElementById("guiaFullscreen");
@@ -3034,13 +3097,143 @@
     overlay.querySelector(".guia-fullscreen-conteudo").scrollTop = 0;
   }
   function fecharTelaCheiaGuia(){
+    if(tfcTimeoutDigitacao){
+      clearTimeout(tfcTimeoutDigitacao);
+      tfcTimeoutDigitacao = null;
+      salvarConteudoEditavel(document.getElementById("tfcCorpo"));
+    }
     document.getElementById("guiaFullscreen").classList.remove("aberto");
+    renderGuiasRapidos();
   }
+
+  function mostrarStatusSalvoTelaCheia(){
+    var status = document.getElementById("tfcStatusSalvo");
+    status.textContent = "Salvo ✓";
+    status.classList.add("mostrar");
+    setTimeout(function(){ status.classList.remove("mostrar"); }, 1500);
+  }
+
+  function salvarConteudoEditavel(editorEl){
+    var itemId = editorEl.dataset.itemId;
+    if(!itemId) return;
+    var texto = serializarEditorParaMarkup(editorEl).replace(/\n{3,}/g, "\n\n").trim();
+    if(!texto) return;
+    var novoGuia = { texto: texto, nomeArquivo: editorEl.dataset.nomeArquivo || "", atualizadoEm: todayISO() };
+    salvarGuiaRemota(itemId, novoGuia);
+    var textoMeta = (novoGuia.nomeArquivo ? novoGuia.nomeArquivo + " · " : "") + "Atualizado em " + formatDateBR(novoGuia.atualizadoEm);
+    if(editorEl.id === "tfcCorpo"){
+      document.getElementById("tfcRodape").textContent = textoMeta;
+      mostrarStatusSalvoTelaCheia();
+    } else {
+      var metaEl = editorEl.parentElement ? editorEl.parentElement.querySelector(".guia-meta") : null;
+      if(metaEl) metaEl.textContent = textoMeta;
+      showToast("Guia atualizado.");
+    }
+  }
+
+  var tfcTimeoutDigitacao = null;
+  function agendarSalvarTelaCheia(){
+    if(tfcTimeoutDigitacao) clearTimeout(tfcTimeoutDigitacao);
+    tfcTimeoutDigitacao = setTimeout(function(){
+      salvarConteudoEditavel(document.getElementById("tfcCorpo"));
+    }, 900);
+  }
+
+  document.getElementById("tfcCorpo").addEventListener("input", agendarSalvarTelaCheia);
+
   document.getElementById("btnFecharTelaCheia").addEventListener("click", fecharTelaCheiaGuia);
   document.addEventListener("keydown", function(e){
     if(e.key === "Escape" && document.getElementById("guiaFullscreen").classList.contains("aberto")){
       fecharTelaCheiaGuia();
     }
+  });
+
+  var editorFlutuanteAtivo = null;
+
+  function encontrarEditorDeGuia(node){
+    var el = (node && node.nodeType === 3) ? node.parentElement : node;
+    return el && el.closest ? el.closest("[contenteditable='true']") : null;
+  }
+
+  function esconderBarraFlutuante(){
+    document.getElementById("guiaFlutuanteWrap").classList.remove("visivel");
+    document.getElementById("guiaFlutuantePopover").classList.remove("aberto");
+    editorFlutuanteAtivo = null;
+  }
+
+  function atualizarBarraFlutuanteSelecao(){
+    var wrap = document.getElementById("guiaFlutuanteWrap");
+    var sel = window.getSelection();
+    if(!sel || sel.rangeCount === 0 || sel.isCollapsed){ esconderBarraFlutuante(); return; }
+    var range = sel.getRangeAt(0);
+    var editor = encontrarEditorDeGuia(range.commonAncestorContainer);
+    if(!editor){ esconderBarraFlutuante(); return; }
+    var rect = range.getBoundingClientRect();
+    if(rect.width === 0 && rect.height === 0){ esconderBarraFlutuante(); return; }
+    editorFlutuanteAtivo = editor;
+    wrap.style.top = Math.max(44, rect.top) + "px";
+    wrap.style.left = (rect.left + rect.width/2) + "px";
+    wrap.classList.add("visivel");
+  }
+
+  document.addEventListener("selectionchange", atualizarBarraFlutuanteSelecao);
+
+  document.addEventListener("click", function(e){
+    var wrap = document.getElementById("guiaFlutuanteWrap");
+    if(!wrap.contains(e.target)){
+      document.getElementById("guiaFlutuantePopover").classList.remove("aberto");
+    }
+  });
+
+  function posicionarPopoverFlutuante(){
+    var popover = document.getElementById("guiaFlutuantePopover");
+    popover.classList.remove("abaixo");
+    popover.style.transform = "translateX(-50%)";
+
+    var rect = popover.getBoundingClientRect();
+    if(rect.top < 8){
+      popover.classList.add("abaixo");
+    }
+
+    rect = popover.getBoundingClientRect();
+    if(rect.left < 8){
+      popover.style.transform = "translateX(calc(-50% + " + (8 - rect.left) + "px))";
+    } else if(rect.right > window.innerWidth - 8){
+      popover.style.transform = "translateX(calc(-50% - " + (rect.right - (window.innerWidth - 8)) + "px))";
+    }
+  }
+
+  var guiaFlutuanteLapisBtn = document.getElementById("guiaFlutuanteLapis");
+  guiaFlutuanteLapisBtn.addEventListener("mousedown", function(e){ e.preventDefault(); e.stopPropagation(); });
+  guiaFlutuanteLapisBtn.addEventListener("click", function(e){
+    e.stopPropagation();
+    var popover = document.getElementById("guiaFlutuantePopover");
+    if(popover.classList.contains("aberto")){
+      popover.classList.remove("aberto");
+      return;
+    }
+    popover.classList.add("aberto");
+    posicionarPopoverFlutuante();
+  });
+
+  var guiaFlutuanteNegritoBtn = document.getElementById("guiaFlutuanteNegrito");
+  guiaFlutuanteNegritoBtn.addEventListener("mousedown", function(e){ e.preventDefault(); e.stopPropagation(); });
+  guiaFlutuanteNegritoBtn.addEventListener("click", function(){
+    if(!editorFlutuanteAtivo) return;
+    editorFlutuanteAtivo.focus();
+    document.execCommand("bold");
+    if(editorFlutuanteAtivo.dataset.itemId) salvarConteudoEditavel(editorFlutuanteAtivo);
+    document.getElementById("guiaFlutuantePopover").classList.remove("aberto");
+  });
+
+  document.querySelectorAll("#guiaFlutuantePopover .guia-cor-dot").forEach(function(botaoCor){
+    botaoCor.addEventListener("mousedown", function(e){ e.preventDefault(); e.stopPropagation(); });
+    botaoCor.addEventListener("click", function(){
+      if(!editorFlutuanteAtivo) return;
+      aplicarCorNaSelecaoEditor(editorFlutuanteAtivo, botaoCor.getAttribute("data-cor"));
+      if(editorFlutuanteAtivo.dataset.itemId) salvarConteudoEditavel(editorFlutuanteAtivo);
+      document.getElementById("guiaFlutuantePopover").classList.remove("aberto");
+    });
   });
 
   function removerSpansDeCor(fragmentoOuElemento){
@@ -3141,13 +3334,26 @@
 
       if(temGuia && !guiaModoEdicao[item.id]){
         painel.innerHTML =
-          "<div class='guia-texto-leitura'>"+renderGuiaTexto(guia.texto)+"</div>"+
+          "<div class='guia-texto-leitura' contenteditable='true' spellcheck='false'>"+renderGuiaTexto(guia.texto)+"</div>"+
           "<div class='guia-meta'>"+(guia.nomeArquivo?escapeHtml(guia.nomeArquivo)+" · ":"")+"Atualizado em "+formatDateBR(guia.atualizadoEm||todayISO())+"</div>";
+        var leituraEl = painel.querySelector(".guia-texto-leitura");
+        leituraEl.dataset.itemId = item.id;
+        leituraEl.dataset.nomeArquivo = guia.nomeArquivo || "";
+        var timeoutLeitura = null;
+        leituraEl.addEventListener("input", function(){
+          if(timeoutLeitura) clearTimeout(timeoutLeitura);
+          timeoutLeitura = setTimeout(function(){ salvarConteudoEditavel(leituraEl); }, 900);
+        });
+        leituraEl.addEventListener("paste", function(e){
+          e.preventDefault();
+          var texto = (e.clipboardData || window.clipboardData).getData("text/plain");
+          document.execCommand("insertText", false, texto);
+        });
         var acoesLeitura = document.createElement("div");
         acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;";
         var btnTelaCheiaGuia = document.createElement("button");
         btnTelaCheiaGuia.className = "btn small primary"; btnTelaCheiaGuia.textContent = "⛶ Tela cheia";
-        btnTelaCheiaGuia.addEventListener("click", function(){ abrirTelaCheiaGuia(materiaNome, item.nome, guia); });
+        btnTelaCheiaGuia.addEventListener("click", function(){ abrirTelaCheiaGuia(materiaNome, item, guias[item.id]); });
         var btnEditarGuia = document.createElement("button");
         btnEditarGuia.className = "btn small"; btnEditarGuia.textContent = "Editar";
         btnEditarGuia.addEventListener("click", function(){ guiaModoEdicao[item.id] = true; renderGuiasRapidos(); });
@@ -3169,23 +3375,8 @@
           "<label style='font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;'>Importar arquivo (.pdf, .docx, .html, .txt)</label>"+
           "<input type='file' class='guiaFileInput' accept='.pdf,.docx,.html,.htm,.txt'>"+
           "<p style='font-size:11px;color:var(--text-faint);margin:6px 0 12px;'>A leitura de PDF/.docx precisa de internet no momento da importação.</p>"+
-          "<div class='guia-toolbar-cores'>"+
-          "<span class='guia-toolbar-label'>Formatar termo selecionado:</span>"+
-          "<button type='button' class='guia-negrito-btn' id='guiaBtnNegrito'>N</button>"+
-          "<span class='guia-toolbar-divisor'></span>"+
-          "<button type='button' class='guia-cor-dot cor-amarelo' data-cor='amarelo' title='Amarelo'></button>"+
-          "<button type='button' class='guia-cor-dot cor-verde' data-cor='verde' title='Verde'></button>"+
-          "<button type='button' class='guia-cor-dot cor-vermelho' data-cor='vermelho' title='Vermelho'></button>"+
-          "<button type='button' class='guia-cor-dot cor-azul' data-cor='azul' title='Azul'></button>"+
-          "<button type='button' class='guia-cor-dot cor-rosa' data-cor='rosa' title='Rosa'></button>"+
-          "<button type='button' class='guia-cor-dot cor-laranja' data-cor='laranja' title='Laranja'></button>"+
-          "<button type='button' class='guia-cor-dot cor-roxo' data-cor='roxo' title='Roxo'></button>"+
-          "<button type='button' class='guia-cor-dot cor-cinza' data-cor='cinza' title='Cinza'></button>"+
-          "<button type='button' class='guia-cor-dot cor-marrom' data-cor='marrom' title='Marrom'></button>"+
-          "<button type='button' class='guia-cor-dot cor-branco' data-cor='branco' title='Remover cor'></button>"+
-          "</div>"+
-          "<p style='font-size:11px;color:var(--text-faint);margin:2px 0 10px;'>Selecione um trecho do texto abaixo: clique em <b>N</b> pra negrito, ou numa bolinha de cor pra destacar. A mudança já aparece na hora, direto no texto — sem código.</p>"+
-          "<div class='guia-editor-editavel' id='guiaEditorEditavel' contenteditable='true' data-placeholder='Cole ou digite o conteúdo do guia aqui...'></div>";
+          "<p style='font-size:11px;color:var(--text-faint);margin:0 0 10px;'>Selecione um trecho do texto abaixo — vai aparecer um ícone de lápis pra você formatar (negrito ou cor), direto no texto, sem código.</p>"+
+          "<div class='guia-editor-editavel' id='guiaEditorEditavel' contenteditable='true' spellcheck='false' data-placeholder='Cole ou digite o conteúdo do guia aqui...'></div>";
         painel.appendChild(wrapImport);
 
         var editorEl = wrapImport.querySelector("#guiaEditorEditavel");
@@ -3196,20 +3387,6 @@
           e.preventDefault();
           var texto = (e.clipboardData || window.clipboardData).getData("text/plain");
           document.execCommand("insertText", false, texto);
-        });
-
-        var btnNegritoGuia = wrapImport.querySelector("#guiaBtnNegrito");
-        btnNegritoGuia.addEventListener("mousedown", function(e){ e.preventDefault(); });
-        btnNegritoGuia.addEventListener("click", function(){
-          editorEl.focus();
-          document.execCommand("bold");
-        });
-
-        wrapImport.querySelectorAll(".guia-cor-dot").forEach(function(botaoCor){
-          botaoCor.addEventListener("mousedown", function(e){ e.preventDefault(); });
-          botaoCor.addEventListener("click", function(){
-            aplicarCorNaSelecaoEditor(editorEl, botaoCor.getAttribute("data-cor"));
-          });
         });
 
         var acoesImport = document.createElement("div");
