@@ -355,6 +355,17 @@
     align-items:center;
   }
   .assunto-grupo-header:first-child{margin-top:0;}
+  @keyframes piscaRevisao{
+    0%,100%{opacity:1;background:transparent;}
+    50%{opacity:.3;background:rgba(252,211,77,0.22);}
+  }
+  .assunto-grupo-header.pisca-revisao{
+    animation:piscaRevisao .9s ease-in-out 3;
+    border-radius:6px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .assunto-grupo-header.pisca-revisao{animation:none;}
+  }
 
   .assunto-subgrupo-header{
     display:flex;align-items:center;justify-content:space-between;
@@ -758,6 +769,18 @@
   }
   .guia-badge.tem-guia{background:var(--success-dim);color:var(--success);}
   .guia-badge.sem-guia{background:var(--bg-panel-alt);color:var(--text-faint);}
+  .guia-icone-btn{
+    width:26px;height:26px;flex-shrink:0;
+    border-radius:6px;
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    color:var(--text-primary);
+    font-size:14px;
+    line-height:1;
+    cursor:pointer;
+    padding:0;
+  }
+  .guia-icone-btn:hover{ border-color:var(--accent-brass); color:var(--accent-brass); }
   .guia-painel{
     margin-top:12px;
     background:var(--bg-panel-alt);
@@ -930,6 +953,34 @@
     color:var(--text-faint);
   }
   .guia-meta{color:var(--text-faint);font-size:11px;margin-top:10px;}
+  .guia-tabela{
+    border-collapse:collapse;
+    margin:12px 0;
+    width:100%;
+    font-size:0.9em;
+    font-family:var(--font-body);
+  }
+  .guia-tabela th, .guia-tabela td{
+    border:1px solid var(--border-soft);
+    padding:6px 10px;
+    text-align:left;
+    vertical-align:top;
+    color:var(--text-primary);
+  }
+  .guia-tabela th{
+    background:var(--bg-panel-alt);
+    font-weight:700;
+  }
+  .guia-botao-tabela{
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:8px;
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    color:var(--text-primary);
+    cursor:pointer;
+  }
+  .guia-botao-tabela:hover{ border-color:var(--accent-brass); color:var(--accent-brass); }
 
   .caderno-item{
     border-bottom:1px solid var(--border-subtle);
@@ -1137,8 +1188,16 @@
 
     <!-- MATERIAS -->
     <section class="tab" id="tab-materias">
-      <h2 class="section-title">Matérias e assuntos</h2>
-      <p class="section-sub">Cadastre manualmente o que você precisa estudar e acompanhe o status de cada assunto.</p>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:20px;">
+        <div>
+          <h2 class="section-title" style="margin-bottom:4px;">Matérias e assuntos</h2>
+          <p class="section-sub" style="margin:0;">Cadastre manualmente o que você precisa estudar e acompanhe o status de cada assunto.</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <select id="filtroMateriasSelect" style="min-width:170px;"></select>
+          <input type="hidden" id="filtroMateriasInput">
+        </div>
+      </div>
 
       <div class="panel">
         <div class="add-form">
@@ -1375,6 +1434,7 @@
       <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
       <div class="guia-fullscreen-materia" id="tfcMateria"></div>
     </div>
+    <button type="button" id="btnTabelaTelaCheia" class="guia-botao-tabela">▦ Tabela</button>
     <span class="guia-fullscreen-salvo" id="tfcStatusSalvo"></span>
   </div>
   <div class="guia-fullscreen-conteudo">
@@ -1729,6 +1789,7 @@
   }
 
   /* ---------------- TABS ---------------- */
+  var piscarRevisoesPendente = false;
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var tabSections = document.querySelectorAll("section.tab");
   tabButtons.forEach(function(btn){
@@ -1737,6 +1798,7 @@
       tabSections.forEach(function(s){ s.classList.remove("active"); });
       btn.classList.add("active");
       document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+      if(btn.dataset.tab === "revisoes") piscarRevisoesPendente = true;
       renderAll();
     });
   });
@@ -2053,13 +2115,55 @@
     showToast("Revisão pontual marcada para daqui a 2 dias, mesma etapa.");
   }
 
+  document.getElementById("filtroMateriasInput").addEventListener("input", function(){
+    document.getElementById("filtroMateriasSelect").value = "";
+    renderMaterias();
+  });
+  document.getElementById("filtroMateriasSelect").addEventListener("change", function(){
+    document.getElementById("filtroMateriasInput").value = this.value;
+    renderMaterias();
+  });
+
+  function popularFiltroMateriasSelect(filtroAtual){
+    var select = document.getElementById("filtroMateriasSelect");
+    var opcoes = "<option value=''>Todas as matérias</option>";
+    state.materias.forEach(function(m){
+      opcoes += "<option value='"+escapeHtml(m.nome)+"'>"+escapeHtml(m.nome)+"</option>";
+    });
+    select.innerHTML = opcoes;
+    select.value = filtroAtual || "";
+  }
+
+  function materiaOuAssuntoCombinaComFiltro(m, filtro){
+    if(!filtro) return true;
+    if(m.nome.toLowerCase().indexOf(filtro) > -1) return true;
+    return m.assuntos.some(function(a){
+      if(a.nome.toLowerCase().indexOf(filtro) > -1) return true;
+      return (a.subassuntos||[]).some(function(sub){ return sub.nome.toLowerCase().indexOf(filtro) > -1; });
+    });
+  }
+
   function renderMaterias(){
     var container = document.getElementById("materiasList");
     container.innerHTML = "";
-    document.getElementById("materiasEmpty").style.display = state.materias.length ? "none" : "block";
+    var filtroOriginal = (document.getElementById("filtroMateriasInput").value || "").trim();
+    var filtro = filtroOriginal.toLowerCase();
+    var materiasParaExibir = state.materias.filter(function(m){ return materiaOuAssuntoCombinaComFiltro(m, filtro); });
+    popularFiltroMateriasSelect(filtroOriginal);
 
-    state.materias.forEach(function(m, idx){
-      if(!m.cor){ m.cor = COLOR_PALETTE[idx % COLOR_PALETTE.length]; saveState(); }
+    var materiasEmptyEl = document.getElementById("materiasEmpty");
+    if(state.materias.length === 0){
+      materiasEmptyEl.textContent = "Nenhuma matéria cadastrada. Adicione a primeira acima.";
+      materiasEmptyEl.style.display = "block";
+    } else if(filtro && materiasParaExibir.length === 0){
+      materiasEmptyEl.textContent = "Nenhuma matéria ou assunto encontrado para \"" + filtro + "\".";
+      materiasEmptyEl.style.display = "block";
+    } else {
+      materiasEmptyEl.style.display = "none";
+    }
+
+    materiasParaExibir.forEach(function(m, idx){
+      if(!m.cor){ m.cor = COLOR_PALETTE[state.materias.indexOf(m) % COLOR_PALETTE.length]; saveState(); }
 
       var totalSec = state.sessions
         .filter(function(s){ return s.materiaId === m.id; })
@@ -2188,7 +2292,12 @@
       addBtn.addEventListener("click", addAssunto);
       input.addEventListener("keydown", function(e){ if(e.key==="Enter") addAssunto(); });
 
-      if(m.assuntos.length === 0){
+      var assuntosParaExibir = !filtro || m.nome.toLowerCase().indexOf(filtro) > -1 ? m.assuntos : m.assuntos.filter(function(a){
+        if(a.nome.toLowerCase().indexOf(filtro) > -1) return true;
+        return (a.subassuntos||[]).some(function(sub){ return sub.nome.toLowerCase().indexOf(filtro) > -1; });
+      });
+
+      if(assuntosParaExibir.length === 0){
         var empty = document.createElement("div");
         empty.className = "empty-state";
         empty.textContent = "Nenhum assunto cadastrado nesta matéria.";
@@ -2199,7 +2308,7 @@
         var table = document.createElement("table");
         table.innerHTML = "<thead><tr><th>Assunto</th><th>Início do estudo</th><th>Tempo estudado</th><th>Status</th><th>Questões</th><th></th></tr></thead>";
         var tbody = document.createElement("tbody");
-        m.assuntos.forEach(function(a){
+        assuntosParaExibir.forEach(function(a){
           if(a.dataInicio === undefined) a.dataInicio = null;
           if(a.questoesCertas === undefined) a.questoesCertas = 0;
           if(a.questoesErradas === undefined) a.questoesErradas = 0;
@@ -2585,7 +2694,7 @@
     var hoje = todayISO();
     var lista = state.revisoes.slice();
     document.getElementById("revisoesEmpty").style.display = lista.length ? "none" : "block";
-    if(!lista.length) return;
+    if(!lista.length){ piscarRevisoesPendente = false; return; }
 
     state.materias.forEach(function(m){
       var revisoesDaMateria = lista.filter(function(r){ return r.materiaId === m.id; });
@@ -2597,6 +2706,8 @@
       grupoHeader.innerHTML =
         "<span style='display:flex;align-items:center;flex:1;'>"+colorDotHtml(m.cor)+escapeHtml(m.nome)+"</span>"+
         "<span style='font-family:var(--font-mono);font-size:12px;color:var(--text-muted);'>"+revisoesDaMateria.length+" revisão"+(revisoesDaMateria.length>1?"ões":"")+"</span>";
+      var temRevisaoPendente = revisoesDaMateria.some(function(r){ return !r.feita && r.data <= hoje; });
+      if(piscarRevisoesPendente && temRevisaoPendente) grupoHeader.classList.add("pisca-revisao");
       container.appendChild(grupoHeader);
 
       var idsAssuntos = (m.assuntos||[]).map(function(a){ return a.id; }).concat([""]);
@@ -2628,6 +2739,7 @@
         .sort(function(x,y){ return (x.data||"").localeCompare(y.data||""); })
         .forEach(function(r){ container.appendChild(criarCardRevisao(r, hoje, null, null)); });
     }
+    piscarRevisoesPendente = false;
   }
 
   /* ---------------- EDITAL ---------------- */
@@ -3074,13 +3186,41 @@
 
   var GUIA_CORES = ["amarelo","verde","vermelho","azul","rosa","laranja","roxo","cinza","marrom","branco"];
 
-  function renderGuiaTexto(texto){
-    var escapado = escapeHtml(texto);
+  function renderTextoFormatado(trecho){
+    var escapado = escapeHtml(trecho);
     var re = /\{\{(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)\|([\s\S]*?)\}\}/g;
     var comCores = escapado.replace(re, function(match, cor, conteudo){
       return "<span class='guia-cor-"+cor+"'>"+conteudo+"</span>";
     });
     return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  function renderTabelaGuia(conteudoTabela){
+    var linhas = conteudoTabela.split("\n").filter(function(l){ return l.trim() !== ""; });
+    if(!linhas.length) return "";
+    var linhasHtml = linhas.map(function(linha, i){
+      var celulas = linha.split("|||");
+      var tag = i === 0 ? "th" : "td";
+      var celulasHtml = celulas.map(function(cel){
+        return "<"+tag+">"+renderTextoFormatado(cel.trim())+"</"+tag+">";
+      }).join("");
+      return "<tr>"+celulasHtml+"</tr>";
+    });
+    return "<table class='guia-tabela'><tbody>"+linhasHtml.join("")+"</tbody></table>";
+  }
+
+  function renderGuiaTexto(texto){
+    var regexTabela = /\{\{tabela\}\}\n([\s\S]*?)\n\{\{\/tabela\}\}/g;
+    var resultado = "";
+    var ultimoIndex = 0;
+    var m;
+    while((m = regexTabela.exec(texto)) !== null){
+      resultado += renderTextoFormatado(texto.slice(ultimoIndex, m.index));
+      resultado += renderTabelaGuia(m[1]);
+      ultimoIndex = m.index + m[0].length;
+    }
+    resultado += renderTextoFormatado(texto.slice(ultimoIndex));
+    return resultado;
   }
 
   function abrirTelaCheiaGuia(materiaNome, item, guia){
@@ -3140,6 +3280,12 @@
   }
 
   document.getElementById("tfcCorpo").addEventListener("input", agendarSalvarTelaCheia);
+  document.getElementById("tfcCorpo").addEventListener("paste", colarNoGuia);
+  document.getElementById("btnTabelaTelaCheia").addEventListener("mousedown", function(e){ e.preventDefault(); });
+  document.getElementById("btnTabelaTelaCheia").addEventListener("click", function(){
+    inserirTabelaNoEditor(document.getElementById("tfcCorpo"));
+  });
+
 
   document.getElementById("btnFecharTelaCheia").addEventListener("click", fecharTelaCheiaGuia);
   document.addEventListener("keydown", function(e){
@@ -3272,6 +3418,128 @@
     editorEl.focus();
   }
 
+  function inserirTabelaNoEditor(editorEl){
+    var colunasStr = prompt("Quantas colunas a tabela vai ter?", "3");
+    if(colunasStr === null) return;
+    var colunas = parseInt(colunasStr, 10);
+    if(isNaN(colunas) || colunas < 1 || colunas > 8){ showToast("Escolha um número de colunas entre 1 e 8."); return; }
+    var linhasStr = prompt("Quantas linhas (sem contar o cabeçalho)?", "2");
+    if(linhasStr === null) return;
+    var linhas = parseInt(linhasStr, 10);
+    if(isNaN(linhas) || linhas < 1 || linhas > 30){ showToast("Escolha um número de linhas entre 1 e 30."); return; }
+
+    var table = document.createElement("table");
+    table.className = "guia-tabela";
+    var tbody = document.createElement("tbody");
+
+    var trCabecalho = document.createElement("tr");
+    for(var c=0; c<colunas; c++){
+      var th = document.createElement("th");
+      th.textContent = "Coluna " + (c+1);
+      trCabecalho.appendChild(th);
+    }
+    tbody.appendChild(trCabecalho);
+
+    for(var l=0; l<linhas; l++){
+      var tr = document.createElement("tr");
+      for(var c2=0; c2<colunas; c2++){
+        var td = document.createElement("td");
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+
+    editorEl.focus();
+    var sel = window.getSelection();
+    var inserido = false;
+    if(sel && sel.rangeCount > 0){
+      var range = sel.getRangeAt(0);
+      if(editorEl.contains(range.commonAncestorContainer)){
+        range.collapse(false);
+        range.insertNode(table);
+        inserido = true;
+      }
+    }
+    if(!inserido){
+      editorEl.appendChild(table);
+    }
+    var brDepois = document.createElement("br");
+    table.parentNode.insertBefore(brDepois, table.nextSibling);
+
+    editorEl.dispatchEvent(new Event("input", {bubbles:true}));
+    showToast("Tabela inserida — clique nas células pra preencher.");
+  }
+
+  function htmlColadoParaGuia(html){
+    var doc = new DOMParser().parseFromString(html, "text/html");
+
+    function ehNegrito(el){
+      var fw = (el.style && el.style.fontWeight) || "";
+      if(fw){ return fw === "bold" || fw === "bolder" || parseInt(fw, 10) >= 600; }
+      var t = el.tagName.toLowerCase();
+      return t === "strong" || t === "b";
+    }
+    function blocos(n, neg){
+      var r = "";
+      n.childNodes.forEach(function(f){ r += no(f, neg); });
+      return r;
+    }
+    function no(f, neg){
+      if(f.nodeType === 3) return escapeHtml(f.textContent.replace(/\s+/g, " "));
+      if(f.nodeType !== 1) return "";
+      var t = f.tagName.toLowerCase();
+      if(/^(script|style|head|meta|title)$/.test(t)) return "";
+      if(t === "br") return "<br>";
+      if(t === "table") return tabela(f);
+      if(/^(p|div|li|h[1-6]|ul|ol|section|blockquote)$/.test(t)){
+        var titulo = /^h[1-6]$/.test(t);
+        var miolo = (t === "li" ? "\u2022 " : "") + blocos(f, neg || titulo);
+        if(titulo && !neg && miolo.trim()) miolo = "<strong>" + miolo + "</strong>";
+        if(t === "li") return "<br>" + miolo;
+        return "<br>" + miolo + "<br>";
+      }
+      var b = ehNegrito(f);
+      if(b && !neg){
+        var interno = blocos(f, true);
+        return interno.trim() ? "<strong>" + interno + "</strong>" : interno;
+      }
+      return blocos(f, neg || b);
+    }
+    function tabela(tb){
+      var linhasHtml = [];
+      tb.querySelectorAll("tr").forEach(function(tr){
+        var celulas = Array.prototype.filter.call(tr.children, function(c){ return /^(td|th)$/i.test(c.tagName); });
+        if(!celulas.length) return;
+        var cabecalho = linhasHtml.length === 0;
+        var tag = cabecalho ? "th" : "td";
+        linhasHtml.push("<tr>" + celulas.map(function(c){
+          var conteudo = blocos(c, cabecalho).replace(/(<br>)+/g, " ").trim();
+          return "<" + tag + ">" + conteudo + "</" + tag + ">";
+        }).join("") + "</tr>");
+      });
+      if(!linhasHtml.length) return "";
+      return "<br><table class='guia-tabela'><tbody>" + linhasHtml.join("") + "</tbody></table><br>";
+    }
+
+    return blocos(doc.body, false).replace(/(<br>){3,}/g, "<br><br>").replace(/^(<br>)+/, "");
+  }
+
+  function colarNoGuia(e){
+    e.preventDefault();
+    var cd = e.clipboardData || window.clipboardData;
+    var html = cd.getData("text/html");
+    var texto = cd.getData("text/plain");
+    if(html && /<table[\s>]/i.test(html)){
+      var h = htmlColadoParaGuia(html);
+      if(h && h.indexOf("<table") > -1){
+        document.execCommand("insertHTML", false, h);
+        return;
+      }
+    }
+    document.execCommand("insertText", false, texto);
+  }
+
   function serializarEditorParaMarkup(node){
     var resultado = "";
     node.childNodes.forEach(function(filho){
@@ -3291,6 +3559,17 @@
           var cor = filho.className.match(/guia-cor-(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)/)[1];
           var innerCor = serializarEditorParaMarkup(filho);
           if(innerCor) resultado += "{{"+cor+"|"+innerCor+"}}";
+        } else if(tag === "table"){
+          var linhasTabela = [];
+          filho.querySelectorAll("tr").forEach(function(tr){
+            var celulas = [];
+            tr.querySelectorAll("td, th").forEach(function(cel){
+              celulas.push(serializarEditorParaMarkup(cel).replace(/\n+/g, " ").trim());
+            });
+            linhasTabela.push(celulas.join("|||"));
+          });
+          if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
+          resultado += "{{tabela}}\n" + linhasTabela.join("\n") + "\n{{/tabela}}\n";
         } else {
           resultado += serializarEditorParaMarkup(filho);
         }
@@ -3312,6 +3591,7 @@
       "<span class='guia-assunto-nome'>"+(classeExtra?"↳ ":"")+escapeHtml(item.nome)+"</span>"+
       "<span style='display:flex;align-items:center;gap:10px;'>"+
       "<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
+      (temGuia?"<button class='guia-icone-btn telaCheiaDiretoBtn' title='Tela cheia'>⛶</button>":"")+
       (temGuia?"<button class='btn small editarGuiaDiretoBtn'>Editar</button>":"")+
       "<button class='btn small toggleGuiaBtn'>"+(guiaAbertoIds[item.id]?"Fechar":(temGuia?"Ver guia":"Adicionar guia"))+"</button>"+
       "</span>";
@@ -3324,6 +3604,9 @@
         guiaAbertoIds[item.id] = true;
         guiaModoEdicao[item.id] = true;
         renderGuiasRapidos();
+      });
+      topo.querySelector(".telaCheiaDiretoBtn").addEventListener("click", function(){
+        abrirTelaCheiaGuia(materiaNome, item, guias[item.id]);
       });
     }
     row.appendChild(topo);
@@ -3344,19 +3627,9 @@
           if(timeoutLeitura) clearTimeout(timeoutLeitura);
           timeoutLeitura = setTimeout(function(){ salvarConteudoEditavel(leituraEl); }, 900);
         });
-        leituraEl.addEventListener("paste", function(e){
-          e.preventDefault();
-          var texto = (e.clipboardData || window.clipboardData).getData("text/plain");
-          document.execCommand("insertText", false, texto);
-        });
+        leituraEl.addEventListener("paste", colarNoGuia);
         var acoesLeitura = document.createElement("div");
         acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;";
-        var btnTelaCheiaGuia = document.createElement("button");
-        btnTelaCheiaGuia.className = "btn small primary"; btnTelaCheiaGuia.textContent = "⛶ Tela cheia";
-        btnTelaCheiaGuia.addEventListener("click", function(){ abrirTelaCheiaGuia(materiaNome, item, guias[item.id]); });
-        var btnEditarGuia = document.createElement("button");
-        btnEditarGuia.className = "btn small"; btnEditarGuia.textContent = "Editar";
-        btnEditarGuia.addEventListener("click", function(){ guiaModoEdicao[item.id] = true; renderGuiasRapidos(); });
         var btnExcluirGuia = document.createElement("button");
         btnExcluirGuia.className = "btn small danger"; btnExcluirGuia.textContent = "Excluir guia";
         btnExcluirGuia.addEventListener("click", function(){
@@ -3365,8 +3638,12 @@
           renderGuiasRapidos();
           showToast("Guia excluído.");
         });
-        acoesLeitura.appendChild(btnTelaCheiaGuia);
-        acoesLeitura.appendChild(btnEditarGuia);
+        var btnTabelaLeitura = document.createElement("button");
+        btnTabelaLeitura.type = "button";
+        btnTabelaLeitura.className = "guia-botao-tabela"; btnTabelaLeitura.textContent = "▦ Tabela";
+        btnTabelaLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnTabelaLeitura.addEventListener("click", function(){ inserirTabelaNoEditor(leituraEl); });
+        acoesLeitura.appendChild(btnTabelaLeitura);
         acoesLeitura.appendChild(btnExcluirGuia);
         painel.appendChild(acoesLeitura);
       } else {
@@ -3383,11 +3660,7 @@
         editorEl.innerHTML = temGuia ? renderGuiaTexto(guia.texto) : "";
         var fileInputEl = wrapImport.querySelector(".guiaFileInput");
 
-        editorEl.addEventListener("paste", function(e){
-          e.preventDefault();
-          var texto = (e.clipboardData || window.clipboardData).getData("text/plain");
-          document.execCommand("insertText", false, texto);
-        });
+        editorEl.addEventListener("paste", colarNoGuia);
 
         var acoesImport = document.createElement("div");
         acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;";
@@ -3395,6 +3668,12 @@
         btnSalvarGuia.className = "btn primary small"; btnSalvarGuia.textContent = "Salvar guia";
         var btnCancelarGuia = document.createElement("button");
         btnCancelarGuia.className = "btn small"; btnCancelarGuia.textContent = "Cancelar";
+        var btnTabelaEditor = document.createElement("button");
+        btnTabelaEditor.type = "button";
+        btnTabelaEditor.className = "guia-botao-tabela"; btnTabelaEditor.textContent = "▦ Tabela";
+        btnTabelaEditor.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnTabelaEditor.addEventListener("click", function(){ inserirTabelaNoEditor(editorEl); });
+        acoesImport.appendChild(btnTabelaEditor);
         acoesImport.appendChild(btnSalvarGuia);
         acoesImport.appendChild(btnCancelarGuia);
         painel.appendChild(acoesImport);
@@ -3403,10 +3682,17 @@
           var file = e.target.files[0];
           if(!file) return;
           showToast("Lendo arquivo...");
-          extrairTextoArquivo(file).then(function(texto){
-            editorEl.textContent = texto.trim();
-            showToast("Texto extraído! Revise antes de salvar.");
-          }).catch(function(err){
+          var ehDocx = /\.docx$/i.test(file.name);
+          var leitura = ehDocx
+            ? file.arrayBuffer().then(function(buf){ return mammoth.convertToHtml({ arrayBuffer: buf }); }).then(function(res){
+                editorEl.innerHTML = htmlColadoParaGuia(res.value);
+                showToast("Documento importado com tabelas! Revise antes de salvar.");
+              })
+            : extrairTextoArquivo(file).then(function(texto){
+                editorEl.textContent = texto.trim();
+                showToast("Texto extraído! Revise antes de salvar.");
+              });
+          leitura.catch(function(err){
             console.error(err);
             showToast(err.message || "Não foi possível ler esse arquivo.");
           });
@@ -3795,6 +4081,47 @@
       "<path d='"+linhaPath+"' style='fill:none;stroke:var(--accent-sky);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;'/>"+
       pontosSvg + labelsSvg +
     "</svg>";
+  }
+
+  function gerarGraficoBarras(dias7){
+    var w = 340, h = 150, padTop = 20, padBottom = 26, padX = 16;
+    var innerW = w - padX*2;
+    var innerH = h - padTop - padBottom;
+    var max = Math.max.apply(null, dias7.map(function(d){ return d.total; }).concat([1]));
+    var slot = innerW / dias7.length;
+    var barW = Math.min(slot*0.55, 30);
+    var diasSemana = ["dom","seg","ter","qua","qui","sex","sáb"];
+
+    var idxMaior = -1, maiorValor = -1;
+    dias7.forEach(function(d, idx){
+      if(d.total > maiorValor){ maiorValor = d.total; idxMaior = idx; }
+    });
+
+    var barrasSvg = dias7.map(function(d, i){
+      var xCentro = padX + slot*i + slot/2;
+      var x = xCentro - barW/2;
+      var bh = max>0 ? (d.total/max)*innerH : 0;
+      if(d.total > 0) bh = Math.max(bh, 3);
+      var y = padTop + innerH - bh;
+      var cor = d.ehHoje ? "var(--accent-brass)" : "var(--accent-sky)";
+      var mostrarValor = d.total > 0 && (d.ehHoje || i === idxMaior);
+      var valorLabel = mostrarValor ?
+        "<text x='"+xCentro.toFixed(1)+"' y='"+(y-8).toFixed(1)+"' text-anchor='middle' style='font-size:9px;fill:var(--text-faint);font-family:var(--font-mono);'>"+formatDuration(d.total)+"</text>" : "";
+      return "<rect x='"+x.toFixed(1)+"' y='"+y.toFixed(1)+"' width='"+barW.toFixed(1)+"' height='"+bh.toFixed(1)+"' rx='3' style='fill:"+cor+";'/>"+valorLabel;
+    }).join("");
+
+    var labelsSvg = dias7.map(function(d, i){
+      var xCentro = padX + slot*i + slot/2;
+      var diaIdx = new Date(d.data+"T00:00:00").getDay();
+      var corLabel = d.ehHoje ? "var(--accent-brass)" : "var(--text-muted)";
+      return "<text x='"+xCentro.toFixed(1)+"' y='"+(h-8)+"' text-anchor='middle' style='font-size:10px;fill:"+corLabel+";font-family:var(--font-body);'>"+diasSemana[diaIdx]+"</text>";
+    }).join("");
+
+    var linhaBase = "<line x1='"+padX+"' y1='"+(padTop+innerH)+"' x2='"+(w-padX)+"' y2='"+(padTop+innerH)+"' style='stroke:var(--border-subtle);stroke-width:1;'/>";
+
+    return "<svg viewBox='0 0 "+w+" "+h+"' style='width:100%;height:auto;display:block;overflow:visible;'>"+
+      linhaBase + barrasSvg + labelsSvg +
+      "</svg>";
   }
 
   function gerarMiniBarras(dias7){
