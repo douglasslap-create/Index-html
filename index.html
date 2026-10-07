@@ -710,15 +710,13 @@
   }
   .acoes-assunto-wrap .btn{width:100%;}
 
-  .subassuntos-tr td{ border-top:none; padding-top:0; padding-bottom:12px; background:var(--bg-panel-alt); }
-  .subassuntos-wrap{ padding:8px 6px 2px 26px; }
-  .subassuntos-lista{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
-  .subassunto-chip{
-    display:inline-flex; align-items:center; gap:4px;
-    background:var(--bg-panel); border:1px solid var(--border-soft);
-    border-radius:12px; padding:3px 6px 3px 10px;
-    font-size:12px; color:var(--text-primary);
-  }
+  .subtopico-tr td{ background:var(--bg-panel-alt); font-size:12.5px; }
+  .subtopico-tr td:first-child{ box-shadow: inset 3px 0 0 var(--border-soft); }
+  .subtopico-nome-linha{ display:flex; align-items:center; gap:6px; }
+  .subtopico-nome-linha .sub-prefixo{ color:var(--text-faint); font-size:12px; flex-shrink:0; }
+  .subassuntos-tr td{ border-top:none; padding-top:4px; padding-bottom:14px; background:var(--bg-panel-alt); }
+  .subassuntos-wrap{ padding:0 6px; }
+  .revisao-cab .rev-sub{font-size:12.5px;color:var(--accent-sky);font-weight:600;}
   .subassunto-add{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
   .subassunto-add input{
     flex:1; min-width:160px; max-width:320px;
@@ -2068,14 +2066,24 @@
     { key:"28d", dias:28, label:"28 dias" }
   ];
 
-  function criarRevisao(materia, assunto, etapaObj, ciclo){
+  function criarRevisao(materia, assunto, etapaObj, ciclo, sub){
     var data = addDaysISO(todayISO(), etapaObj.dias);
+    var subId = sub ? sub.id : "";
     var existe = state.revisoes.some(function(r){
-      return r.assuntoId===assunto.id && r.etapa===etapaObj.key && r.ciclo===ciclo && !r.feita;
+      return r.assuntoId===assunto.id && (r.subassuntoId||"")===subId && r.etapa===etapaObj.key && r.ciclo===ciclo && !r.feita;
     });
     if(!existe){
-      state.revisoes.push({ id: uid(), materiaId: materia.id, assuntoId: assunto.id, data: data, etapa: etapaObj.key, ciclo: ciclo, feita:false });
+      var nova = { id: uid(), materiaId: materia.id, assuntoId: assunto.id, data: data, etapa: etapaObj.key, ciclo: ciclo, feita:false };
+      if(sub) nova.subassuntoId = sub.id;
+      state.revisoes.push(nova);
     }
+  }
+
+  function marcarSubConcluido(materia, assunto, sub){
+    sub.status = "concluido";
+    sub.dataConclusao = todayISO();
+    if(!sub.ciclo) sub.ciclo = 1;
+    criarRevisao(materia, assunto, ETAPAS[0], sub.ciclo, sub);
   }
 
   function marcarConcluido(materia, assunto){
@@ -2090,13 +2098,15 @@
     var m = findMateria(revisao.materiaId);
     var a = m ? findAssunto(m.id, revisao.assuntoId) : null;
     if(a){
+      var subDaRevisao = revisao.subassuntoId ? (a.subassuntos||[]).find(function(x){ return x.id===revisao.subassuntoId; }) : null;
+      var alvoCiclo = subDaRevisao || a;
       var idxAtual = ETAPAS.findIndex(function(e){ return e.key===revisao.etapa; });
       if(idxAtual === -1 || idxAtual === ETAPAS.length-1){
-        a.ciclo = (a.ciclo||1) + 1;
+        alvoCiclo.ciclo = (alvoCiclo.ciclo||1) + 1;
         revisao.etapa = ETAPAS[0].key;
         revisao.data = addDaysISO(todayISO(), ETAPAS[0].dias);
-        revisao.ciclo = a.ciclo;
-        showToast("Ciclo concluído! Reiniciando no ciclo "+a.ciclo+", marco de 24h.");
+        revisao.ciclo = alvoCiclo.ciclo;
+        showToast("Ciclo concluído! Reiniciando no ciclo "+alvoCiclo.ciclo+", marco de 24h.");
       } else {
         var proxima = ETAPAS[idxAtual+1];
         revisao.etapa = proxima.key;
@@ -2173,6 +2183,10 @@
       m.assuntos.forEach(function(a){
         certasMateria += (a.questoesCertas || 0);
         erradasMateria += (a.questoesErradas || 0);
+        (a.subassuntos||[]).forEach(function(sub){
+          certasMateria += (sub.questoesCertas || 0);
+          erradasMateria += (sub.questoesErradas || 0);
+        });
       });
       var totalQMateria = certasMateria + erradasMateria;
       var aproveitamentoMateria = totalQMateria > 0 ? Math.round((certasMateria/totalQMateria)*100) : null;
@@ -2459,57 +2473,178 @@
           tbody.appendChild(tr);
 
           if(a.subassuntos === undefined) a.subassuntos = [];
-          var trSub = document.createElement("tr");
-          trSub.className = "subassuntos-tr";
-          var tdSub = document.createElement("td");
-          tdSub.colSpan = 6;
+
+          a.subassuntos.forEach(function(sub){
+            if(sub.dataInicio === undefined) sub.dataInicio = null;
+            if(sub.questoesCertas === undefined) sub.questoesCertas = 0;
+            if(sub.questoesErradas === undefined) sub.questoesErradas = 0;
+
+            var trS = document.createElement("tr");
+            trS.className = "subtopico-tr";
+
+            function excluirSubassunto(){
+              if(!confirm('Excluir o subtópico "'+sub.nome+'"?')) return;
+              a.subassuntos = a.subassuntos.filter(function(x){ return x.id !== sub.id; });
+              state.revisoes = state.revisoes.filter(function(r){ return r.subassuntoId !== sub.id; });
+              if(guias[sub.id]) excluirGuiaRemota(sub.id);
+              saveState(); renderAll();
+            }
+
+            var tdNomeS = document.createElement("td");
+            var nomeWrapS = document.createElement("div");
+            nomeWrapS.style.cssText = "display:flex;justify-content:space-between;align-items:flex-start;gap:8px;";
+            var nomeTextWrapS = document.createElement("div");
+            var nomeLinhaS = document.createElement("div");
+            nomeLinhaS.className = "subtopico-nome-linha";
+            nomeLinhaS.innerHTML = "<span class='sub-prefixo'>↳</span><span>"+escapeHtml(sub.nome)+"</span>";
+            nomeTextWrapS.appendChild(nomeLinhaS);
+            if(sub.dataInicio){
+              var diasEstudoS = Math.floor((new Date(todayISO()+"T00:00:00") - new Date(sub.dataInicio+"T00:00:00")) / 86400000);
+              var subInfoS = document.createElement("div");
+              subInfoS.style.cssText = "font-size:11px;color:var(--text-faint);margin-top:2px;margin-left:16px;";
+              subInfoS.textContent = diasEstudoS <= 0 ? "Começou hoje" : "Há "+diasEstudoS+" dia"+(diasEstudoS>1?"s":"")+" de estudo";
+              if(sub.status==="concluido" || (sub.ciclo && sub.ciclo>1)){
+                subInfoS.textContent += " · Ciclo "+(sub.ciclo||1);
+              }
+              nomeTextWrapS.appendChild(subInfoS);
+            }
+            var miniEditS = document.createElement("button");
+            miniEditS.className = "mini-edit-btn";
+            miniEditS.title = "Editar nome do subtópico";
+            miniEditS.textContent = "✎";
+            miniEditS.addEventListener("click", function(){
+              var novoNome = prompt("Editar nome do subtópico:", sub.nome);
+              if(novoNome === null) return;
+              novoNome = novoNome.trim();
+              if(!novoNome){ showToast("O nome não pode ficar vazio."); return; }
+              sub.nome = novoNome;
+              saveState();
+              renderAll();
+            });
+            var miniDelS = document.createElement("button");
+            miniDelS.className = "mini-del-btn";
+            miniDelS.title = "Excluir subtópico";
+            miniDelS.textContent = "×";
+            miniDelS.addEventListener("click", excluirSubassunto);
+            var miniBotoesWrapS = document.createElement("div");
+            miniBotoesWrapS.style.cssText = "display:flex;gap:5px;flex-shrink:0;";
+            miniBotoesWrapS.appendChild(miniEditS);
+            miniBotoesWrapS.appendChild(miniDelS);
+            nomeWrapS.appendChild(nomeTextWrapS);
+            nomeWrapS.appendChild(miniBotoesWrapS);
+            tdNomeS.appendChild(nomeWrapS);
+
+            var tdInicioS = document.createElement("td");
+            var inputInicioS = document.createElement("input");
+            inputInicioS.type = "date";
+            inputInicioS.style.minWidth = "130px";
+            if(sub.dataInicio) inputInicioS.value = sub.dataInicio;
+            inputInicioS.addEventListener("change", function(){
+              sub.dataInicio = this.value || null;
+              saveState();
+              renderMaterias();
+            });
+            tdInicioS.appendChild(inputInicioS);
+
+            var tdAprovS = document.createElement("td");
+            var certasS = sub.questoesCertas || 0;
+            var erradasS = sub.questoesErradas || 0;
+            var totalQS = certasS + erradasS;
+            var aproveitamentoS = totalQS > 0 ? Math.round((certasS/totalQS)*100) : null;
+            var corAprovS = aproveitamentoS===null ? "var(--text-faint)" : (aproveitamentoS>=70?"var(--success)":(aproveitamentoS>=40?"var(--warn)":"var(--danger)"));
+            tdAprovS.style.fontFamily = "var(--font-mono)";
+            tdAprovS.style.fontWeight = "600";
+            tdAprovS.style.color = corAprovS;
+            tdAprovS.title = "Aproveitamento em questões deste subtópico";
+            tdAprovS.textContent = aproveitamentoS===null ? "—" : aproveitamentoS+"%";
+
+            var tdStatusS = document.createElement("td");
+            var selS = document.createElement("select");
+            selS.className = "status-select";
+            selS.title = "Status do subtópico (Concluído envia para as revisões)";
+            [["nao_iniciado","Não iniciado"],["estudando","Estudando"],["revisao","Em revisão"],["concluido","Concluído"]]
+              .forEach(function(opt){
+                var o = document.createElement("option");
+                o.value = opt[0]; o.textContent = opt[1];
+                if((sub.status || "nao_iniciado") === opt[0]) o.selected = true;
+                selS.appendChild(o);
+              });
+            selS.addEventListener("change", function(){
+              var novo = this.value;
+              if(novo === "estudando" && !sub.dataInicio){
+                sub.dataInicio = todayISO();
+              }
+              if(novo === "concluido" && sub.status !== "concluido"){
+                marcarSubConcluido(m, a, sub);
+                showToast("Subtópico concluído. Primeira revisão agendada para amanhã (24h).");
+              } else {
+                sub.status = novo;
+                if(novo !== "concluido") sub.dataConclusao = null;
+              }
+              saveState();
+              renderAll();
+            });
+            tdStatusS.appendChild(selS);
+
+            var tdQtdS = document.createElement("td");
+            var qtdWrapS = document.createElement("div");
+            qtdWrapS.style.cssText = "display:flex;flex-direction:column;gap:4px;";
+
+            var certaRowS = criarLinhaContadorQuestoes("certas", sub.questoesCertas, function(novo){
+              sub.questoesCertas = novo;
+              saveState(); renderAll();
+            });
+            var valorErradasAntesS = sub.questoesErradas;
+            var erradaRowS = criarLinhaContadorQuestoes("erradas", sub.questoesErradas, function(novo){
+              var aumentouS = novo > valorErradasAntesS;
+              sub.questoesErradas = novo;
+              saveState(); renderAll();
+              if(aumentouS) abrirCadernoComPreset(m.id, a.id);
+            });
+            qtdWrapS.appendChild(certaRowS);
+            qtdWrapS.appendChild(erradaRowS);
+            tdQtdS.appendChild(qtdWrapS);
+
+            var tdAcoesS = document.createElement("td");
+            var registrarBtnS = document.createElement("button");
+            registrarBtnS.className = "btn small";
+            registrarBtnS.textContent = "Registrar erro";
+            registrarBtnS.addEventListener("click", function(){
+              abrirCadernoComPreset(m.id, a.id);
+            });
+            var delSubBtn = document.createElement("button");
+            delSubBtn.className = "btn small danger";
+            delSubBtn.textContent = "Excluir";
+            delSubBtn.addEventListener("click", excluirSubassunto);
+            var acoesWrapS = document.createElement("div");
+            acoesWrapS.className = "acoes-assunto-wrap";
+            acoesWrapS.appendChild(registrarBtnS);
+            acoesWrapS.appendChild(delSubBtn);
+            tdAcoesS.appendChild(acoesWrapS);
+
+            trS.appendChild(tdNomeS); trS.appendChild(tdInicioS); trS.appendChild(tdAprovS); trS.appendChild(tdStatusS); trS.appendChild(tdQtdS); trS.appendChild(tdAcoesS);
+            tbody.appendChild(trS);
+          });
+
+          var trAddSub = document.createElement("tr");
+          trAddSub.className = "subassuntos-tr";
+          var tdAddSub = document.createElement("td");
+          tdAddSub.colSpan = 6;
           var subWrap = document.createElement("div");
           subWrap.className = "subassuntos-wrap";
-
-          if(a.subassuntos.length){
-            var subLista = document.createElement("div");
-            subLista.className = "subassuntos-lista";
-            a.subassuntos.forEach(function(sub){
-              var chip = document.createElement("span");
-              chip.className = "subassunto-chip";
-              chip.innerHTML = "<span class='subassunto-nome'>"+escapeHtml(sub.nome)+"</span>";
-              var editSub = document.createElement("button");
-              editSub.className = "mini-edit-btn"; editSub.title = "Editar sub-assunto"; editSub.textContent = "✎";
-              editSub.addEventListener("click", function(){
-                var novo = prompt("Editar nome do sub-assunto:", sub.nome);
-                if(novo === null) return;
-                novo = novo.trim();
-                if(!novo){ showToast("O nome não pode ficar vazio."); return; }
-                sub.nome = novo;
-                saveState(); renderAll();
-              });
-              var delSub = document.createElement("button");
-              delSub.className = "mini-del-btn"; delSub.title = "Excluir sub-assunto"; delSub.textContent = "×";
-              delSub.addEventListener("click", function(){
-                if(!confirm('Excluir o sub-assunto "'+sub.nome+'"?')) return;
-                a.subassuntos = a.subassuntos.filter(function(x){ return x.id !== sub.id; });
-                if(guias[sub.id]) excluirGuiaRemota(sub.id);
-                saveState(); renderAll();
-              });
-              chip.appendChild(editSub);
-              chip.appendChild(delSub);
-              subLista.appendChild(chip);
-            });
-            subWrap.appendChild(subLista);
-          }
 
           var subAddWrap = document.createElement("div");
           subAddWrap.className = "subassunto-add";
           var subInput = document.createElement("input");
           subInput.type = "text";
-          subInput.placeholder = "Adicione o subtema aqui";
+          subInput.placeholder = "Adicione o subtópico aqui";
           var subAddBtn = document.createElement("button");
           subAddBtn.className = "btn small";
           subAddBtn.textContent = "Adicionar";
           function addSubassunto(){
             var nomeSub = subInput.value.trim();
             if(!nomeSub) return;
-            a.subassuntos.push({ id: uid(), nome: nomeSub });
+            a.subassuntos.push({ id: uid(), nome: nomeSub, status: "nao_iniciado", dataInicio: null, questoesCertas: 0, questoesErradas: 0, ciclo: 1, dataConclusao: null });
             saveState();
             renderAll();
           }
@@ -2519,9 +2654,9 @@
           subAddWrap.appendChild(subAddBtn);
           subWrap.appendChild(subAddWrap);
 
-          tdSub.appendChild(subWrap);
-          trSub.appendChild(tdSub);
-          tbody.appendChild(trSub);
+          tdAddSub.appendChild(subWrap);
+          trAddSub.appendChild(tdAddSub);
+          tbody.appendChild(trAddSub);
         });
         table.appendChild(tbody);
         tableWrap.appendChild(table);
@@ -2577,6 +2712,8 @@
             : atrasada ? "<span class='tag atrasada'>Atrasada</span>"
             : "<span class='tag'>Pendente</span>";
     var marcoTxt = etapaObj ? etapaObj.label + (r.ciclo ? " · ciclo "+r.ciclo : "") : "—";
+    var subDoCard = (a && r.subassuntoId) ? (a.subassuntos||[]).find(function(x){ return x.id===r.subassuntoId; }) : null;
+    var subTxt = subDoCard ? "<span class='rev-sub'>› "+escapeHtml(subDoCard.nome)+"</span>" : "";
 
     var card = document.createElement("div");
     card.className = "revisao-card";
@@ -2585,6 +2722,7 @@
     cab.className = "revisao-cab";
     cab.innerHTML =
       "<span class='rev-data'>"+formatDateBR(r.data)+"</span>"+
+      subTxt+
       "<span class='rev-marco'>"+marcoTxt+"</span>"+
       tag;
     card.appendChild(cab);
@@ -2624,9 +2762,10 @@
           }
           var pctFinal = r.questoesCertas / total;
           var certasDaVez = r.questoesCertas, erradasDaVez = r.questoesErradas;
-          if(a){
-            a.questoesCertas = (a.questoesCertas||0) + certasDaVez;
-            a.questoesErradas = (a.questoesErradas||0) + erradasDaVez;
+          var alvoQuestoes = subDoCard || a;
+          if(alvoQuestoes){
+            alvoQuestoes.questoesCertas = (alvoQuestoes.questoesCertas||0) + certasDaVez;
+            alvoQuestoes.questoesErradas = (alvoQuestoes.questoesErradas||0) + erradasDaVez;
           }
           r.questoesCertas = 0; r.questoesErradas = 0;
           var pctPercent = Math.round(pctFinal*100);
@@ -4190,6 +4329,10 @@
       m.assuntos.forEach(function(a){
         totalCertas += (a.questoesCertas || 0);
         totalErradas += (a.questoesErradas || 0);
+        (a.subassuntos||[]).forEach(function(sub){
+          totalCertas += (sub.questoesCertas || 0);
+          totalErradas += (sub.questoesErradas || 0);
+        });
       });
     });
     var totalQuestoes = totalCertas + totalErradas;
@@ -4277,6 +4420,10 @@
             .reduce(function(acc,s){ return acc+s.duracaoSec; },0);
           var certas = a.questoesCertas || 0;
           var erradas = a.questoesErradas || 0;
+          (a.subassuntos||[]).forEach(function(sub){
+            certas += (sub.questoesCertas || 0);
+            erradas += (sub.questoesErradas || 0);
+          });
           var totalQ = certas + erradas;
           var aproveitamento = totalQ > 0 ? Math.round((certas/totalQ)*100) : null;
           return { assuntoNome: a.nome, total: total, aproveitamento: aproveitamento };
@@ -4412,12 +4559,14 @@
         var m = findMateria(r.materiaId);
         var a = m ? findAssunto(m.id, r.assuntoId) : null;
         var etapaObj = ETAPAS.find(function(e){ return e.key===r.etapa; });
+        var subModal = (a && r.subassuntoId) ? (a.subassuntos||[]).find(function(x){ return x.id===r.subassuntoId; }) : null;
         var item = document.createElement("div");
         item.className = "modal-item";
         item.innerHTML =
           "<span>"+(etapaObj ? "<strong>["+etapaObj.label+"]</strong> " : "")+
           (m ? colorDotHtml(m.cor)+escapeHtml(m.nome) : "—")+
-          (a ? " — "+escapeHtml(a.nome) : "")+"</span>";
+          (a ? " — "+escapeHtml(a.nome) : "")+
+          (subModal ? " › "+escapeHtml(subModal.nome) : "")+"</span>";
         body.appendChild(item);
       });
     }
