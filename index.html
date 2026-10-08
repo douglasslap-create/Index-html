@@ -368,6 +368,51 @@
     .assunto-grupo-header.pisca-revisao{animation:none;}
   }
 
+  .loading-book{
+    position:relative;
+    width:76px; height:52px;
+  }
+  .loading-book-half{
+    position:absolute; top:0; bottom:0; width:38px;
+  }
+  .loading-book-half.left{
+    left:0;
+    background:#16a34a;
+    border-radius:6px 0 0 6px;
+    box-shadow:inset -2px 0 4px rgba(0,0,0,.25);
+  }
+  .loading-book-half.right{
+    right:0;
+    background:#bdeed0;
+    border-radius:0 6px 6px 0;
+  }
+  .loading-book-spine{
+    position:absolute; left:50%; top:0; bottom:0; width:4px;
+    margin-left:-2px;
+    background:#0c0a14;
+  }
+  .loading-book-page{
+    position:absolute; top:2px; bottom:2px; left:50%; width:34px;
+    background:#f0fdf4;
+    border-radius:0 5px 5px 0;
+    transform-origin:left center;
+    box-shadow:1px 0 3px rgba(0,0,0,.18);
+    animation:loadingPageFlip 1.5s ease-in-out infinite;
+  }
+  .loading-book-page.lp2{ animation-delay:.2s; background:#ddf7e6; }
+  .loading-book-page.lp3{ animation-delay:.4s; background:#c8f2d7; }
+  @keyframes loadingPageFlip{
+    0%, 100%{ transform:scaleX(1); }
+    50%{ transform:scaleX(.06); }
+  }
+  .loading-text{
+    margin-top:16px;
+    letter-spacing:.02em;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .loading-book-page{ animation:none; }
+  }
+
   .assunto-subgrupo-header{
     display:flex;align-items:center;justify-content:space-between;
     font-size:12.5px;color:var(--text-muted);
@@ -1008,7 +1053,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 </head>
 <body>
-<div id="loadingOverlay" style="position:fixed;inset:0;background:#07050c;display:flex;align-items:center;justify-content:center;z-index:300;color:#8f87ac;font-family:'Lora',serif;font-size:14px;">Carregando seus dados...</div>
+<div id="loadingOverlay" style="position:fixed;inset:0;background:#07050c;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;color:#8f87ac;font-family:'Lora',serif;font-size:14px;">
+  <div class="loading-book" aria-hidden="true">
+    <div class="loading-book-half left"></div>
+    <div class="loading-book-half right"></div>
+    <div class="loading-book-spine"></div>
+    <div class="loading-book-page lp1"></div>
+    <div class="loading-book-page lp2"></div>
+    <div class="loading-book-page lp3"></div>
+  </div>
+  <span class="loading-text">Carregando seus dados...</span>
+</div>
 
 <div id="app">
 
