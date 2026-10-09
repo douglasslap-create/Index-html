@@ -368,49 +368,111 @@
     .assunto-grupo-header.pisca-revisao{animation:none;}
   }
 
-  .loading-book{
+  /* ---- Carregamento: livro folheando (estilo chapado, verde e preto) ---- */
+  .lb-scene{
+    --lb-w:230px;
     position:relative;
-    width:76px; height:52px;
+    width:var(--lb-w);
+    height:calc(var(--lb-w) * .74);
+    perspective:1100px;
   }
-  .loading-book-half{
-    position:absolute; top:0; bottom:0; width:38px;
+  .lb-sombra{
+    position:absolute;
+    left:7%; top:12%;
+    width:96%; height:92%;
+    background:#0b1a12;
+    clip-path:polygon(0 8%, 90% 8%, 100% 46%, 100% 100%, 46% 100%, 6% 92%);
+    transform:translate(7%, 7%);
+    opacity:.9;
   }
-  .loading-book-half.left{
-    left:0;
+  .lb-capa{
+    position:absolute;
+    left:5%; right:5%; top:9%; bottom:10%;
     background:#16a34a;
-    border-radius:6px 0 0 6px;
-    box-shadow:inset -2px 0 4px rgba(0,0,0,.25);
+    border-radius:3px;
+    box-shadow:0 4px 0 #0e7c35;
   }
-  .loading-book-half.right{
-    right:0;
-    background:#bdeed0;
-    border-radius:0 6px 6px 0;
+  .lb-paginas{
+    position:absolute;
+    left:7%; right:7%; top:5%; bottom:15%;
+    transform-style:preserve-3d;
   }
-  .loading-book-spine{
-    position:absolute; left:50%; top:0; bottom:0; width:4px;
-    margin-left:-2px;
-    background:#0c0a14;
+  .lb-pagina{
+    position:absolute;
+    top:0; bottom:0;
+    width:50%;
+    background:#f4faf6;
+    overflow:hidden;
   }
-  .loading-book-page{
-    position:absolute; top:2px; bottom:2px; left:50%; width:34px;
-    background:#f0fdf4;
-    border-radius:0 5px 5px 0;
+  .lb-pagina.esq{ left:0; border-radius:7px 0 0 0; box-shadow:inset -10px 0 12px -8px rgba(0,0,0,.18); }
+  .lb-pagina.dir{ right:0; border-radius:0 7px 0 0; box-shadow:inset 10px 0 12px -8px rgba(0,0,0,.14); }
+  .lb-texto{
+    position:absolute;
+    left:11%; right:11%; top:12%; bottom:10%;
+    background:repeating-linear-gradient(to bottom, #d3e6da 0 2.5px, transparent 2.5px 8px);
+  }
+  .lb-img{
+    position:absolute;
+    width:22%; height:24%;
+    background:#c6dccd;
+  }
+  .lb-pagina.esq .lb-img{ right:12%; bottom:13%; }
+  .lb-pagina.dir .lb-img{ right:11%; top:11%; background:#dcebe1; }
+  .lb-pagina.esq .lb-texto,
+  .lb-pagina.dir .lb-texto{ background-clip:padding-box; }
+  .lb-base{
+    position:absolute;
+    left:7%; right:7%; bottom:10%;
+    height:5%;
+    background:#d6e6dc;
+    border-radius:0 0 3px 3px;
+  }
+  .lb-marcador{
+    position:absolute;
+    left:50%; bottom:2%;
+    width:11%; height:9%;
+    margin-left:-5.5%;
+    background:#0c5a2a;
+    border-radius:0 0 3px 3px;
+  }
+  .lb-virar{
+    position:absolute;
+    right:0; top:0; bottom:0;
+    width:50%;
     transform-origin:left center;
-    box-shadow:1px 0 3px rgba(0,0,0,.18);
-    animation:loadingPageFlip 1.5s ease-in-out infinite;
+    transform-style:preserve-3d;
+    animation:lbVirar 1.7s cubic-bezier(.45,.05,.4,.95) infinite;
   }
-  .loading-book-page.lp2{ animation-delay:.2s; background:#ddf7e6; }
-  .loading-book-page.lp3{ animation-delay:.4s; background:#c8f2d7; }
-  @keyframes loadingPageFlip{
-    0%, 100%{ transform:scaleX(1); }
-    50%{ transform:scaleX(.06); }
+  .lb-virar.v2{ animation-delay:-.85s; }
+  .lb-virar .lb-face{ animation:lbBorrar 1.7s cubic-bezier(.45,.05,.4,.95) infinite; }
+  .lb-virar.v2 .lb-face{ animation-delay:-.85s; }
+  .lb-face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    overflow:hidden;
+    background:#f4faf6;
   }
-  .loading-text{
-    margin-top:16px;
+  .lb-face.frente{ border-radius:0 7px 0 0; }
+  .lb-face.verso{ transform:rotateY(180deg); border-radius:7px 0 0 0; }
+  .lb-face.verso .lb-img{ right:12%; bottom:13%; background:#c6dccd; }
+  .lb-face.frente .lb-img{ right:11%; top:11%; background:#dcebe1; }
+  @keyframes lbVirar{
+    0%   { transform:rotateY(0deg); }
+    12%  { transform:rotateY(0deg); }
+    88%  { transform:rotateY(-180deg); }
+    100% { transform:rotateY(-180deg); }
+  }
+  @keyframes lbBorrar{
+    0%, 12%, 88%, 100% { filter:blur(0); }
+    50% { filter:blur(1.6px); }
+  }
+  .lb-texto-carregando{
+    margin-top:22px;
     letter-spacing:.02em;
   }
   @media (prefers-reduced-motion: reduce){
-    .loading-book-page{ animation:none; }
+    .lb-virar{ animation:none; display:none; }
   }
 
   .assunto-subgrupo-header{
@@ -1054,15 +1116,25 @@
 </head>
 <body>
 <div id="loadingOverlay" style="position:fixed;inset:0;background:#07050c;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;color:#8f87ac;font-family:'Lora',serif;font-size:14px;">
-  <div class="loading-book" aria-hidden="true">
-    <div class="loading-book-half left"></div>
-    <div class="loading-book-half right"></div>
-    <div class="loading-book-spine"></div>
-    <div class="loading-book-page lp1"></div>
-    <div class="loading-book-page lp2"></div>
-    <div class="loading-book-page lp3"></div>
+  <div class="lb-scene" aria-hidden="true">
+    <div class="lb-sombra"></div>
+    <div class="lb-capa"></div>
+    <div class="lb-paginas">
+      <div class="lb-pagina esq"><div class="lb-texto"></div><div class="lb-img"></div></div>
+      <div class="lb-pagina dir"><div class="lb-texto"></div><div class="lb-img"></div></div>
+      <div class="lb-virar v1">
+        <div class="lb-face frente"><div class="lb-texto"></div><div class="lb-img"></div></div>
+        <div class="lb-face verso"><div class="lb-texto"></div><div class="lb-img"></div></div>
+      </div>
+      <div class="lb-virar v2">
+        <div class="lb-face frente"><div class="lb-texto"></div><div class="lb-img"></div></div>
+        <div class="lb-face verso"><div class="lb-texto"></div><div class="lb-img"></div></div>
+      </div>
+    </div>
+    <div class="lb-base"></div>
+    <div class="lb-marcador"></div>
   </div>
-  <span class="loading-text">Carregando seus dados...</span>
+  <span class="lb-texto-carregando">Carregando seus dados...</span>
 </div>
 
 <div id="app">
@@ -1949,6 +2021,7 @@
     saveState();
     refreshTimerControls();
     updateTimerDisplay();
+    if(document.hidden) startTabBlink();
   });
 
   document.getElementById("btnPause").addEventListener("click", function(){
@@ -1961,6 +2034,7 @@
     saveState();
     refreshTimerControls();
     updateTimerDisplay();
+    stopTabBlink();
   });
 
   document.getElementById("btnStop").addEventListener("click", function(){
@@ -1969,6 +2043,7 @@
     if(total < 1){
       t.rodando = false; t.inicio = null; t.acumulado = 0;
       saveState(); refreshTimerControls(); updateTimerDisplay();
+      stopTabBlink();
       return;
     }
     state.sessions.push({
@@ -1983,6 +2058,7 @@
     refreshTimerControls();
     updateTimerDisplay();
     renderCronometroSessions();
+    stopTabBlink();
     showToast("Sessão salva: " + formatDuration(total));
   });
 
@@ -1992,6 +2068,34 @@
     }
   }
   timerInterval = setInterval(timerLoop, 1000);
+
+  /* ---------------- PISCAR A ABA QUANDO O CRONÔMETRO ESTÁ RODANDO EM SEGUNDO PLANO ---------------- */
+  var ORIGINAL_TAB_TITLE = document.title;
+  var tabBlinkInterval = null;
+  var tabBlinkOn = false;
+
+  function startTabBlink(){
+    if(tabBlinkInterval) return;
+    tabBlinkOn = false;
+    tabBlinkInterval = setInterval(function(){
+      tabBlinkOn = !tabBlinkOn;
+      document.title = tabBlinkOn ? "⏱️ Cronômetro rodando..." : ORIGINAL_TAB_TITLE;
+    }, 1000);
+  }
+  function stopTabBlink(){
+    if(tabBlinkInterval){
+      clearInterval(tabBlinkInterval);
+      tabBlinkInterval = null;
+    }
+    document.title = ORIGINAL_TAB_TITLE;
+  }
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){
+      if(state.timer.rodando) startTabBlink();
+    } else {
+      stopTabBlink();
+    }
+  });
 
   function criarLinhaSessao(s){
     var row = document.createElement("div");
