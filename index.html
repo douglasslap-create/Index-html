@@ -1833,6 +1833,32 @@
     }).catch(function(e){ console.error("Falha ao excluir guia na planilha", e); });
   }
 
+  /* ---------------- SINCRONIZAÇÃO ENTRE ABAS ABERTAS ---------------- */
+  // O navegador dispara o evento "storage" nas OUTRAS abas (nunca na que fez a mudança)
+  // sempre que o localStorage muda. Usamos isso para espelhar qualquer ação (iniciar/pausar/
+  // parar cronômetro, marcar revisão, editar assunto, etc.) entre abas abertas do painel.
+  window.addEventListener("storage", function(e){
+    if(e.key === STORAGE_KEY){
+      if(!e.newValue) return;
+      try{
+        state = mesclarComPadrao(JSON.parse(e.newValue));
+      }catch(err){
+        console.error("Falha ao sincronizar estado entre abas", err);
+        return;
+      }
+      renderAll();
+    } else if(e.key === STORAGE_KEY + "_guias"){
+      if(!e.newValue) return;
+      try{
+        guias = JSON.parse(e.newValue) || {};
+      }catch(err){
+        console.error("Falha ao sincronizar guias entre abas", err);
+        return;
+      }
+      renderGuiasRapidos();
+    }
+  });
+
   function extrairTextoArquivo(file){
     var nome = file.name.toLowerCase();
     if(nome.endsWith(".pdf") || file.type === "application/pdf"){
