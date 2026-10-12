@@ -915,7 +915,33 @@
     border-bottom:1px solid var(--border-soft);
     flex-shrink:0;
     background:var(--bg-panel);
+    overflow:hidden;
+    max-height:120px;
+    opacity:1;
+    transition:max-height .25s ease, opacity .2s ease, padding .25s ease, border-color .25s ease;
   }
+  .guia-fullscreen.barra-recolhida .guia-fullscreen-barra{
+    max-height:0;
+    opacity:0;
+    padding-top:0;
+    padding-bottom:0;
+    border-bottom-color:transparent;
+  }
+  .guia-fullscreen-handle{
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    width:100%;
+    height:16px;
+    border:none;
+    border-bottom:1px solid var(--border-subtle);
+    background:var(--bg-deep);
+    color:var(--text-muted);
+    cursor:pointer;
+    font-size:11px;
+    line-height:1;
+    padding:0;
+  }
+  .guia-fullscreen-handle:hover{color:var(--text-primary);}
   .guia-fullscreen-titulos{min-width:0;}
   .guia-fullscreen-assunto{
     font-family:var(--font-head);font-weight:600;font-size:15px;color:var(--text-primary);
@@ -1560,9 +1586,9 @@
       <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
       <div class="guia-fullscreen-materia" id="tfcMateria"></div>
     </div>
-    <button type="button" id="btnTabelaTelaCheia" class="guia-botao-tabela">▦ Tabela</button>
     <span class="guia-fullscreen-salvo" id="tfcStatusSalvo"></span>
   </div>
+  <button type="button" id="btnRecolherBarraTelaCheia" class="guia-fullscreen-handle" title="Esconder barra">⌃</button>
   <div class="guia-fullscreen-conteudo">
     <div class="guia-fullscreen-corpo" id="tfcCorpo" contenteditable="true" spellcheck="false"></div>
     <div class="guia-fullscreen-rodape" id="tfcRodape"></div>
@@ -3559,6 +3585,9 @@
       (guia.nomeArquivo ? guia.nomeArquivo + " · " : "") + "Atualizado em " + formatDateBR(guia.atualizadoEm || todayISO());
     var overlay = document.getElementById("guiaFullscreen");
     overlay.classList.add("aberto");
+    overlay.classList.remove("barra-recolhida");
+    var handleEl = document.getElementById("btnRecolherBarraTelaCheia");
+    if(handleEl){ handleEl.textContent = "⌃"; handleEl.title = "Esconder barra"; }
     overlay.querySelector(".guia-fullscreen-conteudo").scrollTop = 0;
   }
   function fecharTelaCheiaGuia(){
@@ -3606,11 +3635,13 @@
 
   document.getElementById("tfcCorpo").addEventListener("input", agendarSalvarTelaCheia);
   document.getElementById("tfcCorpo").addEventListener("paste", colarNoGuia);
-  document.getElementById("btnTabelaTelaCheia").addEventListener("mousedown", function(e){ e.preventDefault(); });
-  document.getElementById("btnTabelaTelaCheia").addEventListener("click", function(){
-    inserirTabelaNoEditor(document.getElementById("tfcCorpo"));
-  });
 
+  document.getElementById("btnRecolherBarraTelaCheia").addEventListener("click", function(){
+    var overlay = document.getElementById("guiaFullscreen");
+    var recolhida = overlay.classList.toggle("barra-recolhida");
+    this.textContent = recolhida ? "⌄" : "⌃";
+    this.title = recolhida ? "Mostrar barra" : "Esconder barra";
+  });
 
   document.getElementById("btnFecharTelaCheia").addEventListener("click", fecharTelaCheiaGuia);
   document.addEventListener("keydown", function(e){
