@@ -1113,6 +1113,66 @@
     cursor:pointer;
   }
   .guia-botao-tabela:hover{ border-color:var(--accent-brass); color:var(--accent-brass); }
+  .guia-botao-imagem{
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:8px;
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    color:var(--text-primary);
+    cursor:pointer;
+  }
+  .guia-botao-imagem:hover{ border-color:var(--accent-brass); color:var(--accent-brass); }
+
+  .guia-img-wrap{
+    position:relative;
+    display:block;
+    margin:14px 0;
+    max-width:100%;
+  }
+  .guia-img-wrap.guia-img-centro{ text-align:center; }
+  .guia-img-wrap.guia-img-esquerda{ text-align:left; }
+  .guia-img-wrap.guia-img-direita{ text-align:right; }
+  .guia-img{
+    max-width:100%;
+    border-radius:8px;
+    border:1px solid var(--border-soft);
+    display:inline-block;
+    vertical-align:top;
+    cursor:pointer;
+  }
+  .guia-img-toolbar{
+    display:none;
+    gap:4px;
+    margin-top:6px;
+    justify-content:center;
+  }
+  .guia-img-wrap.guia-img-esquerda .guia-img-toolbar{ justify-content:flex-start; }
+  .guia-img-wrap.guia-img-direita .guia-img-toolbar{ justify-content:flex-end; }
+  .guia-img-wrap.guia-img-selecionada .guia-img-toolbar{ display:flex; }
+  .guia-img-wrap.guia-img-selecionada .guia-img{ outline:2px solid var(--accent-brass); }
+  .guia-img-btn{
+    font-size:13px;
+    line-height:1;
+    padding:5px 8px;
+    border-radius:7px;
+    border:1px solid var(--border-soft);
+    background:var(--bg-panel-alt);
+    color:var(--text-primary);
+    cursor:pointer;
+  }
+  .guia-img-btn:hover{ border-color:var(--accent-brass); color:var(--accent-brass); }
+  .guia-img-btn-excluir:hover{ border-color:var(--danger); color:var(--danger); }
+  .guia-img-enviando{
+    display:block;
+    margin:14px 0;
+    padding:14px;
+    border:1px dashed var(--border-soft);
+    border-radius:8px;
+    font-size:12.5px;
+    color:var(--text-muted);
+    text-align:center;
+  }
 
   .caderno-item{
     border-bottom:1px solid var(--border-subtle);
@@ -3560,14 +3620,37 @@
     return "<table class='guia-tabela'><tbody>"+linhasHtml.join("")+"</tbody></table>";
   }
 
+  function renderImagemGuia(fileId, urlCod, align, width){
+    var url = "";
+    try{ url = decodeURIComponent(urlCod || ""); }catch(e){ url = urlCod || ""; }
+    var alinhamento = (align === "esquerda" || align === "direita") ? align : "centro";
+    var larguraNum = parseInt(width, 10);
+    if(isNaN(larguraNum) || larguraNum < 20 || larguraNum > 100) larguraNum = 60;
+    return "<div class='guia-img-wrap guia-img-"+alinhamento+"' contenteditable='false' data-file-id='"+escapeHtml(fileId||"")+"' data-align='"+alinhamento+"' data-width='"+larguraNum+"'>"+
+      "<img class='guia-img' src='"+escapeHtml(url)+"' style='width:"+larguraNum+"%' draggable='false'>"+
+      "<div class='guia-img-toolbar'>"+
+        "<button type='button' class='guia-img-btn' data-acao='esquerda' title='Alinhar à esquerda'>◧</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='centro' title='Centralizar'>▣</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='direita' title='Alinhar à direita'>◨</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='menor' title='Diminuir'>−</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='maior' title='Aumentar'>+</button>"+
+        "<button type='button' class='guia-img-btn guia-img-btn-excluir' data-acao='excluir' title='Excluir imagem'>🗑</button>"+
+      "</div>"+
+    "</div>";
+  }
+
   function renderGuiaTexto(texto){
-    var regexTabela = /\{\{tabela\}\}\n([\s\S]*?)\n\{\{\/tabela\}\}/g;
+    var regexBloco = /\{\{tabela\}\}\n([\s\S]*?)\n\{\{\/tabela\}\}|\{\{img\|([^|]*)\|([^|]*)\|([^|]*)\|([^}]*)\}\}/g;
     var resultado = "";
     var ultimoIndex = 0;
     var m;
-    while((m = regexTabela.exec(texto)) !== null){
+    while((m = regexBloco.exec(texto)) !== null){
       resultado += renderTextoFormatado(texto.slice(ultimoIndex, m.index));
-      resultado += renderTabelaGuia(m[1]);
+      if(m[1] !== undefined){
+        resultado += renderTabelaGuia(m[1]);
+      } else {
+        resultado += renderImagemGuia(m[2], m[3], m[4], m[5]);
+      }
       ultimoIndex = m.index + m[0].length;
     }
     resultado += renderTextoFormatado(texto.slice(ultimoIndex));
@@ -3635,6 +3718,7 @@
 
   document.getElementById("tfcCorpo").addEventListener("input", agendarSalvarTelaCheia);
   document.getElementById("tfcCorpo").addEventListener("paste", colarNoGuia);
+  configurarImagensGuia(document.getElementById("tfcCorpo"));
 
   document.getElementById("btnRecolherBarraTelaCheia").addEventListener("click", function(){
     var overlay = document.getElementById("guiaFullscreen");
@@ -3827,6 +3911,135 @@
     showToast("Tabela inserida — clique nas células pra preencher.");
   }
 
+  /* ---------------- IMAGENS NOS GUIAS RÁPIDOS ---------------- */
+  function inserirNoEditorNaPosicaoCursor(editorEl, node){
+    editorEl.focus();
+    var sel = window.getSelection();
+    var inserido = false;
+    if(sel && sel.rangeCount > 0){
+      var range = sel.getRangeAt(0);
+      if(editorEl.contains(range.commonAncestorContainer)){
+        range.collapse(false);
+        range.insertNode(node);
+        inserido = true;
+      }
+    }
+    if(!inserido){
+      editorEl.appendChild(node);
+    }
+    var brDepois = document.createElement("br");
+    node.parentNode.insertBefore(brDepois, node.nextSibling);
+  }
+
+  function lerArquivoComoDataURL(file, callback){
+    var reader = new FileReader();
+    reader.onload = function(){ callback(reader.result); };
+    reader.readAsDataURL(file);
+  }
+
+  function iniciarUploadImagem(editorEl, file){
+    if(!file || file.type.indexOf("image/") !== 0){
+      showToast("Selecione uma imagem válida.");
+      return;
+    }
+    if(file.size > 4*1024*1024){
+      showToast("Imagem muito grande (máx. 4MB).");
+      return;
+    }
+    lerArquivoComoDataURL(file, function(dataUrl){
+      var uploadId = "up" + Date.now() + Math.random().toString(36).slice(2);
+      var placeholder = document.createElement("div");
+      placeholder.className = "guia-img-enviando";
+      placeholder.contentEditable = "false";
+      placeholder.textContent = "Enviando imagem...";
+      inserirNoEditorNaPosicaoCursor(editorEl, placeholder);
+
+      fetch(SHEETS_API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ token: SHEETS_API_TOKEN, action: "uploadImagem", uploadId: uploadId, imagemBase64: dataUrl, nomeArquivo: file.name || "imagem" })
+      }).catch(function(e){ console.error("Falha ao enviar imagem", e); });
+
+      consultarStatusImagem(uploadId, editorEl, placeholder, 0);
+    });
+  }
+
+  function consultarStatusImagem(uploadId, editorEl, placeholder, tentativas){
+    if(!placeholder.parentNode) return; // usuário pode ter cancelado/saído da tela
+    if(tentativas > 25){
+      placeholder.textContent = "Falha ao enviar a imagem. Tente de novo.";
+      setTimeout(function(){ if(placeholder.parentNode) placeholder.remove(); }, 3000);
+      return;
+    }
+    jsonpRequest(SHEETS_API_URL + "?token=" + encodeURIComponent(SHEETS_API_TOKEN) + "&action=imagemStatus&uploadId=" + encodeURIComponent(uploadId))
+      .then(function(resp){
+        if(resp && resp.url){
+          var temp = document.createElement("div");
+          temp.innerHTML = renderImagemGuia(resp.fileId || "", encodeURIComponent(resp.url), "centro", "60");
+          var novoWrap = temp.firstChild;
+          if(placeholder.parentNode){
+            placeholder.parentNode.replaceChild(novoWrap, placeholder);
+          }
+          editorEl.dispatchEvent(new Event("input", {bubbles:true}));
+        } else {
+          setTimeout(function(){ consultarStatusImagem(uploadId, editorEl, placeholder, tentativas+1); }, 600);
+        }
+      })
+      .catch(function(){
+        setTimeout(function(){ consultarStatusImagem(uploadId, editorEl, placeholder, tentativas+1); }, 600);
+      });
+  }
+
+  function excluirImagemRemota(fileId){
+    if(!fileId) return;
+    fetch(SHEETS_API_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ token: SHEETS_API_TOKEN, action: "excluirImagem", fileId: fileId })
+    }).catch(function(e){ console.error("Falha ao excluir imagem", e); });
+  }
+
+  function configurarImagensGuia(editorEl){
+    editorEl.addEventListener("click", function(e){
+      var wrapClicado = e.target.closest ? e.target.closest(".guia-img-wrap") : null;
+      var btn = e.target.closest ? e.target.closest(".guia-img-btn") : null;
+      if(btn && editorEl.contains(btn)){
+        e.preventDefault();
+        var wrap = btn.closest(".guia-img-wrap");
+        if(!wrap) return;
+        var acao = btn.dataset.acao;
+        var imgEl = wrap.querySelector("img.guia-img");
+        if(acao === "esquerda" || acao === "centro" || acao === "direita"){
+          wrap.classList.remove("guia-img-esquerda", "guia-img-centro", "guia-img-direita");
+          wrap.classList.add("guia-img-" + acao);
+          wrap.dataset.align = acao;
+        } else if(acao === "maior"){
+          var w1 = Math.min(100, (parseInt(wrap.dataset.width, 10) || 60) + 10);
+          wrap.dataset.width = w1;
+          if(imgEl) imgEl.style.width = w1 + "%";
+        } else if(acao === "menor"){
+          var w2 = Math.max(20, (parseInt(wrap.dataset.width, 10) || 60) - 10);
+          wrap.dataset.width = w2;
+          if(imgEl) imgEl.style.width = w2 + "%";
+        } else if(acao === "excluir"){
+          var fileIdDel = wrap.dataset.fileId;
+          wrap.remove();
+          excluirImagemRemota(fileIdDel);
+        }
+        editorEl.dispatchEvent(new Event("input", {bubbles:true}));
+        return;
+      }
+      editorEl.querySelectorAll(".guia-img-wrap.guia-img-selecionada").forEach(function(w){
+        if(w !== wrapClicado) w.classList.remove("guia-img-selecionada");
+      });
+      if(wrapClicado && editorEl.contains(wrapClicado)){
+        wrapClicado.classList.toggle("guia-img-selecionada");
+      }
+    });
+  }
+
   function htmlColadoParaGuia(html){
     var doc = new DOMParser().parseFromString(html, "text/html");
 
@@ -3882,8 +4095,20 @@
   }
 
   function colarNoGuia(e){
-    e.preventDefault();
     var cd = e.clipboardData || window.clipboardData;
+    var editorAlvo = e.currentTarget;
+    if(cd && cd.items){
+      for(var i=0; i<cd.items.length; i++){
+        var itemColado = cd.items[i];
+        if(itemColado.kind === "file" && itemColado.type.indexOf("image/") === 0){
+          e.preventDefault();
+          var blobImagem = itemColado.getAsFile();
+          if(blobImagem) iniciarUploadImagem(editorAlvo, blobImagem);
+          return;
+        }
+      }
+    }
+    e.preventDefault();
     var html = cd.getData("text/html");
     var texto = cd.getData("text/plain");
     if(html && /<table[\s>]/i.test(html)){
@@ -3905,6 +4130,14 @@
         var tag = filho.tagName.toLowerCase();
         if(tag === "br"){
           resultado += "\n";
+        } else if(filho.classList && filho.classList.contains("guia-img-wrap")){
+          var imgElSer = filho.querySelector("img.guia-img");
+          var urlSer = imgElSer ? (imgElSer.getAttribute("src")||"") : "";
+          var fidSer = filho.dataset.fileId || "";
+          var alignSer = filho.dataset.align || "centro";
+          var widthSer = filho.dataset.width || "60";
+          if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
+          resultado += "{{img|"+fidSer+"|"+encodeURIComponent(urlSer)+"|"+alignSer+"|"+widthSer+"}}\n";
         } else if(tag === "div" || tag === "p"){
           if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
           resultado += serializarEditorParaMarkup(filho) + "\n";
@@ -3984,6 +4217,7 @@
           timeoutLeitura = setTimeout(function(){ salvarConteudoEditavel(leituraEl); }, 900);
         });
         leituraEl.addEventListener("paste", colarNoGuia);
+        configurarImagensGuia(leituraEl);
         var acoesLeitura = document.createElement("div");
         acoesLeitura.style.cssText = "display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;";
         var btnExcluirGuia = document.createElement("button");
@@ -3999,7 +4233,21 @@
         btnTabelaLeitura.className = "guia-botao-tabela"; btnTabelaLeitura.textContent = "▦ Tabela";
         btnTabelaLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
         btnTabelaLeitura.addEventListener("click", function(){ inserirTabelaNoEditor(leituraEl); });
+        var inputImagemLeitura = document.createElement("input");
+        inputImagemLeitura.type = "file"; inputImagemLeitura.accept = "image/*"; inputImagemLeitura.style.display = "none";
+        inputImagemLeitura.addEventListener("change", function(e){
+          var fileImg = e.target.files[0];
+          if(fileImg) iniciarUploadImagem(leituraEl, fileImg);
+          inputImagemLeitura.value = "";
+        });
+        var btnImagemLeitura = document.createElement("button");
+        btnImagemLeitura.type = "button";
+        btnImagemLeitura.className = "guia-botao-imagem"; btnImagemLeitura.textContent = "📷 Imagem";
+        btnImagemLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnImagemLeitura.addEventListener("click", function(){ inputImagemLeitura.click(); });
         acoesLeitura.appendChild(btnTabelaLeitura);
+        acoesLeitura.appendChild(btnImagemLeitura);
+        acoesLeitura.appendChild(inputImagemLeitura);
         acoesLeitura.appendChild(btnExcluirGuia);
         painel.appendChild(acoesLeitura);
       } else {
@@ -4017,9 +4265,10 @@
         var fileInputEl = wrapImport.querySelector(".guiaFileInput");
 
         editorEl.addEventListener("paste", colarNoGuia);
+        configurarImagensGuia(editorEl);
 
         var acoesImport = document.createElement("div");
-        acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;";
+        acoesImport.style.cssText = "display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;";
         var btnSalvarGuia = document.createElement("button");
         btnSalvarGuia.className = "btn primary small"; btnSalvarGuia.textContent = "Salvar guia";
         var btnCancelarGuia = document.createElement("button");
@@ -4029,7 +4278,21 @@
         btnTabelaEditor.className = "guia-botao-tabela"; btnTabelaEditor.textContent = "▦ Tabela";
         btnTabelaEditor.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
         btnTabelaEditor.addEventListener("click", function(){ inserirTabelaNoEditor(editorEl); });
+        var inputImagemEditor = document.createElement("input");
+        inputImagemEditor.type = "file"; inputImagemEditor.accept = "image/*"; inputImagemEditor.style.display = "none";
+        inputImagemEditor.addEventListener("change", function(e){
+          var fileImg2 = e.target.files[0];
+          if(fileImg2) iniciarUploadImagem(editorEl, fileImg2);
+          inputImagemEditor.value = "";
+        });
+        var btnImagemEditor = document.createElement("button");
+        btnImagemEditor.type = "button";
+        btnImagemEditor.className = "guia-botao-imagem"; btnImagemEditor.textContent = "📷 Imagem";
+        btnImagemEditor.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnImagemEditor.addEventListener("click", function(){ inputImagemEditor.click(); });
         acoesImport.appendChild(btnTabelaEditor);
+        acoesImport.appendChild(btnImagemEditor);
+        acoesImport.appendChild(inputImagemEditor);
         acoesImport.appendChild(btnSalvarGuia);
         acoesImport.appendChild(btnCancelarGuia);
         painel.appendChild(acoesImport);
