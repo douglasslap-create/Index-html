@@ -1933,6 +1933,7 @@
         return;
       }
       renderAll();
+      syncTabBlink();
     } else if(e.key === STORAGE_KEY + "_guias"){
       if(!e.newValue) return;
       try{
@@ -2133,7 +2134,7 @@
     saveState();
     refreshTimerControls();
     updateTimerDisplay();
-    if(document.hidden) startTabBlink();
+    syncTabBlink();
   });
 
   document.getElementById("btnPause").addEventListener("click", function(){
@@ -2146,7 +2147,7 @@
     saveState();
     refreshTimerControls();
     updateTimerDisplay();
-    stopTabBlink();
+    syncTabBlink();
   });
 
   document.getElementById("btnStop").addEventListener("click", function(){
@@ -2155,7 +2156,7 @@
     if(total < 1){
       t.rodando = false; t.inicio = null; t.acumulado = 0;
       saveState(); refreshTimerControls(); updateTimerDisplay();
-      stopTabBlink();
+      syncTabBlink();
       return;
     }
     state.sessions.push({
@@ -2170,7 +2171,7 @@
     refreshTimerControls();
     updateTimerDisplay();
     renderCronometroSessions();
-    stopTabBlink();
+    syncTabBlink();
     showToast("Sessão salva: " + formatDuration(total));
   });
 
@@ -2181,17 +2182,23 @@
   }
   timerInterval = setInterval(timerLoop, 1000);
 
-  /* ---------------- PISCAR A ABA QUANDO O CRONÔMETRO ESTÁ RODANDO EM SEGUNDO PLANO ---------------- */
+  /* ---------------- PISCAR A ABA QUANDO O CRONÔMETRO ESTÁ RODANDO OU PAUSADO EM SEGUNDO PLANO ---------------- */
   var ORIGINAL_TAB_TITLE = document.title;
   var tabBlinkInterval = null;
   var tabBlinkOn = false;
 
+  function textoPiscarAba(){
+    var t = state.timer;
+    if(t.rodando) return "⏱️ Cronômetro rodando...";
+    if(t.acumulado > 0) return "⏸️ Cronômetro pausado...";
+    return ORIGINAL_TAB_TITLE;
+  }
   function startTabBlink(){
     if(tabBlinkInterval) return;
     tabBlinkOn = false;
     tabBlinkInterval = setInterval(function(){
       tabBlinkOn = !tabBlinkOn;
-      document.title = tabBlinkOn ? "⏱️ Cronômetro rodando..." : ORIGINAL_TAB_TITLE;
+      document.title = tabBlinkOn ? textoPiscarAba() : ORIGINAL_TAB_TITLE;
     }, 1000);
   }
   function stopTabBlink(){
@@ -2201,13 +2208,16 @@
     }
     document.title = ORIGINAL_TAB_TITLE;
   }
-  document.addEventListener("visibilitychange", function(){
-    if(document.hidden){
-      if(state.timer.rodando) startTabBlink();
+  // Pisca quando a aba está em segundo plano e o cronômetro está rodando OU pausado (com tempo acumulado)
+  function syncTabBlink(){
+    var t = state.timer;
+    if(document.hidden && (t.rodando || t.acumulado > 0)){
+      startTabBlink();
     } else {
       stopTabBlink();
     }
-  });
+  }
+  document.addEventListener("visibilitychange", syncTabBlink);
 
   function criarLinhaSessao(s){
     var row = document.createElement("div");
