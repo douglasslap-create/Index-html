@@ -1191,6 +1191,21 @@
     border-left:2px solid var(--border-soft);padding-left:10px;margin-bottom:8px;
   }
 
+  .cad-alternativas{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
+  .cad-alternativas > div{flex:1;min-width:200px;}
+  .cad-alt-label{font-size:11.5px;font-weight:600;display:block;margin-bottom:5px;}
+  .cad-alt-label.errada{color:var(--danger);}
+  .cad-alt-label.certa{color:var(--success);}
+  .cad-alt-input{width:100%;box-sizing:border-box;}
+  .cad-alt-input.errada{border:1px solid var(--danger);background:var(--danger-dim);}
+  .cad-alt-input.certa{border:1px solid var(--success);background:var(--success-dim);}
+  .caderno-item .caderno-alt{
+    font-size:13px;line-height:1.5;white-space:pre-wrap;
+    padding:6px 10px;border-radius:6px;margin-bottom:6px;border-left:3px solid;
+  }
+  .caderno-item .caderno-alt.errada{color:var(--danger);border-color:var(--danger);background:var(--danger-dim);}
+  .caderno-item .caderno-alt.certa{color:var(--success);border-color:var(--success);background:var(--success-dim);}
+
   @media (max-width:640px){
     .timer-display{font-size:40px;}
     .bar-row .bar-label{width:100px;font-size:12px;}
@@ -1515,6 +1530,16 @@
         <div style="margin-bottom:12px;">
           <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">O que a questão pedia / onde você errou</label>
           <textarea id="cadEnunciado" style="min-height:90px;" placeholder="Cole ou resuma o enunciado da questão..."></textarea>
+        </div>
+        <div class="cad-alternativas">
+          <div>
+            <label class="cad-alt-label errada" for="cadAltErrada">✗ Alternativa que eu marquei (errada)</label>
+            <textarea id="cadAltErrada" class="cad-alt-input errada" style="min-height:56px;" placeholder="Ex.: C — ou o texto da alternativa"></textarea>
+          </div>
+          <div>
+            <label class="cad-alt-label certa" for="cadAltCerta">✓ Alternativa correta (gabarito)</label>
+            <textarea id="cadAltCerta" class="cad-alt-input certa" style="min-height:56px;" placeholder="Ex.: B — ou o texto da alternativa"></textarea>
+          </div>
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Anotação (o porquê do erro, gabarito comentado, etc.)</label>
@@ -2208,16 +2233,24 @@
     }
     document.title = ORIGINAL_TAB_TITLE;
   }
-  // Pisca quando a aba está em segundo plano e o cronômetro está rodando OU pausado (com tempo acumulado)
+  // "Ausente" = aba escondida OU janela do navegador sem foco (ex.: outra janela/app por cima)
+  function usuarioAusente(){
+    return document.hidden || !document.hasFocus();
+  }
+  // Pisca quando o usuário está ausente e o cronômetro está rodando OU pausado (com tempo acumulado)
   function syncTabBlink(){
     var t = state.timer;
-    if(document.hidden && (t.rodando || t.acumulado > 0)){
+    if(usuarioAusente() && (t.rodando || t.acumulado > 0)){
       startTabBlink();
-    } else {
+    } else if(tabBlinkInterval || document.title !== ORIGINAL_TAB_TITLE){
       stopTabBlink();
     }
   }
   document.addEventListener("visibilitychange", syncTabBlink);
+  window.addEventListener("blur", syncTabBlink);
+  window.addEventListener("focus", syncTabBlink);
+  // Rede de segurança: reavalia a cada segundo, caso o navegador não dispare algum evento
+  setInterval(syncTabBlink, 1000);
 
   function criarLinhaSessao(s){
     var row = document.createElement("div");
@@ -4314,12 +4347,20 @@
           var ehDocx = /\.docx$/i.test(file.name);
           var leitura = ehDocx
             ? file.arrayBuffer().then(function(buf){ return mammoth.convertToHtml({ arrayBuffer: buf }); }).then(function(res){
-                editorEl.innerHTML = htmlColadoParaGuia(res.value);
-                showToast("Documento importado com tabelas! Revise antes de salvar.");
+                var jaTinha = editorEl.textContent.trim() !== "" || editorEl.querySelector(".guia-img-wrap, table");
+                if(jaTinha) editorEl.appendChild(document.createElement("br"));
+                if(jaTinha) editorEl.appendChild(document.createElement("br"));
+                editorEl.insertAdjacentHTML("beforeend", htmlColadoParaGuia(res.value));
+                showToast(jaTinha ? "Documento adicionado ao final do guia! Revise antes de salvar." : "Documento importado com tabelas! Revise antes de salvar.");
               })
             : extrairTextoArquivo(file).then(function(texto){
-                editorEl.textContent = texto.trim();
-                showToast("Texto extraído! Revise antes de salvar.");
+                var jaTinhaTxt = editorEl.textContent.trim() !== "" || editorEl.querySelector(".guia-img-wrap, table");
+                if(jaTinhaTxt){
+                  editorEl.appendChild(document.createElement("br"));
+                  editorEl.appendChild(document.createElement("br"));
+                }
+                editorEl.appendChild(document.createTextNode(texto.trim()));
+                showToast(jaTinhaTxt ? "Texto adicionado ao final do guia! Revise antes de salvar." : "Texto extraído! Revise antes de salvar.");
               });
           leitura.catch(function(err){
             console.error(err);
@@ -4426,18 +4467,23 @@
     var tipoErro = document.getElementById("cadTipoErro").value.trim();
     var enunciado = document.getElementById("cadEnunciado").value.trim();
     var anotacao = document.getElementById("cadAnotacao").value.trim();
+    var altErrada = document.getElementById("cadAltErrada").value.trim();
+    var altCerta = document.getElementById("cadAltCerta").value.trim();
     if(!materiaId){ showToast("Selecione a matéria."); return; }
     if(!enunciado){ showToast("Descreva a questão que você errou."); return; }
     state.cadernoErros.push({
       id: uid(), materiaId: materiaId, assuntoId: assuntoId || "",
       data: data, banca: banca, tipoErro: tipoErro,
-      enunciado: enunciado, anotacao: anotacao, resolvida: false
+      enunciado: enunciado, altErrada: altErrada, altCerta: altCerta,
+      anotacao: anotacao, resolvida: false
     });
     saveState();
     document.getElementById("cadBanca").value = "";
     document.getElementById("cadTipoErro").value = "";
     document.getElementById("cadEnunciado").value = "";
     document.getElementById("cadAnotacao").value = "";
+    document.getElementById("cadAltErrada").value = "";
+    document.getElementById("cadAltCerta").value = "";
     renderCaderno();
     showToast("Questão adicionada ao caderno.");
   });
@@ -4469,6 +4515,19 @@
     enun.className = "caderno-enunciado";
     enun.textContent = item.enunciado;
     div.appendChild(enun);
+
+    if(item.altErrada){
+      var altE = document.createElement("div");
+      altE.className = "caderno-alt errada";
+      altE.textContent = "✗ Marquei: " + item.altErrada;
+      div.appendChild(altE);
+    }
+    if(item.altCerta){
+      var altC = document.createElement("div");
+      altC.className = "caderno-alt certa";
+      altC.textContent = "✓ Correta: " + item.altCerta;
+      div.appendChild(altC);
+    }
 
     if(item.anotacao){
       var anot = document.createElement("div");
@@ -4517,7 +4576,7 @@
         var m = findMateria(item.materiaId);
         var a = m ? findAssunto(m.id, item.assuntoId) : null;
         var textoBusca = [
-          item.enunciado, item.anotacao, item.banca, item.tipoErro,
+          item.enunciado, item.altErrada || "", item.altCerta || "", item.anotacao, item.banca, item.tipoErro,
           m ? m.nome : "", a ? a.nome : ""
         ].join(" ").toLowerCase();
         if(textoBusca.indexOf(busca) === -1) return false;
