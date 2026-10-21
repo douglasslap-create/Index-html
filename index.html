@@ -88,7 +88,10 @@
     margin-top:22px;
     border-bottom:1px solid var(--border-subtle);
     overflow-x:auto;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
   }
+  nav.tabs::-webkit-scrollbar{display:none;height:0;}
   nav.tabs button{
     background:none;
     border:none;
@@ -594,7 +597,87 @@
     width:100%;
   }
   input[type=checkbox]{accent-color:var(--accent-brass);width:16px;height:16px;cursor:pointer;}
-  select:focus,input:focus,textarea:focus{outline:1px solid var(--accent-sky);}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent-brass);box-shadow:0 0 0 3px rgba(74,222,128,.16);}
+
+  /* ---- Caixas de seleção: visual moderno em verde e preto ---- */
+  select{
+    -webkit-appearance:none;-moz-appearance:none;appearance:none;
+    background-color:#000000;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%234ade80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 13px center;
+    background-size:12px 8px;
+    border:1px solid var(--border-soft);
+    border-radius:10px;
+    padding:10px 38px 10px 14px;
+    cursor:pointer;
+    text-overflow:ellipsis;
+    transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  }
+  select:hover:not(:disabled){border-color:var(--accent-brass-dim);background-color:#0a0a0a;}
+  select:focus{outline:none;border-color:var(--accent-brass);box-shadow:0 0 0 3px rgba(74,222,128,.18);}
+  select:disabled{opacity:.45;cursor:not-allowed;}
+  select{color:var(--accent-brass);font-weight:500;}
+  /* setinhas dos campos numéricos e ícone do calendário em verde */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+  .num-wrap{position:relative;display:inline-flex;align-items:stretch;}
+  .num-wrap input[type=number]{padding-right:30px;}
+  .num-wrap .num-btns{position:absolute;right:1px;top:1px;bottom:1px;width:24px;display:flex;flex-direction:column;border-left:1px solid var(--border-soft);}
+  .num-wrap .num-btns button{flex:1;border:0;background:transparent;color:var(--accent-brass);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;}
+  .num-wrap .num-btns button:hover{background:rgba(74,222,128,.16);}
+  .num-wrap .num-btns button+button{border-top:1px solid var(--border-soft);}
+  .num-wrap .num-btns svg{width:10px;height:7px;}
+  input[type=number]{-moz-appearance:textfield;accent-color:var(--accent-brass);}
+  input[type=date]::-webkit-calendar-picker-indicator,
+  input[type=time]::-webkit-calendar-picker-indicator{
+    cursor:pointer;filter:invert(74%) sepia(45%) saturate(560%) hue-rotate(83deg) brightness(95%);opacity:1;
+  }
+  select{color-scheme:dark;}
+  input[type=date],input[type=time]{color:var(--accent-brass);color-scheme:dark;font-weight:500;}
+  input[type=date]::-webkit-datetime-edit,
+  input[type=date]::-webkit-datetime-edit-fields-wrapper,
+  input[type=date]::-webkit-datetime-edit-text,
+  input[type=date]::-webkit-datetime-edit-day-field,
+  input[type=date]::-webkit-datetime-edit-month-field,
+  input[type=date]::-webkit-datetime-edit-year-field{color:var(--accent-brass);}
+  input[type=date]::-webkit-datetime-edit-text{opacity:.6;}
+  input[type=date]:focus::-webkit-datetime-edit-day-field:focus,
+  input[type=date]:focus::-webkit-datetime-edit-month-field:focus,
+  input[type=date]:focus::-webkit-datetime-edit-year-field:focus{background:var(--accent-brass-dim);color:#fff;}
+  input[type=date]{border-radius:10px;background-color:#000;}
+
+  /* ---- Lista de opções própria (igual em qualquer navegador) ---- */
+  .cs-pop{
+    position:fixed;z-index:1000;background:#000;border:1px solid var(--accent-brass-dim);
+    border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.7),0 0 0 3px rgba(74,222,128,.10);
+    overflow-y:auto;overscroll-behavior:contain;padding:4px;
+    scrollbar-width:thin;scrollbar-color:var(--accent-brass-dim) #000;
+  }
+  .cs-pop::-webkit-scrollbar{width:8px;}
+  .cs-pop::-webkit-scrollbar-thumb{background:var(--accent-brass-dim);border-radius:8px;}
+  .cs-pop::-webkit-scrollbar-track{background:#000;}
+  .cs-item{
+    padding:9px 12px;border-radius:7px;color:var(--accent-brass);font-size:13.5px;line-height:1.35;
+    cursor:pointer;font-family:var(--font-body);word-break:break-word;
+  }
+  .cs-item.cs-hover{background:rgba(74,222,128,.14);color:#bbf7d0;}
+  .cs-item.cs-sel{background:var(--accent-brass-dim);color:#fff;}
+  .cs-item.cs-off{opacity:.4;cursor:not-allowed;}
+  .cs-group{padding:8px 12px 4px;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;}
+  select option,select optgroup{
+    background-color:#000000 !important;background:#000000 !important;
+    color:#4ade80 !important;padding:8px 10px;
+  }
+  select option:hover,select option:focus,select option:active{
+    background-color:#14532d !important;background:#14532d !important;color:#ffffff !important;
+    box-shadow:0 0 0 100px #14532d inset;
+  }
+  select option:checked{
+    background-color:#14532d !important;background:#14532d linear-gradient(#14532d,#14532d) !important;color:#ffffff !important;
+    box-shadow:0 0 0 100px #14532d inset;
+  }
+  select.dia-add-select,.dia-add-select{padding:7px 32px 7px 12px;background-position:right 11px center;}
 
   button.btn{
     font-family:var(--font-body);
@@ -1191,6 +1274,48 @@
     border-left:2px solid var(--border-soft);padding-left:10px;margin-bottom:8px;
   }
 
+  .guia-math{display:inline-block;max-width:100%;overflow-x:auto;vertical-align:middle;}
+  .guia-math.guia-math-bloco{display:block;text-align:center;margin:10px 0;}
+  .guia-math .katex{font-size:1.1em;}
+  .guia-math .katex-display{margin:0;}
+  .guia-continuar{
+    display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+    padding:12px 14px;margin-bottom:14px;border-radius:10px;cursor:pointer;
+    border:1px solid var(--accent-brass);background:var(--bg-panel-alt);color:var(--text-primary);
+    font-family:inherit;font-size:13.5px;
+  }
+  .guia-continuar small{color:var(--text-muted);font-size:12px;}
+  .guia-continuar:hover{background:var(--bg-panel);}
+  .guia-continuar-ico{font-size:22px;}
+  .est-filtros{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px;}
+  .est-filtros > div{flex:1;min-width:180px;}
+  .est-svg{display:block;max-width:100%;}
+  .est-svg text{fill:var(--text-muted);font-size:11px;font-family:var(--font-body);}
+  .est-svg .est-valor{fill:var(--text-primary);font-weight:600;font-size:11px;}
+  .est-svg .est-grade{stroke:var(--border-subtle);stroke-width:1;shape-rendering:crispEdges;}
+  .est-legenda{display:flex;gap:16px;justify-content:center;font-size:12px;color:var(--text-muted);margin-top:8px;}
+  .est-legenda i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px;}
+  .est-hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px;}
+  .est-hbar-nome{width:150px;flex-shrink:0;text-align:right;color:var(--text-muted);line-height:1.25;overflow-wrap:anywhere;}
+  .est-hbar-trilho{flex:1;min-width:0;background:var(--bg-panel-alt);border-radius:4px;min-height:26px;display:flex;align-items:center;}
+  .est-hbar{height:26px;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding:0 8px;font-weight:700;font-size:11.5px;color:#0b0b0b;box-sizing:border-box;white-space:nowrap;flex-shrink:0;}
+  .est-hbar-fora{margin-left:8px;font-size:11.5px;font-weight:700;color:var(--text-primary);white-space:nowrap;}
+  .est-hs-c,.est-hs-e{height:26px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0b0b0b;overflow:hidden;box-sizing:border-box;}
+  .est-hs-c{background:var(--success);border-radius:4px 0 0 4px;}
+  .est-hs-e{background:var(--danger);border-radius:0 4px 4px 0;}
+  .est-hs-c:only-child{border-radius:4px;} .est-hs-e:only-child{border-radius:4px;}
+  .est-hs-total{margin-left:8px;font-size:11.5px;color:var(--text-muted);white-space:nowrap;}
+  .est-tabela-wrap{max-height:460px;overflow:auto;}
+  table.est-tabela{width:100%;border-collapse:collapse;font-size:13px;}
+  .est-tabela th{position:sticky;top:0;background:var(--bg-panel-alt);cursor:pointer;user-select:none;text-align:left;padding:10px;border-bottom:1px solid var(--border-soft);white-space:nowrap;font-weight:600;z-index:1;}
+  .est-tabela th .est-seta{opacity:.5;margin-left:4px;font-size:11px;}
+  .est-tabela td{padding:9px 10px;border-bottom:1px solid var(--border-subtle);vertical-align:top;}
+  .est-tabela td.est-num{text-align:center;white-space:nowrap;font-family:var(--font-mono);}
+  .est-badge{display:inline-block;min-width:40px;text-align:center;padding:2px 8px;border-radius:5px;font-weight:700;font-size:12px;color:#0b0b0b;}
+  @media (max-width:640px){
+    table.est-tabela{min-width:560px;}
+    .est-hbar-nome{width:104px;font-size:12px;}
+  }
   .cad-alternativas{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;}
   .cad-alternativas > div{flex:1;min-width:200px;}
   .cad-alt-label{font-size:11.5px;font-weight:600;display:block;margin-bottom:5px;}
@@ -1214,6 +1339,8 @@
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
 </head>
 <body>
 <div id="loadingOverlay" style="position:fixed;inset:0;background:#07050c;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:300;color:#8f87ac;font-family:'Lora',serif;font-size:14px;">
@@ -1250,6 +1377,7 @@
 
   <nav class="tabs">
     <button data-tab="painel" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
+    <button data-tab="planejamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18"/><path d="M8 2v4M16 2v4"/><path d="M7 13h4M7 17h8"/></svg>Planejamento</button>
     <button data-tab="cronometro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Cronômetro</button>
     <button data-tab="materias"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 5.5v15"/></svg>Matérias e assuntos</button>
     <button data-tab="revisoes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>Revisões</button>
@@ -1288,14 +1416,6 @@
             <button class="btn primary small" id="btnSalvarConcurso">Salvar</button>
             <button class="btn small" id="btnCancelarConcurso">Cancelar</button>
           </div>
-        </div>
-      </div>
-
-      <div class="gadget" style="margin-bottom:20px;">
-        <div class="gadget-header">Grade de estudos da semana</div>
-        <div class="gadget-body">
-          <p class="section-sub" style="margin-bottom:14px;">Monte seu planejamento: escolha quais matérias estudar em cada dia.</p>
-          <div id="gradeHorariaContainer"></div>
         </div>
       </div>
 
@@ -1356,21 +1476,45 @@
           </div>
         </div>
 
-        <div class="full atividade-assunto-grid">
-          <div class="gadget">
-            <div class="gadget-header">Atividade dos últimos 7 dias</div>
-            <div class="gadget-body">
-              <p class="section-sub" style="margin-bottom:2px;">Tempo líquido estudado por dia.</p>
-              <div class="week-chart" id="weekChart"></div>
+        <div class="gadget full">
+          <div class="gadget-header" id="estDiasTitulo">Atividade de estudo</div>
+          <div class="gadget-body">
+            <div class="est-filtros">
+              <div>
+                <label>Matéria</label>
+                <select id="estMateria"><option value="">Todas as matérias</option></select>
+              </div>
+              <div>
+                <label>Período (tempo de estudo)</label>
+                <select id="estPeriodo">
+                  <option value="7" selected>Últimos 7 dias</option>
+                  <option value="30">Últimos 30 dias</option>
+                  <option value="90">Últimos 90 dias</option>
+                  <option value="todo">Todo o período</option>
+                </select>
+              </div>
             </div>
+            <div id="estDias"></div>
           </div>
+        </div>
 
-          <div class="gadget">
-            <div class="gadget-header">Tempo por assunto</div>
-            <div class="gadget-body">
-              <p class="section-sub" style="margin-bottom:16px;">Na mesma ordem em que os assuntos foram cadastrados em Matérias e assuntos.</p>
-              <div id="assuntoBarList" style="max-height:360px;overflow-y:auto;padding-right:4px;"></div>
-            </div>
+        <div class="gadget">
+          <div class="gadget-header" id="estHorasTitulo">Disciplinas x horas de estudo</div>
+          <div class="gadget-body"><div id="estHoras"></div></div>
+        </div>
+        <div class="gadget">
+          <div class="gadget-header">Categorias x horas de estudo</div>
+          <div class="gadget-body"><div id="estRadar"></div></div>
+        </div>
+        <div class="gadget full">
+          <div class="gadget-header" id="estDesempenhoTitulo">Disciplinas x desempenho</div>
+          <div class="gadget-body"><div id="estDesempenho"></div></div>
+        </div>
+        <div class="gadget full">
+          <div class="gadget-header">Tópicos x desempenho</div>
+          <div class="gadget-body">
+            <p class="section-sub" style="margin-bottom:12px;">Clique no título de uma coluna para ordenar. As questões certas e erradas não têm data, então o período filtra só o tempo de estudo.</p>
+            <div class="est-tabela-wrap" id="estTabela"></div>
           </div>
         </div>
 
@@ -1389,6 +1533,18 @@
       </div>
     </section>
 
+    <!-- PLANEJAMENTO -->
+    <section class="tab" id="tab-planejamento">
+      <h2 class="section-title">Planejamento</h2>
+      <p class="section-sub">Organize sua semana de estudos: escolha quais matérias estudar em cada dia.</p>
+      <div class="gadget" style="margin-bottom:20px;">
+        <div class="gadget-header">Grade de estudos da semana</div>
+        <div class="gadget-body">
+          <div id="gradeHorariaContainer"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- CRONOMETRO -->
     <section class="tab" id="tab-cronometro">
       <h2 class="section-title">Cronômetro de estudo</h2>
@@ -1397,6 +1553,7 @@
         <div class="timer-select-row">
           <select id="timerMateria"><option value="">Selecione a matéria</option></select>
           <select id="timerAssunto"><option value="">Assunto (opcional)</option></select>
+          <select id="timerTipo"><option value="">Tipo de estudo (opcional)</option></select>
         </div>
         <div class="timer-display" id="timerDisplay">00:00:00</div>
         <div class="timer-buttons">
@@ -1807,7 +1964,7 @@
       metaDiariaMin: 120,
       checkins: {},
       gradeHoraria: { dom:[], seg:[], ter:[], qua:[], qui:[], sex:[], sab:[] },
-      timer: { rodando:false, inicio:null, acumulado:0, materiaId:"", assuntoId:"" }
+      timer: { rodando:false, inicio:null, acumulado:0, materiaId:"", assuntoId:"", tipo:"" }
     };
   }
 
@@ -2053,6 +2210,7 @@
   }
 
   /* ---------------- TABS ---------------- */
+  var TIPOS_ESTUDO = ["Teoria", "Revisão", "Leitura de Lei", "Jurisprudência", "Questões"];
   var piscarRevisoesPendente = false;
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var tabSections = document.querySelectorAll("section.tab");
@@ -2127,6 +2285,15 @@
       selM.appendChild(o);
     });
     populateAssuntoSelectFor(selA, prevM, prevA);
+    var selT = document.getElementById("timerTipo");
+    if(selT.options.length <= 1){
+      TIPOS_ESTUDO.forEach(function(tp){
+        var ot = document.createElement("option");
+        ot.value = tp; ot.textContent = tp;
+        selT.appendChild(ot);
+      });
+    }
+    selT.value = state.timer.tipo || "";
   }
 
   function populateAssuntoSelectFor(selA, materiaId, selectedAssuntoId){
@@ -2150,6 +2317,10 @@
   });
   document.getElementById("timerAssunto").addEventListener("change", function(){
     state.timer.assuntoId = this.value;
+    saveState();
+  });
+  document.getElementById("timerTipo").addEventListener("change", function(){
+    state.timer.tipo = this.value;
     saveState();
   });
 
@@ -2188,6 +2359,7 @@
       id: uid(),
       materiaId: t.materiaId || "",
       assuntoId: t.assuntoId || "",
+      tipo: t.tipo || "",
       data: todayISO(),
       duracaoSec: Math.round(total)
     });
@@ -2959,7 +3131,7 @@
           function addSubassunto(){
             var nomeSub = subInput.value.trim();
             if(!nomeSub) return;
-            a.subassuntos.push({ id: uid(), nome: nomeSub, status: "nao_iniciado", dataInicio: null, questoesCertas: 0, questoesErradas: 0, ciclo: 1, dataConclusao: null });
+            a.subassuntos.push({ id: uid(), nome: nomeSub, status: "nao_iniciado", dataInicio: todayISO(), questoesCertas: 0, questoesErradas: 0, ciclo: 1, dataConclusao: null });
             saveState();
             renderAll();
           }
@@ -3012,7 +3184,7 @@
     if(!materiaId || !data){ showToast("Selecione a matéria e a data."); return; }
     state.revisoes.push({ id: uid(), materiaId: materiaId, assuntoId: assuntoId || "", data: data, feita: false });
     saveState();
-    document.getElementById("revData").value = "";
+    document.getElementById("revData").value = todayISO();
     renderRevisoes();
     showToast("Revisão adicionada.");
   });
@@ -3142,6 +3314,8 @@
   }
 
   function renderRevisoes(){
+    var rd = document.getElementById("revData");
+    if(rd && !rd.value) rd.value = todayISO();
     populateRevisaoSelects();
     var container = document.getElementById("revisoesList");
     container.innerHTML = "";
@@ -3640,13 +3814,71 @@
 
   var GUIA_CORES = ["amarelo","verde","vermelho","azul","rosa","laranja","roxo","cinza","marrom","branco"];
 
-  function renderTextoFormatado(trecho){
+  function renderTextoSimples(trecho){
     var escapado = escapeHtml(trecho);
     var re = /\{\{(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)\|([\s\S]*?)\}\}/g;
     var comCores = escapado.replace(re, function(match, cor, conteudo){
       return "<span class='guia-cor-"+cor+"'>"+conteudo+"</span>";
     });
     return comCores.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  /* ---------------- FÓRMULAS (LaTeX via KaTeX) ---------------- */
+  // Linha "solta" que é só fórmula (ex.: LEC = \sqrt{\frac{2 \cdot C \cdot D}{A}}): tem comando LaTeX e nenhuma palavra comum
+  function linhaEhFormulaSolta(linha){
+    var t = linha.trim();
+    if(!t || !/\\[a-zA-Z]+/.test(t)) return false;
+    if(/\$|\\\(|\\\[/.test(t)) return false;
+    var resto = t.replace(/\\[a-zA-Z]+/g, " ").replace(/[{}^_]/g, " ");
+    return !/[A-Za-zÀ-ÿ]{4,}/.test(resto);
+  }
+  function renderFormulaGuia(latex, bloco){
+    var interno = "";
+    try{
+      if(window.katex){
+        interno = window.katex.renderToString(latex, { throwOnError:false, displayMode:!!bloco });
+      } else {
+        interno = escapeHtml(latex);
+      }
+    }catch(e){ interno = escapeHtml(latex); }
+    return "<span class='guia-math"+(bloco?" guia-math-bloco":"")+"' contenteditable='false' data-latex='"+escapeHtml(latex)+"' data-display='"+(bloco?"1":"0")+"'>"+interno+"</span>";
+  }
+  function renderTextoFormatado(trecho){
+    // 1) linhas que são só fórmula viram $$...$$
+    trecho = trecho.split("\n").map(function(l){
+      return linhaEhFormulaSolta(l) ? "$$" + l.trim() + "$$" : l;
+    }).join("\n");
+    // 2) separa texto e fórmulas
+    var re = /\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)|\$([^\s$](?:[^$\n]*?[^\s$])?)\$/g;
+    var pecas = [];
+    var ultimo = 0, m;
+    while((m = re.exec(trecho)) !== null){
+      var latex, bloco = false;
+      if(m[1] !== undefined){ latex = m[1]; bloco = true; }
+      else if(m[2] !== undefined){ latex = m[2]; bloco = true; }
+      else if(m[3] !== undefined){ latex = m[3]; }
+      else {
+        latex = m[4];
+        if(!/[\\^_{}]/.test(latex)) continue; // "R$ 100 e R$ 200" não é fórmula
+      }
+      pecas.push({ txt: trecho.slice(ultimo, m.index) });
+      pecas.push({ latex: latex.trim(), bloco: bloco });
+      ultimo = m.index + m[0].length;
+    }
+    pecas.push({ txt: trecho.slice(ultimo) });
+    var out = "";
+    pecas.forEach(function(pc, i){
+      if(pc.txt !== undefined){
+        var t = pc.txt;
+        var ant = pecas[i-1], prox = pecas[i+1];
+        if(ant && ant.latex !== undefined && ant.bloco) t = t.replace(/^\n/, "");
+        if(prox && prox.latex !== undefined && prox.bloco) t = t.replace(/\n$/, "");
+        out += renderTextoSimples(t);
+      } else {
+        out += renderFormulaGuia(pc.latex, pc.bloco);
+      }
+    });
+    return out;
   }
 
   function renderTabelaGuia(conteudoTabela){
@@ -3700,6 +3932,50 @@
     return resultado;
   }
 
+  /* ---------------- ONDE PAREI: lembra a posição de leitura de cada guia ---------------- */
+  var POSICOES_KEY = STORAGE_KEY + "_posicoes";
+  function lerPosicoes(){
+    try{ return JSON.parse(localStorage.getItem(POSICOES_KEY)) || {}; }catch(e){ return {}; }
+  }
+  function gravarPosicoes(p){
+    try{ localStorage.setItem(POSICOES_KEY, JSON.stringify(p)); }catch(e){}
+  }
+  function salvarPosicaoGuia(itemId, top){
+    if(!itemId) return;
+    var p = lerPosicoes();
+    p[itemId] = Math.max(0, Math.round(top));
+    gravarPosicoes(p);
+  }
+  function salvarUltimaLeitura(itemId, materiaNome, assuntoNome){
+    var p = lerPosicoes();
+    p._ultimo = { id: itemId, materia: materiaNome, nome: assuntoNome };
+    gravarPosicoes(p);
+  }
+  // Restaura a rolagem (tentando de novo enquanto imagens/fórmulas carregam) e só passa a gravar depois
+  function restaurarPosicaoGuia(scrollEl, itemId){
+    var alvo = lerPosicoes()[itemId] || 0;
+    scrollEl._restaurando = true;
+    scrollEl._idPosicao = itemId;
+    var liberar = function(){ scrollEl._restaurando = false; };
+    var moveu = function(){ liberar(); };
+    ["wheel","touchstart","mousedown","keydown"].forEach(function(ev){
+      scrollEl.addEventListener(ev, moveu, { once:true, passive:true });
+    });
+    scrollEl.scrollTop = alvo;
+    [250, 700, 1500].forEach(function(ms){
+      setTimeout(function(){ if(scrollEl._restaurando && scrollEl._idPosicao === itemId) scrollEl.scrollTop = alvo; }, ms);
+    });
+    setTimeout(function(){ if(scrollEl._idPosicao === itemId) liberar(); }, 2000);
+  }
+  function rastrearPosicaoGuia(scrollEl, getItemId){
+    var t = null;
+    scrollEl.addEventListener("scroll", function(){
+      if(scrollEl._restaurando) return;
+      if(t) clearTimeout(t);
+      t = setTimeout(function(){ salvarPosicaoGuia(getItemId(), scrollEl.scrollTop); }, 250);
+    });
+  }
+
   function abrirTelaCheiaGuia(materiaNome, item, guia){
     document.getElementById("tfcAssunto").textContent = item.nome;
     document.getElementById("tfcMateria").textContent = materiaNome;
@@ -3714,9 +3990,12 @@
     overlay.classList.remove("barra-recolhida");
     var handleEl = document.getElementById("btnRecolherBarraTelaCheia");
     if(handleEl){ handleEl.textContent = "⌃"; handleEl.title = "Esconder barra"; }
-    overlay.querySelector(".guia-fullscreen-conteudo").scrollTop = 0;
+    salvarUltimaLeitura(item.id, materiaNome, item.nome);
+    restaurarPosicaoGuia(overlay.querySelector(".guia-fullscreen-conteudo"), item.id);
   }
   function fecharTelaCheiaGuia(){
+    var conteudoFc = document.querySelector("#guiaFullscreen .guia-fullscreen-conteudo");
+    if(conteudoFc && !conteudoFc._restaurando) salvarPosicaoGuia(conteudoFc._idPosicao, conteudoFc.scrollTop);
     if(tfcTimeoutDigitacao){
       clearTimeout(tfcTimeoutDigitacao);
       tfcTimeoutDigitacao = null;
@@ -3762,6 +4041,10 @@
   document.getElementById("tfcCorpo").addEventListener("input", agendarSalvarTelaCheia);
   document.getElementById("tfcCorpo").addEventListener("paste", colarNoGuia);
   configurarImagensGuia(document.getElementById("tfcCorpo"));
+  (function(){
+    var conteudoFc = document.querySelector("#guiaFullscreen .guia-fullscreen-conteudo");
+    rastrearPosicaoGuia(conteudoFc, function(){ return conteudoFc._idPosicao; });
+  })();
 
   document.getElementById("btnRecolherBarraTelaCheia").addEventListener("click", function(){
     var overlay = document.getElementById("guiaFullscreen");
@@ -4173,6 +4456,14 @@
         var tag = filho.tagName.toLowerCase();
         if(tag === "br"){
           resultado += "\n";
+        } else if(filho.classList && filho.classList.contains("guia-math")){
+          var latexSer = filho.dataset.latex || "";
+          if(filho.dataset.display === "1"){
+            if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
+            resultado += "$$" + latexSer + "$$\n";
+          } else {
+            resultado += "\\(" + latexSer + "\\)";
+          }
         } else if(filho.classList && filho.classList.contains("guia-img-wrap")){
           var imgElSer = filho.querySelector("img.guia-img");
           var urlSer = imgElSer ? (imgElSer.getAttribute("src")||"") : "";
@@ -4254,6 +4545,8 @@
         var leituraEl = painel.querySelector(".guia-texto-leitura");
         leituraEl.dataset.itemId = item.id;
         leituraEl.dataset.nomeArquivo = guia.nomeArquivo || "";
+        rastrearPosicaoGuia(leituraEl, function(){ return item.id; });
+        setTimeout(function(){ restaurarPosicaoGuia(leituraEl, item.id); }, 0);
         var timeoutLeitura = null;
         leituraEl.addEventListener("input", function(){
           if(timeoutLeitura) clearTimeout(timeoutLeitura);
@@ -4402,6 +4695,30 @@
     document.getElementById("guiasEmpty").style.display = existeAssunto ? "none" : "block";
     if(!existeAssunto) return;
 
+    // Atalho "Continuar lendo" para o último guia aberto em tela cheia
+    var ultimo = lerPosicoes()._ultimo;
+    if(ultimo && guias[ultimo.id]){
+      var itemUltimo = null, matUltimo = "";
+      state.materias.forEach(function(mm){
+        mm.assuntos.forEach(function(aa){
+          if(aa.id === ultimo.id){ itemUltimo = aa; matUltimo = mm.nome; }
+          (aa.subassuntos || []).forEach(function(ss){
+            if(ss.id === ultimo.id){ itemUltimo = ss; matUltimo = mm.nome; }
+          });
+        });
+      });
+      if(itemUltimo){
+        var btnContinuar = document.createElement("button");
+        btnContinuar.type = "button";
+        btnContinuar.className = "guia-continuar";
+        btnContinuar.innerHTML = "<span class='guia-continuar-ico'>📖</span><span><strong>Continuar lendo</strong><br><small>"+escapeHtml(itemUltimo.nome)+" · "+escapeHtml(matUltimo)+"</small></span>";
+        btnContinuar.addEventListener("click", function(){
+          abrirTelaCheiaGuia(matUltimo, itemUltimo, guias[itemUltimo.id]);
+        });
+        container.appendChild(btnContinuar);
+      }
+    }
+
     state.materias.forEach(function(m){
       if(m.assuntos.length === 0) return;
 
@@ -4478,6 +4795,7 @@
       anotacao: anotacao, resolvida: false
     });
     saveState();
+    document.getElementById("cadData").value = todayISO();
     document.getElementById("cadBanca").value = "";
     document.getElementById("cadTipoErro").value = "";
     document.getElementById("cadEnunciado").value = "";
@@ -4562,6 +4880,8 @@
   }
 
   function renderCaderno(){
+    var cd = document.getElementById("cadData");
+    if(cd && !cd.value) cd.value = todayISO();
     populateCadernoSelects();
     var container = document.getElementById("cadernoList");
     container.innerHTML = "";
@@ -4850,6 +5170,180 @@
     "</svg>";
   }
 
+
+  // setinhas verdes personalizadas nos campos numéricos
+  function melhorarCampoNumero(inp){
+    if(!inp || inp.parentNode.className === "num-wrap" || inp.classList.contains("qtd-value-input")) return;
+    var wrap = document.createElement("span");
+    wrap.className = "num-wrap";
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    var box = document.createElement("span");
+    box.className = "num-btns";
+    var up = "<svg viewBox='0 0 10 7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M1.5 5.5L5 2l3.5 3.5'/></svg>";
+    var dn = "<svg viewBox='0 0 10 7' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M1.5 1.5L5 5l3.5-3.5'/></svg>";
+    function botao(html, dir){
+      var b = document.createElement("button");
+      b.type = "button"; b.tabIndex = -1; b.innerHTML = html;
+      b.addEventListener("click", function(){
+        if(dir > 0) inp.stepUp(); else inp.stepDown();
+        inp.dispatchEvent(new Event("input", {bubbles:true}));
+        inp.dispatchEvent(new Event("change", {bubbles:true}));
+      });
+      return b;
+    }
+    box.appendChild(botao(up, 1)); box.appendChild(botao(dn, -1));
+    wrap.appendChild(box);
+  }
+  melhorarCampoNumero(document.getElementById("metaDiariaInput"));
+  melhorarCampoNumero(document.getElementById("checkinMinutosInput"));
+
+
+  // ---- lista suspensa personalizada para todos os <select> ----
+  (function(){
+    var pop = null, selAtual = null, itens = [], idx = -1;
+    function fechar(){
+      if(pop){ pop.remove(); pop = null; }
+      selAtual = null; itens = []; idx = -1;
+    }
+    function marcar(i, rolar){
+      if(idx >= 0 && itens[idx]) itens[idx].el.classList.remove("cs-hover");
+      idx = i;
+      if(idx >= 0 && itens[idx]){
+        itens[idx].el.classList.add("cs-hover");
+        if(rolar){
+          var el = itens[idx].el;
+          if(el.offsetTop < pop.scrollTop) pop.scrollTop = el.offsetTop - 4;
+          else if(el.offsetTop + el.offsetHeight > pop.scrollTop + pop.clientHeight) pop.scrollTop = el.offsetTop + el.offsetHeight - pop.clientHeight + 4;
+        }
+      }
+    }
+    function escolher(i){
+      var it = itens[i];
+      if(!it || it.opt.disabled) return;
+      var sel = selAtual;
+      var mudou = sel.selectedIndex !== it.opt.index;
+      sel.selectedIndex = it.opt.index;
+      fechar();
+      sel.focus();
+      if(mudou){
+        sel.dispatchEvent(new Event("input", {bubbles:true}));
+        sel.dispatchEvent(new Event("change", {bubbles:true}));
+      }
+    }
+    function abrir(sel){
+      fechar();
+      selAtual = sel;
+      pop = document.createElement("div");
+      pop.className = "cs-pop";
+      var filhos = sel.children;
+      function addOpt(opt){
+        var el = document.createElement("div");
+        el.className = "cs-item" + (opt.selected ? " cs-sel" : "") + (opt.disabled ? " cs-off" : "");
+        el.textContent = opt.text;
+        var n = itens.length;
+        itens.push({el: el, opt: opt});
+        el.addEventListener("mouseenter", function(){ if(!opt.disabled) marcar(n, false); });
+        el.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        el.addEventListener("click", function(){ escolher(n); });
+        pop.appendChild(el);
+      }
+      for(var i = 0; i < filhos.length; i++){
+        var f = filhos[i];
+        if(f.tagName === "OPTGROUP"){
+          var g = document.createElement("div");
+          g.className = "cs-group"; g.textContent = f.label;
+          pop.appendChild(g);
+          for(var j = 0; j < f.children.length; j++) addOpt(f.children[j]);
+        } else if(f.tagName === "OPTION"){
+          addOpt(f);
+        }
+      }
+      document.body.appendChild(pop);
+      var r = sel.getBoundingClientRect();
+      var largura = Math.max(r.width, 220);
+      largura = Math.min(largura, window.innerWidth - 16);
+      pop.style.width = largura + "px";
+      var esq = Math.min(Math.max(8, r.left), window.innerWidth - largura - 8);
+      pop.style.left = esq + "px";
+      var abaixo = window.innerHeight - r.bottom - 12;
+      var acima = r.top - 12;
+      var alturaMax = 340;
+      if(abaixo >= 180 || abaixo >= acima){
+        pop.style.top = (r.bottom + 4) + "px";
+        pop.style.maxHeight = Math.min(alturaMax, Math.max(120, abaixo)) + "px";
+      } else {
+        var h = Math.min(alturaMax, Math.max(120, acima));
+        pop.style.maxHeight = h + "px";
+        pop.style.top = "auto";
+        pop.style.bottom = (window.innerHeight - r.top + 4) + "px";
+      }
+      var si = -1;
+      itens.forEach(function(it, k){ if(it.opt.selected && si < 0) si = k; });
+      marcar(si, false);
+      if(si >= 0){ pop.scrollTop = Math.max(0, itens[si].el.offsetTop - pop.clientHeight / 2 + 20); }
+    }
+    function proximo(de, dir){
+      var k = de;
+      for(var n = 0; n < itens.length; n++){
+        k += dir;
+        if(k < 0 || k >= itens.length) return de;
+        if(!itens[k].opt.disabled) return k;
+      }
+      return de;
+    }
+    function ehSelectSimples(t){
+      return t && t.tagName === "SELECT" && !t.multiple && !(t.size > 1) && !t.disabled;
+    }
+    document.addEventListener("mousedown", function(ev){
+      var t = ev.target;
+      if(ehSelectSimples(t)){
+        ev.preventDefault();
+        if(pop && selAtual === t){ fechar(); return; }
+        t.focus();
+        abrir(t);
+        return;
+      }
+      if(pop && !pop.contains(t)) fechar();
+    }, true);
+    document.addEventListener("keydown", function(ev){
+      var t = ev.target;
+      if(pop){
+        if(ev.key === "Escape"){ ev.preventDefault(); var s0 = selAtual; fechar(); if(s0) s0.focus(); return; }
+        if(ev.key === "ArrowDown"){ ev.preventDefault(); marcar(proximo(idx, 1), true); return; }
+        if(ev.key === "ArrowUp"){ ev.preventDefault(); marcar(proximo(idx, -1), true); return; }
+        if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); if(idx >= 0) escolher(idx); else fechar(); return; }
+        if(ev.key === "Tab"){ fechar(); return; }
+      } else if(ehSelectSimples(t) && (ev.key === "Enter" || ev.key === " " || (ev.altKey && ev.key === "ArrowDown"))){
+        ev.preventDefault();
+        abrir(t);
+      }
+    }, true);
+    window.addEventListener("resize", fechar);
+    window.addEventListener("scroll", function(ev){
+      if(pop && !(ev.target && ev.target.nodeType === 1 && pop.contains(ev.target))) fechar();
+    }, true);
+  })();
+
+  function calcularSequenciaEstudo(hoje){
+    var set = {}, lista = [];
+    state.sessions.forEach(function(x){
+      if(x.data && x.duracaoSec > 0 && !set[x.data]){ set[x.data] = true; lista.push(x.data); }
+    });
+    lista.sort();
+    // melhor sequência histórica
+    var melhor = 0, corrente = 0, ant = null;
+    lista.forEach(function(d){
+      corrente = (ant && addDaysISO(ant, 1) === d) ? corrente + 1 : 1;
+      if(corrente > melhor) melhor = corrente;
+      ant = d;
+    });
+    // sequência atual: conta para trás a partir de hoje (ou de ontem, se hoje ainda não estudou)
+    var atual = 0, d = set[hoje] ? hoje : addDaysISO(hoje, -1);
+    while(set[d]){ atual++; d = addDaysISO(d, -1); }
+    return { atual: atual, melhor: melhor };
+  }
+
   function renderPainelDashboard(){
     var hoje = todayISO();
     var seteDiasAtras = addDaysISO(hoje, -7);
@@ -4861,6 +5355,8 @@
       .reduce(function(a,s){ return a+s.duracaoSec; },0);
     var revisoesPendentes = state.revisoes.filter(function(r){ return !r.feita && r.data<=hoje; }).length;
     var errosPendentes = state.cadernoErros.filter(function(e){ return !e.resolvida; }).length;
+
+    var sequencia = calcularSequenciaEstudo(hoje);
 
     var diasSemanaLabels = ["dom","seg","ter","qua","qui","sex","sáb"];
     var dias7 = [];
@@ -4894,6 +5390,7 @@
       book: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z'/><path d='M4 5.5v15'/></svg>",
       checkCircle: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='9'/><path d='M8 12l3 3 5-6'/></svg>",
       alert: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l10 18H2z'/><path d='M12 9v5'/><path d='M12 17h.01'/></svg>",
+      flame: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-3-1-5 1-8z'/></svg>",
       percent: "<svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><line x1='19' y1='5' x2='5' y2='19'/><circle cx='6.5' cy='6.5' r='2.7'/><circle cx='17.5' cy='17.5' r='2.7'/></svg>"
     };
 
@@ -4904,7 +5401,7 @@
       { icon:"clock", color:"var(--accent-brass)", value: formatDuration(totalHoje), label:"Hoje" },
       { icon:"calendar", color:"var(--accent-sky)", value: formatDuration(totalSemana), label:"Últimos 7 dias" },
       { icon:"calendarCheck", color: revisoesPendentes>0 ? "var(--warn)" : "var(--success)", value: String(revisoesPendentes), label:"Revisões pendentes" },
-      { icon:"book", color:"var(--accent-brass)", value: String(state.materias.length), label:"Matérias cadastradas" },
+      { icon:"flame", color: sequencia.atual>0 ? "var(--accent-brass)" : "var(--border-soft)", value: sequencia.atual+(sequencia.atual===1?" dia":" dias"), label:"Dias seguidos estudando", sub:"Melhor sequência: "+sequencia.melhor+(sequencia.melhor===1?" dia":" dias") },
       { icon:"checkCircle", color:"var(--success)", value: String(totalQuestoes), label:"Questões resolvidas" },
       { icon:"percent", color: aproveitamentoNum===null ? "var(--border-soft)" : (aproveitamentoNum>=70?"var(--success)":(aproveitamentoNum>=40?"var(--warn)":"var(--danger)")), value: aproveitamentoNum===null ? "—" : aproveitamentoNum+"%", label:"Aproveitamento" },
       { icon:"alert", color: errosPendentes>0 ? "var(--danger)" : "var(--success)", value: String(errosPendentes), label:"Erros pendentes no caderno" }
@@ -4916,12 +5413,10 @@
         "<span class='stat-icon-big'>"+ICONS[s.icon]+"</span>"+
         "<span class='stat-label-top'>"+s.label+"</span>"+
         "<span class='status-pill' style='background:"+s.color+"'>"+s.value+"</span>"+
+        (s.sub ? "<span style='font-size:11.5px;color:var(--text-muted);margin-top:8px;'>"+s.sub+"</span>" : "")+
         (idx===0 ? gerarMiniBarras(dias7) : "");
       grid.appendChild(card);
     });
-
-    var weekChart = document.getElementById("weekChart");
-    weekChart.innerHTML = gerarGraficoLinha(dias7);
 
     var barList = document.getElementById("barList");
     barList.innerHTML = "";
@@ -4950,50 +5445,6 @@
           "<span class='materia-legenda-nome'>"+escapeHtml(p.nome)+"</span>"+
           "<span style='font-family:var(--font-mono);font-size:13.5px;font-weight:600;color:"+p.cor+";'>"+formatDuration(p.total)+"</span>";
         barList.appendChild(item);
-      });
-    }
-
-    var assuntoBarList = document.getElementById("assuntoBarList");
-    assuntoBarList.innerHTML = "";
-    var existeAlgumAssunto = state.materias.some(function(m){ return m.assuntos.length > 0; });
-
-    if(!existeAlgumAssunto){
-      assuntoBarList.innerHTML = "<div class='empty-state'>Cadastre assuntos dentro das matérias para ver esse comparativo.</div>";
-    } else {
-      state.materias.forEach(function(m){
-        if(m.assuntos.length === 0) return;
-
-        var assuntosDaMateria = m.assuntos.map(function(a){
-          var total = state.sessions
-            .filter(function(s){ return s.materiaId===m.id && s.assuntoId===a.id; })
-            .reduce(function(acc,s){ return acc+s.duracaoSec; },0);
-          var certas = a.questoesCertas || 0;
-          var erradas = a.questoesErradas || 0;
-          (a.subassuntos||[]).forEach(function(sub){
-            certas += (sub.questoesCertas || 0);
-            erradas += (sub.questoesErradas || 0);
-          });
-          var totalQ = certas + erradas;
-          var aproveitamento = totalQ > 0 ? Math.round((certas/totalQ)*100) : null;
-          return { assuntoNome: a.nome, total: total, aproveitamento: aproveitamento };
-        });
-
-        var grupoHeader = document.createElement("div");
-        grupoHeader.className = "assunto-grupo-header";
-        grupoHeader.style.color = m.cor;
-        grupoHeader.innerHTML = colorDotHtml(m.cor)+escapeHtml(m.nome);
-        assuntoBarList.appendChild(grupoHeader);
-
-        assuntosDaMateria.forEach(function(p){
-          var row = document.createElement("div");
-          row.className = "assunto-tempo-row";
-          var corAprov = p.aproveitamento===null ? "var(--text-faint)" : (p.aproveitamento>=70?"var(--success)":(p.aproveitamento>=40?"var(--warn)":"var(--danger)"));
-          row.innerHTML =
-            "<div class='assunto-tempo-nome'>"+escapeHtml(p.assuntoNome)+"</div>"+
-            "<div class='assunto-tempo-aprov' style='color:"+corAprov+";' title='Aproveitamento em questões'>"+(p.aproveitamento===null?"—":p.aproveitamento+"%")+"</div>"+
-            "<div class='assunto-tempo-valor' style='color:"+(p.total>0?m.cor:"var(--text-faint)")+";'>"+(p.total>0?formatDuration(p.total):"—")+"</div>";
-          assuntoBarList.appendChild(row);
-        });
       });
     }
   }
@@ -5070,6 +5521,344 @@
     reader.readAsText(file, "UTF-8");
   });
 
+  /* ---------------- ESTATÍSTICAS (no Painel) ---------------- */
+  var estOrdem = { col: null, dir: 1 };
+
+  function isoDeData(d){
+    var mm = d.getMonth()+1, dd = d.getDate();
+    return d.getFullYear()+"-"+(mm<10?"0"+mm:mm)+"-"+(dd<10?"0"+dd:dd);
+  }
+  function isoMenosDias(n){
+    var d = new Date(); d.setDate(d.getDate()-n);
+    return isoDeData(d);
+  }
+  function rotuloDiaMes(iso){ return iso.slice(8,10)+"/"+iso.slice(5,7); }
+  function horasCurto(sec){
+    var h = Math.floor(sec/3600), m = Math.round((sec%3600)/60);
+    if(m===60){ h++; m=0; }
+    if(h===0) return m+"min";
+    return h+"h"+(m<10?"0"+m:m)+"min";
+  }
+  function corDesempenho(p){
+    if(p===null) return "var(--text-faint)";
+    return p>=70 ? "var(--success)" : (p>=40 ? "var(--warn)" : "var(--danger)");
+  }
+  // Quebra um texto em até maxLinhas linhas de ~maxChars caracteres (sem cortar palavras ao meio, exceto as gigantes)
+  function quebrarLinhas(texto, maxChars, maxLinhas){
+    var palavras = texto.split(/\s+/), linhas = [], atual = "";
+    palavras.forEach(function(p){
+      while(p.length > maxChars){
+        if(atual){ linhas.push(atual); atual = ""; }
+        linhas.push(p.slice(0, maxChars-1)+"-"); p = p.slice(maxChars-1);
+      }
+      if((atual+" "+p).trim().length > maxChars){ linhas.push(atual); atual = p; }
+      else atual = (atual+" "+p).trim();
+    });
+    if(atual) linhas.push(atual);
+    if(linhas.length > maxLinhas){
+      linhas = linhas.slice(0, maxLinhas);
+      linhas[maxLinhas-1] = linhas[maxLinhas-1].replace(/.{0,1}$/, "…");
+    }
+    return linhas;
+  }
+  function larguraDe(id, minimo){
+    var el = document.getElementById(id);
+    var w = el ? el.clientWidth : 0;
+    return Math.max(minimo || 240, w || 640);
+  }
+
+  function sessoesEstatistica(){
+    var filtroM = document.getElementById("estMateria").value;
+    var per = document.getElementById("estPeriodo").value;
+    var inicio = per==="todo" ? "" : isoMenosDias(parseInt(per,10)-1);
+    return state.sessions.filter(function(se){
+      if(filtroM && se.materiaId !== filtroM) return false;
+      if(inicio && (se.data||"") < inicio) return false;
+      return true;
+    });
+  }
+
+  // Gráficos desenhados no tamanho real da tela (1 unidade = 1 pixel): nada de texto esticado ou borrado
+  function svgBarrasTempo(itens, W){
+    var H=210, pl=42, pr=8, pt=14, pb=30;
+    var n = itens.length;
+    var max = 0; itens.forEach(function(i){ if(i.valor>max) max=i.valor; });
+    var maxH = Math.max(1, Math.ceil(max/3600));
+    var area = W-pl-pr, alt = H-pt-pb;
+    var largura = area/n, bw = Math.max(3, Math.min(36, largura*0.68));
+    var passoLabel = Math.max(1, Math.ceil(46/largura));
+    var out = "<svg class='est-svg' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' role='img' aria-label='Horas de estudo'>";
+    for(var t=0;t<=4;t++){
+      var y = Math.round(pt + alt - (alt*t/4)) + 0.5;
+      out += "<line class='est-grade' x1='"+pl+"' x2='"+(W-pr)+"' y1='"+y+"' y2='"+y+"'/>";
+      out += "<text x='"+(pl-6)+"' y='"+(y+4)+"' text-anchor='end'>"+(Math.round(maxH*t/4*10)/10)+"h</text>";
+    }
+    itens.forEach(function(it, i){
+      var x = pl + largura*i + (largura-bw)/2;
+      var h = alt * (it.valor/(maxH*3600));
+      if(it.valor>0) out += "<rect x='"+x.toFixed(1)+"' y='"+(pt+alt-h).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+Math.max(h,1).toFixed(1)+"' rx='2' fill='var(--accent-brass)'><title>"+escapeHtml(it.rotulo+": "+horasCurto(it.valor))+"</title></rect>";
+      if(i % passoLabel === 0 || i === n-1 && (n-1) % passoLabel === 0) out += "<text x='"+(x+bw/2).toFixed(1)+"' y='"+(H-pb+17)+"' text-anchor='middle'>"+escapeHtml(it.rotulo)+"</text>";
+    });
+    return out+"</svg>";
+  }
+
+  // Poucos itens: colunas empilhadas (nomes quebrados em linhas). Muitos itens: linhas horizontais com o nome completo.
+  function htmlDesempenho(itens, W){
+    var n = itens.length;
+    var legenda = "<div class='est-legenda'><span><i style='background:var(--success)'></i>Acertos</span><span><i style='background:var(--danger)'></i>Erros</span></div>";
+    if(n <= 6 && W >= 420){
+      var H0=250, pl=36, pr=8, pt=14;
+      var largura = (W-pl-pr)/n;
+      var maxChars = Math.max(8, Math.floor(largura/6.2));
+      var linhasPorItem = itens.map(function(it){ return quebrarLinhas(it.nome, maxChars, 3); });
+      var maxLin = Math.max.apply(null, linhasPorItem.map(function(l){ return l.length; }));
+      var pb = 12 + maxLin*14, H = H0 - 44 + pb;
+      var alt = H-pt-pb;
+      var max = 0; itens.forEach(function(i){ if(i.certas+i.erradas>max) max=i.certas+i.erradas; });
+      var topo = Math.max(4, Math.ceil(max/4)*4);
+      var out = "<svg class='est-svg' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' role='img' aria-label='Acertos e erros'>";
+      for(var t=0;t<=4;t++){
+        var y = Math.round(pt + alt - (alt*t/4)) + 0.5;
+        out += "<line class='est-grade' x1='"+pl+"' x2='"+(W-pr)+"' y1='"+y+"' y2='"+y+"'/>";
+        out += "<text x='"+(pl-6)+"' y='"+(y+4)+"' text-anchor='end'>"+Math.round(topo*t/4)+"</text>";
+      }
+      var bw = Math.min(70, largura*0.6);
+      itens.forEach(function(it, i){
+        var x = pl + largura*i + (largura-bw)/2;
+        var hc = alt*(it.certas/topo), he = alt*(it.erradas/topo);
+        var tip = escapeHtml(it.nome+" — acertos: "+it.certas+", erros: "+it.erradas);
+        if(it.certas>0) out += "<rect x='"+x.toFixed(1)+"' y='"+(pt+alt-hc).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+hc.toFixed(1)+"' fill='var(--success)'><title>"+tip+"</title></rect>";
+        if(it.erradas>0) out += "<rect x='"+x.toFixed(1)+"' y='"+(pt+alt-hc-he).toFixed(1)+"' width='"+bw.toFixed(1)+"' height='"+he.toFixed(1)+"' fill='var(--danger)'><title>"+tip+"</title></rect>";
+        var cx = x+bw/2;
+        linhasPorItem[i].forEach(function(ln, k){
+          out += "<text x='"+cx.toFixed(1)+"' y='"+(pt+alt+16+k*14)+"' text-anchor='middle'>"+escapeHtml(ln)+"</text>";
+        });
+      });
+      return out+"</svg>"+legenda;
+    }
+    var maxT = 1; itens.forEach(function(i){ if(i.certas+i.erradas>maxT) maxT=i.certas+i.erradas; });
+    var html = "";
+    itens.forEach(function(it){
+      var tot = it.certas+it.erradas;
+      var pc = tot>0 ? Math.round(it.certas/tot*100) : null;
+      var wC = (it.certas/maxT*100), wE = (it.erradas/maxT*100);
+      html += "<div class='est-hbar-row'><div class='est-hbar-nome'>"+escapeHtml(it.nome)+"</div>"+
+        "<div class='est-hbar-trilho'>"+
+          (it.certas>0 ? "<div class='est-hs-c' style='width:"+wC.toFixed(2)+"%'>"+(wC>=7?it.certas:"")+"</div>" : "")+
+          (it.erradas>0 ? "<div class='est-hs-e' style='width:"+wE.toFixed(2)+"%'>"+(wE>=7?it.erradas:"")+"</div>" : "")+
+          "<span class='est-hs-total'>"+(tot>0 ? tot+" · "+pc+"%" : "—")+"</span>"+
+        "</div></div>";
+    });
+    return html+legenda;
+  }
+
+  function svgRadar(cats, valores, W){
+    var n = cats.length;
+    var R = Math.max(50, Math.min(92, W/2 - 90));
+    var H = Math.round(R*2 + 90), cx = W/2, cy = H/2;
+    var max = Math.max.apply(null, valores.concat([1]));
+    function pt(i, r){ var ang = -Math.PI/2 + 2*Math.PI*i/n; return [cx + r*Math.cos(ang), cy + r*Math.sin(ang)]; }
+    var out = "<svg class='est-svg' style='margin:0 auto' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' role='img' aria-label='Categorias x horas'>";
+    for(var ring=1; ring<=4; ring++){
+      var pts = []; for(var i=0;i<n;i++){ var q = pt(i, R*ring/4); pts.push(q[0].toFixed(1)+","+q[1].toFixed(1)); }
+      out += "<polygon points='"+pts.join(" ")+"' fill='none' class='est-grade'/>";
+    }
+    for(var j=0;j<n;j++){ var e = pt(j,R); out += "<line class='est-grade' x1='"+cx+"' y1='"+cy+"' x2='"+e[0].toFixed(1)+"' y2='"+e[1].toFixed(1)+"'/>"; }
+    var dpts = valores.map(function(v,i){ var q = pt(i, R*(v/max)); return q[0].toFixed(1)+","+q[1].toFixed(1); });
+    out += "<polygon points='"+dpts.join(" ")+"' fill='var(--accent-brass)' fill-opacity='.28' stroke='var(--accent-brass)' stroke-width='2'/>";
+    cats.forEach(function(c,i){
+      var l = pt(i, R+16);
+      var anchor = Math.abs(l[0]-cx)<6 ? "middle" : (l[0]<cx ? "end" : "start");
+      var dy = (l[1] < cy-R/2) ? -2 : (l[1] > cy+R/2 ? 12 : 4);
+      out += "<text x='"+l[0].toFixed(1)+"' y='"+(l[1]+dy).toFixed(1)+"' text-anchor='"+anchor+"'>"+escapeHtml(c)+"</text>";
+      if(valores[i]>0){
+        var dy2 = dy + 13;
+        out += "<text class='est-valor' x='"+l[0].toFixed(1)+"' y='"+(l[1]+dy2).toFixed(1)+"' text-anchor='"+anchor+"'>"+horasCurto(valores[i])+"</text>";
+      }
+    });
+    return out+"</svg>";
+  }
+
+  function renderEstatisticas(){
+    var painel = document.getElementById("tab-painel");
+    if(!painel || !painel.classList.contains("active")) return;
+
+    // filtros
+    var selM = document.getElementById("estMateria");
+    var prev = selM.value;
+    selM.innerHTML = '<option value="">Todas as matérias</option>';
+    state.materias.forEach(function(m){
+      var o = document.createElement("option");
+      o.value = m.id; o.textContent = m.nome;
+      selM.appendChild(o);
+    });
+    selM.value = prev;
+    if(selM.value !== prev) selM.value = "";
+    var filtroM = selM.value;
+    var mSel = filtroM ? findMateria(filtroM) : null;
+    var per = document.getElementById("estPeriodo").value;
+    var sessoes = sessoesEstatistica();
+
+    // 1) horas por dia / semana
+    var hoje = todayISO();
+    var buckets = [];
+    var diasSpan = per==="todo" ? null : parseInt(per,10);
+    if(per==="todo"){
+      var menor = hoje;
+      state.sessions.forEach(function(se){ if(se.data && se.data < menor && (!filtroM || se.materiaId===filtroM)) menor = se.data; });
+      diasSpan = Math.max(1, Math.round((new Date(hoje+"T00:00:00") - new Date(menor+"T00:00:00"))/86400000)+1);
+    }
+    if(diasSpan <= 31){
+      for(var d=diasSpan-1; d>=0; d--){ var iso = isoMenosDias(d); buckets.push({ ini:iso, fim:iso, rotulo:rotuloDiaMes(iso) }); }
+    } else {
+      var semanas = Math.min(52, Math.ceil(diasSpan/7));
+      for(var w=semanas-1; w>=0; w--){
+        var fimI = isoMenosDias(w*7), iniI = isoMenosDias(w*7+6);
+        buckets.push({ ini:iniI, fim:fimI, rotulo:rotuloDiaMes(iniI) });
+      }
+    }
+    buckets.forEach(function(bk){
+      bk.valor = sessoes.filter(function(se){ return (se.data||"")>=bk.ini && (se.data||"")<=bk.fim; })
+        .reduce(function(a,se){ return a+se.duracaoSec; },0);
+    });
+    document.getElementById("estDiasTitulo").textContent = diasSpan<=7 ? "Atividade dos últimos 7 dias" : (diasSpan<=31 ? "Horas de estudo por dia" : "Horas de estudo por semana");
+    var algumTempo = buckets.some(function(bk){ return bk.valor>0; });
+    document.getElementById("estDias").innerHTML = algumTempo ? svgBarrasTempo(buckets, larguraDe("estDias")) : "<div class='empty-state'>Nenhuma sessão registrada nesse período.</div>";
+
+    // 2) disciplinas (ou assuntos da matéria filtrada) x horas
+    var itensTempo = [];
+    if(mSel){
+      document.getElementById("estHorasTitulo").textContent = "Assuntos x horas de estudo";
+      mSel.assuntos.forEach(function(a){
+        itensTempo.push({ nome:a.nome, cor:mSel.cor, total: sessoes.filter(function(se){ return se.assuntoId===a.id; }).reduce(function(acc,se){ return acc+se.duracaoSec; },0) });
+      });
+    } else {
+      document.getElementById("estHorasTitulo").textContent = "Disciplinas x horas de estudo";
+      state.materias.forEach(function(m){
+        itensTempo.push({ nome:m.nome, cor:m.cor, total: sessoes.filter(function(se){ return se.materiaId===m.id; }).reduce(function(acc,se){ return acc+se.duracaoSec; },0) });
+      });
+    }
+    var maxT = 0; itensTempo.forEach(function(i){ if(i.total>maxT) maxT=i.total; });
+    var horasEl = document.getElementById("estHoras");
+    horasEl.innerHTML = "";
+    if(maxT===0){ horasEl.innerHTML = "<div class='empty-state'>Sem tempo registrado nesse período.</div>"; }
+    else {
+      itensTempo.forEach(function(it){
+        var pct = it.total/maxT*100;
+        var dentro = pct >= 30;
+        var row = document.createElement("div");
+        row.className = "est-hbar-row";
+        row.innerHTML = "<div class='est-hbar-nome'>"+escapeHtml(it.nome)+"</div>"+
+          "<div class='est-hbar-trilho'>"+(it.total>0
+            ? "<div class='est-hbar' style='width:"+Math.max(2,pct).toFixed(1)+"%;background:"+(it.cor||"var(--accent-brass)")+"'>"+(dentro?horasCurto(it.total):"")+"</div>"+(dentro?"":"<span class='est-hbar-fora'>"+horasCurto(it.total)+"</span>")
+            : "<span class='est-hbar-fora' style='color:var(--text-faint)'>—</span>")+"</div>";
+        horasEl.appendChild(row);
+      });
+    }
+
+    // 3) radar por tipo de estudo
+    var porTipo = TIPOS_ESTUDO.map(function(tp){
+      return sessoes.filter(function(se){ return se.tipo===tp; }).reduce(function(a,se){ return a+se.duracaoSec; },0);
+    });
+    var semTipo = sessoes.filter(function(se){ return !se.tipo; }).reduce(function(a,se){ return a+se.duracaoSec; },0);
+    var radarEl = document.getElementById("estRadar");
+    var htmlRadar = porTipo.some(function(v){ return v>0; })
+      ? svgRadar(TIPOS_ESTUDO, porTipo, Math.min(460, larguraDe("estRadar")))
+      : "<div class='empty-state'>Escolha o tipo de estudo no Cronômetro para alimentar este gráfico.</div>";
+    if(semTipo>0) htmlRadar += "<p class='section-sub' style='margin:8px 0 0;font-size:12px;'>"+horasCurto(semTipo)+" em sessões sem tipo de estudo não entram no radar.</p>";
+    radarEl.innerHTML = htmlRadar;
+
+    // 4) desempenho (acertos x erros)
+    function contarQuestoes(a){
+      var c = a.questoesCertas||0, e = a.questoesErradas||0;
+      (a.subassuntos||[]).forEach(function(sub){ c += sub.questoesCertas||0; e += sub.questoesErradas||0; });
+      return { certas:c, erradas:e };
+    }
+    var itensDesemp = [];
+    if(mSel){
+      document.getElementById("estDesempenhoTitulo").textContent = "Assuntos x desempenho";
+      mSel.assuntos.forEach(function(a){ var q = contarQuestoes(a); itensDesemp.push({ nome:a.nome, certas:q.certas, erradas:q.erradas }); });
+    } else {
+      document.getElementById("estDesempenhoTitulo").textContent = "Disciplinas x desempenho";
+      state.materias.forEach(function(m){
+        var c=0, e=0; m.assuntos.forEach(function(a){ var q = contarQuestoes(a); c+=q.certas; e+=q.erradas; });
+        itensDesemp.push({ nome:m.nome, certas:c, erradas:e });
+      });
+    }
+    itensDesemp = itensDesemp.filter(function(i){ return i.certas+i.erradas>0; });
+    var desempEl = document.getElementById("estDesempenho");
+    desempEl.innerHTML = itensDesemp.length
+      ? htmlDesempenho(itensDesemp, larguraDe("estDesempenho"))
+      : "<div class='empty-state'>Registre questões certas e erradas nos assuntos para ver este gráfico.</div>";
+
+    // 5) tabela tópicos x desempenho
+    var linhas = [];
+    state.materias.forEach(function(m){
+      if(filtroM && m.id!==filtroM) return;
+      m.assuntos.forEach(function(a){
+        var q = contarQuestoes(a);
+        var tempoA = sessoes.filter(function(se){ return se.materiaId===m.id && se.assuntoId===a.id; }).reduce(function(acc,se){ return acc+se.duracaoSec; },0);
+        var tot = q.certas+q.erradas;
+        linhas.push({ disc:m.nome, topico:a.nome, tempo:tempoA, questoes:tot, pct: tot>0 ? Math.round(q.certas/tot*100) : null });
+        (a.subassuntos||[]).forEach(function(sub){
+          var qs = (sub.questoesCertas||0)+(sub.questoesErradas||0);
+          if(qs>0) linhas.push({ disc:m.nome, topico:a.nome+" › "+sub.nome, tempo:0, questoes:qs, pct: Math.round((sub.questoesCertas||0)/qs*100) });
+        });
+      });
+    });
+    if(estOrdem.col){
+      var k = estOrdem.col, dirO = estOrdem.dir;
+      linhas.sort(function(x,y){
+        var vx = x[k], vy = y[k];
+        if(vx===null) return 1; if(vy===null) return -1;
+        if(typeof vx==="string") return vx.localeCompare(vy,"pt-BR")*dirO;
+        return (vx-vy)*dirO;
+      });
+    }
+    var tabEl = document.getElementById("estTabela");
+    if(!linhas.length){ tabEl.innerHTML = "<div class='empty-state'>Cadastre assuntos nas matérias para ver a tabela.</div>"; return; }
+    var colunas = [
+      { k:"disc", t:"Disciplina" }, { k:"topico", t:"Tópico" }, { k:"tempo", t:"Tempo" },
+      { k:"questoes", t:"Questões resolvidas" }, { k:"pct", t:"Desempenho" }
+    ];
+    var tabela = document.createElement("table");
+    tabela.className = "est-tabela";
+    var thead = document.createElement("thead");
+    var trh = document.createElement("tr");
+    colunas.forEach(function(c){
+      var th = document.createElement("th");
+      var seta = estOrdem.col===c.k ? (estOrdem.dir===1?"▲":"▼") : "⇅";
+      th.innerHTML = escapeHtml(c.t)+"<span class='est-seta'>"+seta+"</span>";
+      th.addEventListener("click", function(){
+        if(estOrdem.col===c.k){ estOrdem.dir = -estOrdem.dir; } else { estOrdem.col = c.k; estOrdem.dir = (c.k==="disc"||c.k==="topico") ? 1 : -1; }
+        renderEstatisticas();
+      });
+      trh.appendChild(th);
+    });
+    thead.appendChild(trh); tabela.appendChild(thead);
+    var tbody = document.createElement("tbody");
+    linhas.forEach(function(l){
+      var tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td>"+escapeHtml(l.disc)+"</td>"+
+        "<td>"+escapeHtml(l.topico)+"</td>"+
+        "<td class='est-num'>"+(l.tempo>0 ? horasCurto(l.tempo) : "—")+"</td>"+
+        "<td class='est-num'>"+(l.questoes>0 ? l.questoes : "—")+"</td>"+
+        "<td class='est-num'>"+(l.pct===null ? "—" : "<span class='est-badge' style='background:"+corDesempenho(l.pct)+"'>"+l.pct+"%</span>")+"</td>";
+      tbody.appendChild(tr);
+    });
+    tabela.appendChild(tbody);
+    tabEl.innerHTML = "";
+    tabEl.appendChild(tabela);
+  }
+  document.getElementById("estMateria").addEventListener("change", renderEstatisticas);
+  document.getElementById("estPeriodo").addEventListener("change", renderEstatisticas);
+  var estResizeT = null;
+  window.addEventListener("resize", function(){
+    if(estResizeT) clearTimeout(estResizeT);
+    estResizeT = setTimeout(renderEstatisticas, 200);
+  });
+
   /* ---------------- RENDER ALL ---------------- */
   function renderAll(){
     populateTimerSelects();
@@ -5087,6 +5876,7 @@
     renderCheckinHistorico();
     renderGuiasRapidos();
     renderPainelDashboard();
+    renderEstatisticas();
   }
 
   function mostrarModalRevisoesDoDia(){
