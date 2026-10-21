@@ -848,38 +848,65 @@
   .table-scroll{overflow-x:auto;}
   .table-scroll table{min-width:680px;}
 
-  .qtd-controls{display:flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;}
-  .qtd-controls .qtd-correct{color:var(--success);width:44px;}
-  .qtd-controls .qtd-wrong{color:var(--danger);width:44px;}
+  .qtd-controls{display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap;--qc:var(--success);--qc-bg:rgba(52,211,153,.14);}
+  .qtd-controls.qtd-tipo-erradas{--qc:var(--danger);--qc-bg:rgba(251,113,133,.14);}
+  .qtd-controls .qtd-correct,.qtd-controls .qtd-wrong{
+    color:var(--qc);width:62px;display:inline-flex;align-items:center;gap:6px;font-weight:600;
+  }
+  .qtd-controls .qtd-correct::before,.qtd-controls .qtd-wrong::before{
+    content:"";width:8px;height:8px;border-radius:50%;background:var(--qc);box-shadow:0 0 0 3px var(--qc-bg);flex-shrink:0;
+  }
+  .qtd-stepper{
+    display:inline-flex;align-items:center;background:#000;border:1px solid var(--border-soft);
+    border-radius:999px;padding:2px;transition:border-color .15s, box-shadow .15s;
+  }
+  .qtd-stepper:hover{border-color:var(--qc);}
+  .qtd-stepper:focus-within{border-color:var(--qc);box-shadow:0 0 0 3px var(--qc-bg);}
   .qtd-btn{
-    width:20px;height:20px;line-height:18px;padding:0;
-    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
-    color:var(--text-primary);cursor:pointer;font-family:var(--font-mono);font-size:13px;
+    width:26px;height:26px;padding:0;border:0;border-radius:50%;background:transparent;
+    color:var(--qc);cursor:pointer;font-family:var(--font-mono);font-size:17px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;transition:background .12s, transform .08s;
   }
-  .qtd-btn:hover{border-color:var(--accent-brass);}
-  .qtd-btn-somar{
-    height:20px;line-height:18px;padding:0 6px;white-space:nowrap;
-    border:1px solid var(--border-soft);background:var(--bg-panel-alt);
-    color:var(--text-muted);cursor:pointer;font-family:var(--font-mono);font-size:10px;
-  }
-  .qtd-btn-somar:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
-  .qtd-value{min-width:18px;text-align:center;font-family:var(--font-mono);}
+  .qtd-btn:hover{background:var(--qc-bg);}
+  .qtd-btn:active{transform:scale(.88);}
   input.qtd-value-input[type=number]{
-    width:34px;
-    text-align:center;
-    font-family:var(--font-mono);
-    background:var(--bg-panel-alt);
-    border:1px solid var(--border-soft);
-    color:var(--text-primary);
-    font-size:12px;
-    padding:2px 0;
-    -moz-appearance:textfield;
+    width:42px;text-align:center;font-family:var(--font-mono);font-weight:600;
+    background:transparent;border:0;border-radius:0;box-shadow:none;
+    color:var(--text-primary);font-size:14px;padding:0;-moz-appearance:textfield;
   }
+  input.qtd-value-input[type=number]:focus{outline:none;box-shadow:none;}
   input.qtd-value-input[type=number]::-webkit-outer-spin-button,
-  input.qtd-value-input[type=number]::-webkit-inner-spin-button{
-    -webkit-appearance:none;
-    margin:0;
+  input.qtd-value-input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .qtd-btn-somar{
+    height:28px;padding:0 12px;white-space:nowrap;border-radius:999px;
+    border:1px dashed var(--qc);background:transparent;color:var(--qc);
+    cursor:pointer;font-family:var(--font-body);font-size:12.5px;font-weight:600;transition:background .12s;
   }
+  .qtd-btn-somar:hover{background:var(--qc-bg);}
+  .qtd-lote{display:inline-flex;align-items:center;gap:4px;background:#000;border:1px solid var(--qc);border-radius:999px;padding:2px 2px 2px 10px;}
+  .qtd-lote input[type=number]{width:52px;padding:2px 0;border:0;background:transparent;box-shadow:none;border-radius:0;color:var(--text-primary);font-family:var(--font-mono);font-size:13px;text-align:center;-moz-appearance:textfield;}
+  .qtd-lote input[type=number]:focus{outline:none;box-shadow:none;}
+  .qtd-lote input::-webkit-outer-spin-button,.qtd-lote input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  .qtd-lote .qtd-ok,.qtd-lote .qtd-cancel{width:24px;height:24px;border:0;border-radius:50%;cursor:pointer;font-size:13px;padding:0;display:inline-flex;align-items:center;justify-content:center;}
+  .qtd-lote .qtd-ok{background:var(--qc);color:#000;font-weight:700;}
+  .qtd-lote .qtd-cancel{background:transparent;color:var(--text-muted);}
+  .qtd-lote .qtd-cancel:hover{color:var(--text-primary);}
+
+  /* ---- tamanho compacto dos controles dentro da tabela de assuntos ---- */
+  .table-scroll td select,.table-scroll td input[type=date]{
+    padding:5px 30px 5px 10px;font-size:13px;border-radius:8px;min-height:30px;
+  }
+  .table-scroll td input[type=date]{padding-right:8px;min-width:118px !important;}
+  .table-scroll td select{background-position:right 10px center;background-size:10px 7px;}
+  .qtd-controls{gap:6px;font-size:12.5px;}
+  .qtd-controls .qtd-correct,.qtd-controls .qtd-wrong{width:56px;}
+  .qtd-stepper{padding:1px;}
+  .qtd-btn{width:22px;height:22px;font-size:15px;}
+  input.qtd-value-input[type=number]{width:32px;font-size:13px;}
+  .qtd-btn-somar{height:24px;padding:0 9px;font-size:12px;}
+  .qtd-lote{padding:1px 1px 1px 8px;}
+  .qtd-lote input[type=number]{width:44px;font-size:12.5px;}
+  .qtd-lote .qtd-ok,.qtd-lote .qtd-cancel{width:20px;height:20px;font-size:12px;}
 
   .mini-del-btn{
     width:20px;height:20px;flex-shrink:0;line-height:16px;
@@ -2162,18 +2189,20 @@
 
   function criarLinhaContadorQuestoes(tipo, valorAtual, onMudar){
     var row = document.createElement("div");
-    row.className = "qtd-controls";
+    row.className = "qtd-controls qtd-tipo-" + tipo;
     var label = tipo === "certas" ? "Certas" : "Erradas";
     var labelClasse = tipo === "certas" ? "qtd-correct" : "qtd-wrong";
     row.innerHTML = "<span class='"+labelClasse+"'>"+label+"</span>";
 
+    var stepper = document.createElement("span");
+    stepper.className = "qtd-stepper";
     var minus = document.createElement("button");
-    minus.className = "qtd-btn"; minus.textContent = "–";
+    minus.className = "qtd-btn"; minus.textContent = "−"; minus.title = "Diminuir 1";
     var val = document.createElement("input");
     val.type = "number"; val.min = "0";
     val.className = "qtd-value-input"; val.value = valorAtual;
     var plus = document.createElement("button");
-    plus.className = "qtd-btn"; plus.textContent = "+";
+    plus.className = "qtd-btn"; plus.textContent = "+"; plus.title = "Somar 1";
 
     minus.addEventListener("click", function(){ onMudar(Math.max(0, valorAtual - 1)); });
     plus.addEventListener("click", function(){ onMudar(valorAtual + 1); });
@@ -2182,19 +2211,38 @@
       if(isNaN(novo) || novo < 0) novo = 0;
       onMudar(novo);
     });
+    stepper.appendChild(minus); stepper.appendChild(val); stepper.appendChild(plus);
 
     var somar = document.createElement("button");
     somar.className = "qtd-btn-somar"; somar.textContent = "+ lote";
     somar.title = "Somar uma quantidade ao total de "+label.toLowerCase()+", sem precisar calcular";
     somar.addEventListener("click", function(){
-      var v = prompt("Quantas questões "+label.toUpperCase()+" você fez agora? (será somado ao total atual: "+valorAtual+")", "");
-      if(v === null) return;
-      var num = parseInt(v, 10);
-      if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); return; }
-      onMudar(valorAtual + num);
+      var box = document.createElement("span");
+      box.className = "qtd-lote";
+      var inp = document.createElement("input");
+      inp.type = "number"; inp.min = "1"; inp.placeholder = "qtd";
+      var ok = document.createElement("button");
+      ok.className = "qtd-ok"; ok.textContent = "✓"; ok.title = "Somar";
+      var cancel = document.createElement("button");
+      cancel.className = "qtd-cancel"; cancel.textContent = "✕"; cancel.title = "Cancelar";
+      function confirmar(){
+        var num = parseInt(inp.value, 10);
+        if(isNaN(num) || num <= 0){ showToast("Digite um número válido maior que zero."); inp.focus(); return; }
+        onMudar(valorAtual + num);
+      }
+      function voltar(){ if(box.parentNode) box.parentNode.replaceChild(somar, box); }
+      ok.addEventListener("click", confirmar);
+      cancel.addEventListener("click", voltar);
+      inp.addEventListener("keydown", function(ev){
+        if(ev.key === "Enter"){ ev.preventDefault(); confirmar(); }
+        else if(ev.key === "Escape"){ ev.preventDefault(); voltar(); }
+      });
+      box.appendChild(inp); box.appendChild(ok); box.appendChild(cancel);
+      row.replaceChild(box, somar);
+      inp.focus();
     });
 
-    row.appendChild(minus); row.appendChild(val); row.appendChild(plus); row.appendChild(somar);
+    row.appendChild(stepper); row.appendChild(somar);
     return row;
   }
 
@@ -2888,6 +2936,7 @@
             .filter(function(s){ return s.materiaId === m.id && s.assuntoId === a.id; })
             .reduce(function(acc,s){ return acc + s.duracaoSec; }, 0);
           tdTempo.style.fontFamily = "var(--font-mono)";
+          tdTempo.style.whiteSpace = "nowrap";
           tdTempo.style.color = tempoAssuntoSec > 0 ? "var(--accent-sky)" : "var(--text-faint)";
           tdTempo.textContent = tempoAssuntoSec > 0 ? formatDuration(tempoAssuntoSec) : "—";
 
