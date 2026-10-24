@@ -1006,6 +1006,7 @@
     flex-shrink:0;
     white-space:nowrap;
   }
+  .guia-badge-audio{font-size:15px;line-height:1;filter:saturate(1.2);}
   .guia-badge.tem-guia{background:var(--success-dim);color:var(--success);}
   .guia-badge.sem-guia{background:var(--bg-panel-alt);color:var(--text-faint);}
   .guia-icone-btn{
@@ -2040,7 +2041,8 @@
       <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
       <div class="guia-fullscreen-materia" id="tfcMateria"></div>
     </div>
-    <button type="button" id="btnBlocoTelaCheia" class="btn small" title="Colocar um bloco flutuante em qualquer ponto do guia">🗒 Bloco</button>
+    <button type="button" id="btnAudioTelaCheia" class="btn small" title="Adicionar um áudio ao guia">🎧 Áudio</button>
+    <input type="file" id="inputAudioTelaCheia" accept="audio/*,.mp3,.m4a,.wav,.ogg,.aac,.opus,.flac,.weba" style="display:none">
     <span class="guia-fullscreen-salvo" id="tfcStatusSalvo"></span>
   </div>
   <button type="button" id="btnRecolherBarraTelaCheia" class="guia-fullscreen-handle" title="Esconder barra">⌃</button>
@@ -5123,9 +5125,6 @@
       document.body.classList.add("colocando-bloco");
       showToast("Clique no ponto do guia onde o bloco vai ficar (Esc cancela).");
     };
-    var btnFs = document.getElementById("btnBlocoTelaCheia");
-    btnFs.addEventListener("mousedown", function(e){ e.preventDefault(); });
-    btnFs.addEventListener("click", function(){ window.painelIniciarBloco(); });
 
     document.addEventListener("mousedown", function(e){
       if(!modoColocar) return;
@@ -5736,12 +5735,57 @@
     return blocos(doc.body, false).replace(/(<br>){3,}/g, "<br><br>").replace(/^(<br>)+/, "");
   }
 
+  // arrastar e soltar arquivo de áudio/imagem direto no guia
+  (function(){
+    function alvoGuia(e){
+      return e.target && e.target.closest ? e.target.closest(".guia-texto-leitura,#guiaEditorEditavel,#tfcCorpo") : null;
+    }
+    function ehArquivo(e){
+      var t = e.dataTransfer && e.dataTransfer.types;
+      return t && Array.prototype.indexOf.call(t, "Files") > -1;
+    }
+    document.addEventListener("dragover", function(e){ if(ehArquivo(e) && alvoGuia(e)) e.preventDefault(); }, true);
+    document.addEventListener("drop", function(e){
+      var ed = alvoGuia(e);
+      if(!ed || !ehArquivo(e)) return;
+      var f = e.dataTransfer.files && e.dataTransfer.files[0];
+      if(!f) return;
+      var ehAudio = f.type.indexOf("audio/") === 0 || AUDIO_EXT.test(f.name || "");
+      var ehImg = f.type.indexOf("image/") === 0;
+      if(!ehAudio && !ehImg) return;
+      e.preventDefault();
+      ed.focus();
+      try{
+        var r = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
+        if(r){ var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); }
+      }catch(x){}
+      if(ehAudio) iniciarUploadAudio(ed, f); else iniciarUploadImagem(ed, f);
+    }, true);
+  })();
+
+  (function(){
+    var btn = document.getElementById("btnAudioTelaCheia"), inp = document.getElementById("inputAudioTelaCheia");
+    if(!btn || !inp) return;
+    btn.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+    btn.addEventListener("click", function(){ inp.click(); });
+    inp.addEventListener("change", function(){
+      var f = inp.files && inp.files[0]; inp.value = "";
+      if(f) iniciarUploadAudio(document.getElementById("tfcCorpo"), f);
+    });
+  })();
+
   function colarNoGuia(e){
     var cd = e.clipboardData || window.clipboardData;
     var editorAlvo = e.currentTarget;
     if(cd && cd.items){
       for(var i=0; i<cd.items.length; i++){
         var itemColado = cd.items[i];
+        if(itemColado.kind === "file" && itemColado.type.indexOf("audio/") === 0){
+          e.preventDefault();
+          var blobAudio = itemColado.getAsFile();
+          if(blobAudio) iniciarUploadAudio(editorAlvo, blobAudio);
+          return;
+        }
         if(itemColado.kind === "file" && itemColado.type.indexOf("image/") === 0){
           e.preventDefault();
           var blobImagem = itemColado.getAsFile();
@@ -5842,7 +5886,7 @@
     topo.innerHTML =
       "<span class='guia-assunto-nome'>"+(classeExtra?"↳ ":"")+escapeHtml(item.nome)+"</span>"+
       "<span style='display:flex;align-items:center;gap:10px;'>"+
-      "<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
+      (temGuia && /\{\{audio\|/.test(guia.texto)?"<span class='guia-badge-audio' title='Este guia tem áudio'>🎧</span>":"")+"<span class='guia-badge "+(temGuia?"tem-guia":"sem-guia")+"'>"+(temGuia?"Guia disponível":"Sem guia")+"</span>"+
       (temGuia?"<button class='guia-icone-btn telaCheiaDiretoBtn' title='Tela cheia'>⛶</button>":"")+
       (temGuia?"<button class='btn small editarGuiaDiretoBtn'>Editar</button>":"")+
       "<button class='btn small toggleGuiaBtn'>"+(guiaAbertoIds[item.id]?"Fechar":(temGuia?"Ver guia":"Adicionar guia"))+"</button>"+
@@ -5918,7 +5962,6 @@
         btnBlocoLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
         btnBlocoLeitura.addEventListener("click", function(){ if(window.painelIniciarBloco) window.painelIniciarBloco(); });
         acoesLeitura.appendChild(btnImagemLeitura);
-        acoesLeitura.appendChild(btnBlocoLeitura);
         var inputAudioLeitura = document.createElement("input");
         inputAudioLeitura.type = "file"; inputAudioLeitura.accept = "audio/*,.mp3,.m4a,.wav,.ogg,.aac,.opus,.flac,.weba"; inputAudioLeitura.style.display = "none";
         inputAudioLeitura.addEventListener("change", function(e){
