@@ -1253,6 +1253,8 @@
     display:inline-flex;align-items:center;justify-content:center;
   }
   .gap-play:hover{background:#6ee7a0;}
+  .gap-play,.gmini .gm-play{display:inline-flex;align-items:center;justify-content:center;padding:0 0 0 3px;line-height:1;font-family:Arial,sans-serif;}
+  .gap-play.on,.gmini .gm-play.on{padding:0;}
   .gap-meio{flex:1;min-width:0;}
   .gap-nome{font-size:13px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
   .gap-prog,.gmini-prog{width:100%;height:18px;margin:0;accent-color:var(--accent-brass);cursor:pointer;background:transparent;}
@@ -5207,6 +5209,10 @@
       var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
       return (h ? h + ":" + (m < 10 ? "0" : "") + m : m) + ":" + (s < 10 ? "0" : "") + s;
     }
+    function urlDireta(u){
+      var m = /^https:\/\/drive\.google\.com\/uc\?(?:[^#]*&)?id=([\w-]+)/.exec(u || "");
+      return m ? "https://drive.usercontent.google.com/download?id=" + m[1] + "&export=download&confirm=t" : u;
+    }
     function posSalva(fid){ return ler(POS_KEY, {})[fid] || { t: 0, d: 0 }; }
     function salvarPos(forcar){
       if(!atual) return;
@@ -5249,7 +5255,7 @@
         var vivo = atual && atual.fileId === fid && !!audio.getAttribute("src");
         var s = vivo ? { t: audio.currentTime, d: dur || posSalva(fid).d } : posSalva(fid);
         var btn = w.querySelector(".gap-play");
-        if(btn) btn.textContent = (vivo && tocando) ? "⏸" : "▶";
+        if(btn){ btn.textContent = (vivo && tocando) ? "⏸" : "▶"; btn.classList.toggle("on", !!(vivo && tocando)); }
         var r = w.querySelector(".gap-prog");
         if(r && !(document.activeElement === r)) r.value = s.d ? Math.round((s.t / s.d) * 1000) : 0;
         var t = w.querySelector(".gap-t"), d = w.querySelector(".gap-d");
@@ -5263,7 +5269,7 @@
         var tt = audio.currentTime || posSalva(atual.fileId).t;
         var dd = dur || posSalva(atual.fileId).d;
         mini.querySelector(".gm-nome").textContent = "🎧 " + (atual.nome || "Áudio");
-        mini.querySelector(".gm-play").textContent = tocando ? "⏸" : "▶";
+        mini.querySelector(".gm-play").textContent = tocando ? "⏸" : "▶"; mini.querySelector(".gm-play").classList.toggle("on", !!tocando);
         var rr = mini.querySelector(".gmini-prog");
         if(document.activeElement !== rr) rr.value = dd ? Math.round((tt / dd) * 1000) : 0;
         mini.querySelector(".gm-t").textContent = fmt(tt) + " / " + (dd ? fmt(dd) : "--:--");
@@ -5289,7 +5295,7 @@
       atual = { fileId: info.fileId, url: info.url, nome: info.nome };
       var alvo = (typeof ir === "number") ? ir : posSalva(info.fileId).t;
       if(!mesma){
-        audio.src = info.url;
+        audio.src = urlDireta(info.url);
         audio.playbackRate = taxa;
         var aplicar = function(){
           audio.removeEventListener("loadedmetadata", aplicar);
@@ -5541,7 +5547,7 @@
 
   /* ---------------- ÁUDIO: envio em pedaços para o Drive ---------------- */
   var AUDIO_PEDACO = 1572864;            // 1,5 MB (múltiplo de 256 KB, exigência do Drive)
-  var AUDIO_MAX = 200 * 1024 * 1024;
+  var AUDIO_MAX = 5 * 1024 * 1024 * 1024;
   var AUDIO_EXT = /\.(mp3|m4a|wav|ogg|aac|opus|flac|weba|webm|mp4)$/i;
 
   function blobParaBase64(blob){
@@ -5572,7 +5578,7 @@
       return;
     }
     if(file.size > AUDIO_MAX){
-      showToast("Áudio muito grande (máx. 200 MB).");
+      showToast("Áudio muito grande (máx. 5 GB).");
       return;
     }
     var uploadId = "au" + Date.now() + Math.random().toString(36).slice(2);
