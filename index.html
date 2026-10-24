@@ -5435,14 +5435,7 @@
       if(atual && atual.fileId === fileId){ audio.pause(); audio.removeAttribute("src"); audio.load(); atual = null; mostrarMini(false); }
     };
 
-    // ao abrir o painel, mostra a última faixa pausada onde você parou
-    var ult = ler(LAST_KEY, null);
-    if(ult && ult.url){
-      atual = ult;
-      sessaoMedia();
-      mostrarMini(true);
-      atualizarUI();
-    }
+    // a barra só aparece depois que você aperta play; a posição salva aparece no próprio player do guia
     // widgets novos (guia aberto/recarregado) mostram o tempo salvo
     var pendente = false;
     new MutationObserver(function(){
