@@ -5209,7 +5209,34 @@
       var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
       return (h ? h + ":" + (m < 10 ? "0" : "") + m : m) + ":" + (s < 10 ? "0" : "") + s;
     }
+    var tentativaUrl = 0;
+    function urlsPossiveis(u){
+      var m = /[?&]id=([\w-]+)/.exec(u || "");
+      if(!m || !/google\.com/.test(u)) return [u];
+      var chave = chaveDrive();
+      return (chave ? ["https://www.googleapis.com/drive/v3/files/" + m[1] + "?alt=media&key=" + encodeURIComponent(chave)] : []).concat([
+        "https://drive.usercontent.google.com/download?id=" + m[1] + "&export=download&confirm=t",
+        "https://drive.google.com/uc?export=download&id=" + m[1] + "&confirm=t",
+        "https://drive.usercontent.google.com/download?id=" + m[1] + "&export=download&authuser=0&confirm=t"
+      ]);
+    }
+    function chaveDrive(){
+      try{ return (state && state.driveApiKey) || localStorage.getItem(STORAGE_KEY + "_driveKey") || ""; }catch(e){ return ""; }
+    }
+    function pedirChaveDrive(){
+      var v = prompt("O Google Drive bloqueou a reprodução direta. Cole aqui a sua chave de API do Google (Drive API) — o passo a passo está na conversa com a Claudia. Deixe vazio pra cancelar.", chaveDrive());
+      if(v === null) return;
+      v = v.trim();
+      try{ localStorage.setItem(STORAGE_KEY + "_driveKey", v); }catch(e){}
+      try{ state.driveApiKey = v; saveState(); }catch(e){}
+      if(v && atual){ tentativaUrl = 0; audio.removeAttribute("src"); carregar({ fileId: atual.fileId, url: atual.url, nome: atual.nome }, true); }
+    }
+    window.painelChaveDrive = pedirChaveDrive;
     function urlDireta(u){
+      var l = urlsPossiveis(u);
+      return l[Math.min(tentativaUrl, l.length - 1)];
+    }
+    function urlDireta_old(u){
       var m = /^https:\/\/drive\.google\.com\/uc\?(?:[^#]*&)?id=([\w-]+)/.exec(u || "");
       return m ? "https://drive.usercontent.google.com/download?id=" + m[1] + "&export=download&confirm=t" : u;
     }
@@ -5295,6 +5322,7 @@
       atual = { fileId: info.fileId, url: info.url, nome: info.nome };
       var alvo = (typeof ir === "number") ? ir : posSalva(info.fileId).t;
       if(!mesma){
+        tentativaUrl = 0;
         audio.src = urlDireta(info.url);
         audio.playbackRate = taxa;
         var aplicar = function(){
@@ -5338,7 +5366,19 @@
     audio.addEventListener("ratechange", atualizarUI);
     audio.addEventListener("error", function(){
       if(!atual) return;
-      showToast("Não consegui carregar o áudio. Confira se o arquivo ainda está no Drive (pasta PainelEstudos_Audios).");
+      var lista = urlsPossiveis(atual.url);
+      if(tentativaUrl + 1 < lista.length){
+        tentativaUrl++;
+        var alvoT = posSalva(atual.fileId).t;
+        audio.src = lista[tentativaUrl];
+        audio.playbackRate = taxa;
+        audio.addEventListener("loadedmetadata", function f(){ audio.removeEventListener("loadedmetadata", f); if(alvoT > 1) audio.currentTime = alvoT; }, false);
+        audio.load();
+        return;
+      }
+      var cod = audio.error ? (" (código " + audio.error.code + ")") : "";
+      showToast("Não consegui tocar o áudio" + cod + ".");
+      if(!chaveDrive()) setTimeout(pedirChaveDrive, 300);
       atualizarUI();
     });
     window.addEventListener("pagehide", function(){ salvarPos(true); });
