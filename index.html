@@ -1186,6 +1186,101 @@
   .materia-oculta-meta{color:var(--text-muted);font-size:12.5px;}
   .materia-oculta-acoes{display:flex;gap:8px;}
 
+
+  /* ---- Blocos flutuantes ---- */
+  /* âncora no texto: invisível; o ícone de verdade (marcador) fica na camada flutuante, onde você clicou */
+  .guia-bloco{display:inline-block;width:0;height:1em;margin:0;vertical-align:-.12em;overflow:visible;user-select:none;pointer-events:none;}
+  .gbm{
+    position:fixed;display:none;pointer-events:auto;width:20px;height:20px;cursor:grab;touch-action:none;user-select:none;
+    background:var(--bl-c,#fcd34d);clip-path:polygon(0 0,100% 0,100% 64%,64% 100%,0 100%);
+    filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));transition:transform .1s;
+  }
+  .gbm:hover{transform:scale(1.18);}
+  .gbm:active{cursor:grabbing;}
+  .gbm.bloco-amarelo{--bl-c:#fcd34d;} .gbm.bloco-vermelho{--bl-c:#fb7185;}
+  .gbm.bloco-azul{--bl-c:#60a5fa;} .gbm.bloco-verde{--bl-c:#4ade80;}
+  body.colocando-bloco .guia-texto-leitura, body.colocando-bloco #tfcCorpo{cursor:crosshair !important;}
+  body.colocando-bloco .guia-texto-leitura *, body.colocando-bloco #tfcCorpo *{cursor:crosshair !important;}
+  #guiaBlocoCamada{position:fixed;inset:0;z-index:1190;pointer-events:none;}
+  .gbc{
+    position:fixed;display:none;pointer-events:auto;width:max-content;max-width:calc(100vw - 12px);
+    background:var(--gbc-bg,#fde68a);border-top:5px solid var(--gbc-bd,#f59e0b);border-radius:4px 4px 12px 4px;
+    box-shadow:0 12px 30px rgba(0,0,0,.55);color:#1a1a1a;font-family:var(--font-body);
+  }
+  .gbc.gbc-amarelo{--gbc-bg:#fde68a;--gbc-bd:#f59e0b;} .gbc.gbc-vermelho{--gbc-bg:#fecdd3;--gbc-bd:#e11d48;}
+  .gbc.gbc-azul{--gbc-bg:#bfdbfe;--gbc-bd:#2563eb;} .gbc.gbc-verde{--gbc-bg:#bbf7d0;--gbc-bd:#16a34a;}
+  .gbc-head{display:flex;align-items:center;gap:6px;padding:5px 6px 3px 8px;cursor:grab;touch-action:none;user-select:none;}
+  .gbc-head:active{cursor:grabbing;}
+  .gbc-grip{font-size:13px;letter-spacing:-2px;opacity:.55;margin-right:2px;}
+  .gbc-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.25);padding:0;cursor:pointer;}
+  .gbc-dot.sel{border-color:#000;}
+  .gbc-dot[data-cor=amarelo]{background:#f59e0b;} .gbc-dot[data-cor=vermelho]{background:#e11d48;}
+  .gbc-dot[data-cor=azul]{background:#2563eb;} .gbc-dot[data-cor=verde]{background:#16a34a;}
+  .gbc-esp{flex:1;min-width:14px;}
+  .gbc-btn{border:0;background:transparent;color:#1a1a1a;opacity:.6;cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;border-radius:5px;}
+  .gbc-btn:hover{opacity:1;background:rgba(255,255,255,.55);}
+  .gbc textarea.gbc-txt{
+    display:block;margin:0 6px 6px;background:rgba(255,255,255,.55);color:#1a1a1a;border:1px solid rgba(0,0,0,.22);
+    border-radius:6px;padding:7px 8px;font-size:14px;line-height:1.45;font-family:var(--font-body);
+    resize:both;min-width:150px;min-height:60px;max-width:calc(100vw - 36px);width:240px;height:110px;
+  }
+  .gbc textarea.gbc-txt:focus{outline:none;border-color:rgba(0,0,0,.6);box-shadow:none;}
+  .guia-ctx-menu{
+    position:fixed;z-index:1250;background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:10px;
+    padding:8px 10px;box-shadow:0 12px 30px rgba(0,0,0,.6);font-size:13px;color:var(--text-primary);display:none;
+  }
+  .guia-ctx-menu .t{margin-bottom:7px;color:var(--text-muted);}
+  .guia-ctx-menu .c{display:flex;gap:8px;}
+  .guia-ctx-menu button{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.25);cursor:pointer;padding:0;}
+  .guia-ctx-menu button:hover{border-color:#fff;transform:scale(1.12);}
+
+
+  /* ---- Áudio nos guias ---- */
+  .guia-audio-wrap{margin:14px 0;}
+  .guia-audio-wrap.guia-img-centro .gap{margin:0 auto;}
+  .guia-audio-wrap.guia-img-esquerda .gap{margin:0 auto 0 0;}
+  .guia-audio-wrap.guia-img-direita .gap{margin:0 0 0 auto;}
+  .guia-audio-wrap.guia-img-selecionada .gap{outline:2px solid var(--accent-brass);}
+  .gap{
+    display:flex;align-items:center;gap:12px;max-width:520px;width:100%;text-align:left;
+    background:var(--bg-panel-alt);border:1px solid var(--border-soft);border-radius:14px;padding:10px 12px;
+    user-select:none;
+  }
+  .gap-play{
+    width:44px;height:44px;flex-shrink:0;border-radius:50%;border:0;cursor:pointer;
+    background:var(--accent-brass);color:#04130a;font-size:17px;line-height:1;
+    display:inline-flex;align-items:center;justify-content:center;
+  }
+  .gap-play:hover{background:#6ee7a0;}
+  .gap-meio{flex:1;min-width:0;}
+  .gap-nome{font-size:13px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;}
+  .gap-prog,.gmini-prog{width:100%;height:18px;margin:0;accent-color:var(--accent-brass);cursor:pointer;background:transparent;}
+  .gap-tempos{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);font-variant-numeric:lining-nums tabular-nums;}
+  .gap-ctl{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}
+  .gap-ctl button,.gmini button.gm-b{
+    border:1px solid var(--border-soft);background:transparent;color:var(--text-primary);border-radius:8px;
+    font-size:12px;padding:3px 8px;cursor:pointer;white-space:nowrap;font-family:var(--font-body);
+  }
+  .gap-ctl button:hover,.gmini button.gm-b:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
+  .gap-ctl .gap-vel,.gmini .gm-vel{color:var(--accent-brass);border-color:var(--accent-brass-dim);font-weight:600;}
+  .gap.erro{border-color:var(--danger);}
+  @media (max-width:520px){ .gap{flex-wrap:wrap;} .gap-ctl{flex-direction:row;width:100%;justify-content:flex-end;} }
+  /* mini player em segundo plano */
+  .gmini{
+    position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:1180;display:none;align-items:center;gap:10px;
+    width:min(720px,calc(100vw - 16px));background:#000;border:1px solid var(--accent-brass-dim);border-radius:14px;
+    padding:8px 12px;box-shadow:0 12px 34px rgba(0,0,0,.7);
+  }
+  .gmini.aberto{display:flex;}
+  .gmini .gm-play{width:38px;height:38px;flex-shrink:0;border-radius:50%;border:0;cursor:pointer;background:var(--accent-brass);color:#04130a;font-size:15px;}
+  .gmini .gm-meio{flex:1;min-width:0;}
+  .gmini .gm-nome{font-size:12.5px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .gmini .gm-t{font-size:11.5px;color:var(--text-muted);font-variant-numeric:lining-nums tabular-nums;}
+  .gmini .gm-x{border:0;background:transparent;color:var(--text-muted);font-size:16px;cursor:pointer;padding:2px 6px;}
+  .gmini .gm-x:hover{color:var(--danger);}
+  body.com-audio-mini{padding-bottom:78px;}
+  @media (max-width:560px){ .gmini{flex-wrap:wrap;} .gmini .gm-meio{flex-basis:60%;} }
+
   .guia-flutuante-wrap{
     position:fixed;
     transform:translate(-50%,-100%);
@@ -1945,6 +2040,7 @@
       <div class="guia-fullscreen-assunto" id="tfcAssunto"></div>
       <div class="guia-fullscreen-materia" id="tfcMateria"></div>
     </div>
+    <button type="button" id="btnBlocoTelaCheia" class="btn small" title="Colocar um bloco flutuante em qualquer ponto do guia">🗒 Bloco</button>
     <span class="guia-fullscreen-salvo" id="tfcStatusSalvo"></span>
   </div>
   <button type="button" id="btnRecolherBarraTelaCheia" class="guia-fullscreen-handle" title="Esconder barra">⌃</button>
@@ -4135,8 +4231,12 @@
     }).join("");
   }
 
+  var RE_BLOCO = /\{\{bloco\|(amarelo|vermelho|azul|verde)\|([^|}]*)\|(-?\d+)\|(-?\d+)\|(\d+)\|(\d+)\|([ac])(?:\|(-?\d+)\|(-?\d+))?\}\}/g;
   function renderTextoBasico(trecho){
     var escapado = escapeHtml(trecho);
+    escapado = escapado.replace(RE_BLOCO, function(m, cor, enc, dx, dy, w, h, est, ax, ay){
+      return "<span class='guia-bloco bloco-"+cor+"' contenteditable='false' data-cor='"+cor+"' data-nota=\""+escAttr(decodificarNota(enc))+"\" data-dx='"+dx+"' data-dy='"+dy+"' data-w='"+w+"' data-h='"+h+"' data-estado='"+est+"' data-ax='"+(ax||0)+"' data-ay='"+(ay||0)+"'></span>";
+    });
     var re = /\{\{(amarelo|verde|vermelho|azul|rosa|laranja|roxo|cinza|marrom|branco)\|([\s\S]*?)\}\}/g;
     var comCores = escapado.replace(re, function(match, cor, conteudo){
       return "<span class='guia-cor-"+cor+"'>"+conteudo+"</span>";
@@ -4235,8 +4335,36 @@
     "</div>";
   }
 
+  function renderAudioGuia(fileId, urlCod, align, nomeCod){
+    var url = "", nome = "";
+    try{ url = decodeURIComponent(urlCod || ""); }catch(e){ url = urlCod || ""; }
+    try{ nome = decodeURIComponent(nomeCod || ""); }catch(e){ nome = nomeCod || ""; }
+    var alinhamento = (align === "esquerda" || align === "direita") ? align : "centro";
+    return "<div class='guia-img-wrap guia-audio-wrap guia-img-"+alinhamento+"' contenteditable='false' data-file-id='"+escAttr(fileId||"")+"' data-url='"+escAttr(url)+"' data-nome='"+escAttr(nome)+"' data-align='"+alinhamento+"'>"+
+      "<div class='gap'>"+
+        "<button type='button' class='gap-play' data-aud='play' title='Ouvir / pausar'>▶</button>"+
+        "<div class='gap-meio'>"+
+          "<div class='gap-nome'>🎧 "+escapeHtml(nome || "Áudio")+"</div>"+
+          "<input type='range' class='gap-prog' data-aud='seek' min='0' max='1000' value='0'>"+
+          "<div class='gap-tempos'><span class='gap-t'>0:00</span><span class='gap-d'>--:--</span></div>"+
+        "</div>"+
+        "<div class='gap-ctl'>"+
+          "<button type='button' data-aud='back' title='Voltar 10 segundos'>⟲ 10</button>"+
+          "<button type='button' data-aud='fwd' title='Avançar 10 segundos'>10 ⟳</button>"+
+          "<button type='button' class='gap-vel' data-aud='vel' title='Velocidade'>1x</button>"+
+        "</div>"+
+      "</div>"+
+      "<div class='guia-img-toolbar'>"+
+        "<button type='button' class='guia-img-btn' data-acao='esquerda' title='Alinhar à esquerda'>◧</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='centro' title='Centralizar'>▣</button>"+
+        "<button type='button' class='guia-img-btn' data-acao='direita' title='Alinhar à direita'>◨</button>"+
+        "<button type='button' class='guia-img-btn guia-img-btn-excluir' data-acao='excluir' title='Excluir áudio'>🗑</button>"+
+      "</div>"+
+    "</div>";
+  }
+
   function renderGuiaTexto(texto){
-    var regexBloco = /\{\{tabela\}\}\n([\s\S]*?)\n\{\{\/tabela\}\}|\{\{img\|([^|]*)\|([^|]*)\|([^|]*)\|([^}]*)\}\}/g;
+    var regexBloco = /\{\{tabela\}\}\n([\s\S]*?)\n\{\{\/tabela\}\}|\{\{img\|([^|]*)\|([^|]*)\|([^|]*)\|([^}]*)\}\}|\{\{audio\|([^|]*)\|([^|]*)\|([^|]*)\|([^}]*)\}\}/g;
     var resultado = "";
     var ultimoIndex = 0;
     var m;
@@ -4244,6 +4372,8 @@
       resultado += renderTextoFormatado(texto.slice(ultimoIndex, m.index));
       if(m[1] !== undefined){
         resultado += renderTabelaGuia(m[1]);
+      } else if(m[6] !== undefined){
+        resultado += renderAudioGuia(m[6], m[7], m[8], m[9]);
       } else {
         resultado += renderImagemGuia(m[2], m[3], m[4], m[5]);
       }
@@ -4725,6 +4855,558 @@
     }, true);
   })();
 
+
+  /* ---------------- BLOCOS FLUTUANTES (post-its soltos, presos a um ponto do texto) ---------------- */
+  (function(){
+    var camada = document.createElement("div");
+    camada.id = "guiaBlocoCamada";
+    document.body.appendChild(camada);
+    var cards = [];            // { anchor, el, ta }
+    var agendado = false;
+    var timerSalvar = null;
+    var modoColocar = false;
+
+    function editorDe(anchor){ return encontrarEditorDeGuia(anchor); }
+    function salvarAgora(anchor){
+      var ed = editorDe(anchor);
+      if(!ed) return;
+      if(ed.dataset && ed.dataset.itemId) salvarConteudoEditavel(ed);
+      else ed.dispatchEvent(new Event("input", {bubbles:true}));
+    }
+    function agendarSalvar(anchor){
+      clearTimeout(timerSalvar);
+      timerSalvar = setTimeout(function(){ salvarAgora(anchor); }, 800);
+    }
+    function num(anchor, k, d){ var v = parseInt(anchor.getAttribute("data-"+k), 10); return isNaN(v) ? d : v; }
+
+    function areaVisivel(anchor){
+      var r = { left:0, top:0, right:window.innerWidth, bottom:window.innerHeight };
+      var p = anchor.parentElement;
+      while(p && p !== document.body){
+        var cs = getComputedStyle(p);
+        if(/(auto|scroll|hidden)/.test(cs.overflowY + cs.overflowX)){
+          var b = p.getBoundingClientRect();
+          r.left = Math.max(r.left, b.left); r.top = Math.max(r.top, b.top);
+          r.right = Math.min(r.right, b.right); r.bottom = Math.min(r.bottom, b.bottom);
+        }
+        p = p.parentElement;
+      }
+      return r;
+    }
+
+    function posicionar(c){
+      var a = c.anchor, el = c.el, mk = c.marker;
+      var fsAberto = document.getElementById("guiaFullscreen").classList.contains("aberto");
+      var noFs = !!a.closest("#tfcCorpo");
+      var ar = a.getBoundingClientRect();
+      var semAncora = !a.isConnected || (ar.width === 0 && ar.height === 0 && ar.top === 0 && ar.left === 0) || (fsAberto !== noFs);
+      if(semAncora){ el.style.display = "none"; mk.style.display = "none"; return; }
+      var clip = areaVisivel(a);
+      var S = 20;
+      var mL = ar.left + num(a, "ax", 0), mT = ar.top + num(a, "ay", 0);
+      // marcador: sempre dentro da área visível do guia
+      mL = Math.min(Math.max(mL, clip.left + 2), clip.right - S - 2);
+      var mkVisivel = !(mT + S < clip.top || mT > clip.bottom);
+      mk.style.display = mkVisivel ? "block" : "none";
+      mk.style.left = mL + "px"; mk.style.top = mT + "px";
+      mk.title = (a.getAttribute("data-nota") || "").slice(0, 80) || "Bloco vazio — clique para abrir";
+      if(a.getAttribute("data-estado") === "c"){ el.style.display = "none"; return; }
+      el.style.display = "block";
+      var cw = el.offsetWidth, ch = el.offsetHeight;
+      var dx = num(a, "dx", 26);
+      var left = mL + dx;
+      var top = mT + num(a, "dy", -4);
+      if(dx >= 0 && left + cw > clip.right - 6 && mL - cw - 8 >= clip.left + 6) left = mL - cw - 8;   // não cabe à direita: abre à esquerda do ícone
+      if(clip.right - clip.left > cw + 12){
+        left = Math.min(left, clip.right - cw - 6);
+        left = Math.max(left, clip.left + 6);
+      }
+      el.style.left = left + "px";
+      el.style.top = top + "px";
+      var cT = Math.max(0, clip.top - top), cL = Math.max(0, clip.left - left);
+      var cR = Math.max(0, left + cw - clip.right), cB = Math.max(0, top + ch - clip.bottom);
+      if(cT >= ch || cB >= ch || cL >= cw || cR >= cw){ el.style.display = "none"; return; }
+      el.style.clipPath = (cT||cL||cR||cB) ? "inset("+cT+"px "+cR+"px "+cB+"px "+cL+"px)" : "none";
+    }
+
+    function sincronizar(){
+      agendado = false;
+      var ancoras = document.querySelectorAll(".guia-bloco");
+      ancoras.forEach(function(a){ if(!a._gbc) criarCard(a); });
+      cards = cards.filter(function(c){
+        if(!c.anchor.isConnected){ c.el.remove(); c.marker.remove(); return false; }
+        return true;
+      });
+      cards.forEach(posicionar);
+    }
+    function pedirSync(){
+      if(agendado) return;
+      agendado = true;
+      requestAnimationFrame(sincronizar);
+    }
+
+    function criarCard(a){
+      var el = document.createElement("div");
+      el.className = "gbc gbc-" + (a.getAttribute("data-cor") || "amarelo");
+      var head = document.createElement("div");
+      head.className = "gbc-head";
+      head.innerHTML = "<span class='gbc-grip'>⋮⋮</span>";
+      NOTA_CORES.forEach(function(cor){
+        var d = document.createElement("button");
+        d.type = "button"; d.className = "gbc-dot" + (cor === a.getAttribute("data-cor") ? " sel" : "");
+        d.setAttribute("data-cor", cor); d.title = cor;
+        d.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+        d.addEventListener("click", function(){
+          a.setAttribute("data-cor", cor);
+          a.className = "guia-bloco bloco-" + cor;
+          el.className = "gbc gbc-" + cor;
+          if(a._gbc) a._gbc.marker.className = "gbm bloco-" + cor;
+          head.querySelectorAll(".gbc-dot").forEach(function(x){ x.classList.toggle("sel", x === d); });
+          agendarSalvar(a);
+        });
+        head.appendChild(d);
+      });
+      var esp = document.createElement("span"); esp.className = "gbc-esp"; head.appendChild(esp);
+      var bMin = document.createElement("button");
+      bMin.type = "button"; bMin.className = "gbc-btn"; bMin.textContent = "–"; bMin.title = "Minimizar (clique no ícone do texto para abrir de novo)";
+      bMin.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+      bMin.addEventListener("click", function(){ a.setAttribute("data-estado", "c"); pedirSync(); agendarSalvar(a); });
+      var bDel = document.createElement("button");
+      bDel.type = "button"; bDel.className = "gbc-btn"; bDel.textContent = "✕"; bDel.title = "Excluir bloco";
+      bDel.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+      bDel.addEventListener("click", function(){
+        if((a.getAttribute("data-nota") || "").trim() && !confirm("Excluir este bloco e o que está escrito nele?")) return;
+        var ed = editorDe(a);
+        a.remove();
+        pedirSync();
+        if(ed){ if(ed.dataset && ed.dataset.itemId) salvarConteudoEditavel(ed); else ed.dispatchEvent(new Event("input", {bubbles:true})); }
+        showToast("Bloco excluído.");
+      });
+      head.appendChild(bMin); head.appendChild(bDel);
+      el.appendChild(head);
+
+      var ta = document.createElement("textarea");
+      ta.className = "gbc-txt";
+      ta.placeholder = "Escreva aqui…";
+      ta.value = a.getAttribute("data-nota") || "";
+      ta.style.width = Math.max(150, num(a, "w", 240)) + "px";
+      ta.style.height = Math.max(60, num(a, "h", 110)) + "px";
+      ta.addEventListener("input", function(){ a.setAttribute("data-nota", ta.value); agendarSalvar(a); });
+      ta.addEventListener("keydown", function(e){ e.stopPropagation(); });
+      el.appendChild(ta);
+      camada.appendChild(el);
+
+      var mk = document.createElement("div");
+      mk.className = "gbm bloco-" + (a.getAttribute("data-cor") || "amarelo");
+      camada.appendChild(mk);
+      var c = { anchor: a, el: el, ta: ta, marker: mk };
+      cards.push(c);
+      a._gbc = c;
+
+      // marcador: clique abre/fecha, arrastar muda de lugar
+      mk.addEventListener("pointerdown", function(e){
+        if(e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+        mk.setPointerCapture(e.pointerId);
+        var sx = e.clientX, sy = e.clientY, ax0 = num(a, "ax", 0), ay0 = num(a, "ay", 0), moveu = false;
+        var r0 = mk.getBoundingClientRect(), ar0 = a.getBoundingClientRect();
+        function mover(ev){
+          if(!moveu && Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 5) return;
+          moveu = true;
+          var novoL = r0.left + ev.clientX - sx, novoT = r0.top + ev.clientY - sy;
+          a.setAttribute("data-ax", Math.round(novoL - ar0.left));
+          a.setAttribute("data-ay", Math.round(Math.max(-3000, Math.min(3000, novoT - ar0.top))));
+          posicionar(c);
+        }
+        function soltar(){
+          mk.removeEventListener("pointermove", mover);
+          mk.removeEventListener("pointerup", soltar);
+          mk.removeEventListener("pointercancel", soltar);
+          if(moveu){ agendarSalvar(a); return; }
+          a.setAttribute("data-estado", a.getAttribute("data-estado") === "c" ? "a" : "c");
+          pedirSync();
+          agendarSalvar(a);
+          if(a.getAttribute("data-estado") === "a") setTimeout(function(){ ta.focus(); }, 30);
+        }
+        mk.addEventListener("pointermove", mover);
+        mk.addEventListener("pointerup", soltar);
+        mk.addEventListener("pointercancel", soltar);
+      });
+
+      // arrastar
+      head.addEventListener("pointerdown", function(e){
+        if(e.button !== undefined && e.button !== 0) return;
+        e.preventDefault();
+        head.setPointerCapture(e.pointerId);
+        var r0 = el.getBoundingClientRect();
+        var sx = e.clientX, sy = e.clientY, baseL = r0.left, baseT = r0.top;
+        function mover(ev){
+          var ar = a.getBoundingClientRect();
+          a.setAttribute("data-dx", Math.round(baseL + ev.clientX - sx - ar.left));
+          a.setAttribute("data-dy", Math.round(Math.max(-800, Math.min(3000, baseT + ev.clientY - sy - ar.top))));
+          posicionar(c);
+        }
+        function soltar(ev){
+          head.removeEventListener("pointermove", mover);
+          head.removeEventListener("pointerup", soltar);
+          head.removeEventListener("pointercancel", soltar);
+          agendarSalvar(a);
+        }
+        head.addEventListener("pointermove", mover);
+        head.addEventListener("pointerup", soltar);
+        head.addEventListener("pointercancel", soltar);
+      });
+
+      // redimensionar
+      if(window.ResizeObserver){
+        var ro = new ResizeObserver(function(){
+          if(!c._pronto) return;
+          var w = ta.offsetWidth, h = ta.offsetHeight;
+          if(!w || !h) return;
+          if(w !== num(a, "w", 0) || h !== num(a, "h", 0)){
+            a.setAttribute("data-w", w); a.setAttribute("data-h", h);
+            agendarSalvar(a);
+          }
+          pedirSync();
+        });
+        ro.observe(ta);
+        setTimeout(function(){ c._pronto = true; }, 400);
+      } else { c._pronto = true; }
+      pedirSync();
+    }
+
+    // criar bloco no ponto
+    function pontoParaRange(x, y){
+      var r = null;
+      if(document.caretPositionFromPoint){
+        var cp = document.caretPositionFromPoint(x, y);
+        if(cp){ r = document.createRange(); r.setStart(cp.offsetNode, cp.offset); r.collapse(true); }
+      } else if(document.caretRangeFromPoint){
+        r = document.caretRangeFromPoint(x, y);
+      }
+      return r;
+    }
+    function criarBlocoEm(range, editor, cor, px, py){
+      var node = range.startContainer;
+      var el = node.nodeType === 3 ? node.parentElement : node;
+      if(!editor.contains(range.startContainer) || (el && el.closest && el.closest(".guia-math, .guia-img-wrap, .guia-bloco"))){
+        showToast("Clique em um ponto de texto do guia (fora de fórmula ou imagem).");
+        return;
+      }
+      var a = document.createElement("span");
+      a.className = "guia-bloco bloco-" + cor;
+      a.setAttribute("contenteditable", "false");
+      a.setAttribute("data-cor", cor); a.setAttribute("data-nota", "");
+      a.setAttribute("data-dx", "26"); a.setAttribute("data-dy", "-4"); a.setAttribute("data-ax", "0"); a.setAttribute("data-ay", "0");
+      a.setAttribute("data-w", "240"); a.setAttribute("data-h", "110"); a.setAttribute("data-estado", "a");
+      range.insertNode(a);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      var r2 = document.createRange(); r2.setStartAfter(a); r2.collapse(true); sel.addRange(r2);
+      // o ícone fica exatamente onde você clicou (mesmo longe do texto)
+      if(px !== undefined && py !== undefined){
+        var ar = a.getBoundingClientRect();
+        a.setAttribute("data-ax", Math.round(px - ar.left - 10));
+        a.setAttribute("data-ay", Math.round(py - ar.top - 10));
+      }
+      sincronizar();
+      salvarAgora(a);
+      if(a._gbc) setTimeout(function(){ a._gbc.ta.focus(); }, 30);
+    }
+
+    function sairModoColocar(){
+      modoColocar = false;
+      document.body.classList.remove("colocando-bloco");
+    }
+    window.painelIniciarBloco = function(){
+      modoColocar = true;
+      document.body.classList.add("colocando-bloco");
+      showToast("Clique no ponto do guia onde o bloco vai ficar (Esc cancela).");
+    };
+    var btnFs = document.getElementById("btnBlocoTelaCheia");
+    btnFs.addEventListener("mousedown", function(e){ e.preventDefault(); });
+    btnFs.addEventListener("click", function(){ window.painelIniciarBloco(); });
+
+    document.addEventListener("mousedown", function(e){
+      if(!modoColocar) return;
+      var ed = encontrarEditorDeGuia(e.target);
+      if(!ed){ sairModoColocar(); return; }
+      e.preventDefault(); e.stopPropagation();
+      var r = pontoParaRange(e.clientX, e.clientY);
+      sairModoColocar();
+      if(!r){ showToast("Não consegui achar o ponto. Tente de novo."); return; }
+      criarBlocoEm(r, ed, "amarelo", e.clientX, e.clientY);
+    }, true);
+    document.addEventListener("keydown", function(e){
+      if(e.key === "Escape" && modoColocar){ sairModoColocar(); showToast("Cancelado."); }
+    });
+
+    // clique direito (sem texto selecionado) -> menu para adicionar bloco
+    var menu = document.createElement("div");
+    menu.className = "guia-ctx-menu";
+    menu.innerHTML = "<div class='t'>Adicionar bloco aqui:</div><div class='c'></div>";
+    document.body.appendChild(menu);
+    var ctxEditor = null, ctxRange = null, ctxX = 0, ctxY = 0;
+    var cores = { amarelo:"#fcd34d", vermelho:"#fb7185", azul:"#60a5fa", verde:"#4ade80" };
+    NOTA_CORES.forEach(function(cor){
+      var b = document.createElement("button");
+      b.type = "button"; b.style.background = cores[cor]; b.title = cor;
+      b.addEventListener("mousedown", function(e){ e.preventDefault(); });
+      b.addEventListener("click", function(){
+        var ed = ctxEditor, r = ctxRange;
+        menu.style.display = "none";
+        if(ed && r) criarBlocoEm(r, ed, cor, ctxX, ctxY);
+      });
+      menu.querySelector(".c").appendChild(b);
+    });
+    document.addEventListener("contextmenu", function(e){
+      var ed = encontrarEditorDeGuia(e.target);
+      if(!ed || !ed.classList) return;
+      var sel = window.getSelection();
+      if(sel && !sel.isCollapsed) return;           // com texto selecionado, mantém o menu normal (copiar etc.)
+      var r = pontoParaRange(e.clientX, e.clientY);
+      if(!r) return;
+      e.preventDefault();
+      ctxEditor = ed; ctxRange = r; ctxX = e.clientX; ctxY = e.clientY;
+      menu.style.display = "block";
+      var w = menu.offsetWidth, h = menu.offsetHeight;
+      menu.style.left = Math.min(e.clientX, window.innerWidth - w - 8) + "px";
+      menu.style.top = Math.min(e.clientY, window.innerHeight - h - 8) + "px";
+    });
+    function fecharMenu(){ menu.style.display = "none"; }
+    document.addEventListener("click", fecharMenu);
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape") fecharMenu(); });
+    window.addEventListener("scroll", fecharMenu, true);
+
+    // manter os blocos grudados no texto
+    window.addEventListener("scroll", pedirSync, true);
+    window.addEventListener("resize", pedirSync);
+    new MutationObserver(pedirSync).observe(document.body, { childList:true, subtree:true, characterData:true });
+    setInterval(pedirSync, 700);
+    pedirSync();
+  })();
+
+
+  /* ---------------- PLAYER DE ÁUDIO GLOBAL (segundo plano + lembra onde parou) ---------------- */
+  (function(){
+    var audio = new Audio();
+    audio.preload = "metadata";
+    var POS_KEY = STORAGE_KEY + "_audioPos", RATE_KEY = STORAGE_KEY + "_audioRate", LAST_KEY = STORAGE_KEY + "_audioUltimo";
+    var VELS = [0.75, 1, 1.25, 1.5, 1.75, 2];
+    var taxa = 1;
+    try{ taxa = parseFloat(localStorage.getItem(RATE_KEY)) || 1; }catch(e){}
+    if(VELS.indexOf(taxa) < 0) taxa = 1;
+    audio.defaultPlaybackRate = taxa; audio.playbackRate = taxa;
+    var atual = null;     // { fileId, url, nome }
+    var ultimoSalvo = 0;
+
+    function ler(k, padrao){ try{ return JSON.parse(localStorage.getItem(k)) || padrao; }catch(e){ return padrao; } }
+    function gravar(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+    function fmt(t){
+      if(!isFinite(t) || t < 0) return "--:--";
+      t = Math.floor(t);
+      var h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = t % 60;
+      return (h ? h + ":" + (m < 10 ? "0" : "") + m : m) + ":" + (s < 10 ? "0" : "") + s;
+    }
+    function posSalva(fid){ return ler(POS_KEY, {})[fid] || { t: 0, d: 0 }; }
+    function salvarPos(forcar){
+      if(!atual) return;
+      var agora = Date.now();
+      if(!forcar && agora - ultimoSalvo < 1500) return;
+      ultimoSalvo = agora;
+      var m = ler(POS_KEY, {});
+      var t = audio.ended ? 0 : audio.currentTime;
+      m[atual.fileId] = { t: isFinite(t) ? t : 0, d: isFinite(audio.duration) ? audio.duration : (m[atual.fileId] || {}).d || 0 };
+      gravar(POS_KEY, m);
+      gravar(LAST_KEY, atual);
+    }
+
+    // mini player
+    var mini = document.createElement("div");
+    mini.className = "gmini";
+    mini.innerHTML =
+      "<button type='button' class='gm-play' data-m='play' title='Ouvir / pausar'>▶</button>"+
+      "<div class='gm-meio'><div class='gm-nome'></div>"+
+      "<input type='range' class='gmini-prog' data-m='seek' min='0' max='1000' value='0'>"+
+      "<div class='gm-t'>0:00 / --:--</div></div>"+
+      "<button type='button' class='gm-b' data-m='back' title='Voltar 10 segundos'>⟲ 10</button>"+
+      "<button type='button' class='gm-b' data-m='fwd' title='Avançar 10 segundos'>10 ⟳</button>"+
+      "<button type='button' class='gm-b gm-vel' data-m='vel' title='Velocidade'>1x</button>"+
+      "<button type='button' class='gm-x' data-m='fechar' title='Fechar player'>✕</button>";
+    mini.querySelectorAll("button:not(.gm-play):not(.gm-x)").forEach(function(b){ b.classList.add("gm-b"); });
+    document.body.appendChild(mini);
+
+    function mostrarMini(sim){
+      mini.classList.toggle("aberto", !!sim);
+      document.body.classList.toggle("com-audio-mini", !!sim);
+    }
+
+    function atualizarUI(){
+      var tocando = atual && !audio.paused && !audio.ended;
+      var dur = isFinite(audio.duration) ? audio.duration : 0;
+      // widgets dentro dos guias
+      document.querySelectorAll(".guia-audio-wrap").forEach(function(w){
+        var fid = w.dataset.fileId;
+        var vivo = atual && atual.fileId === fid && !!audio.getAttribute("src");
+        var s = vivo ? { t: audio.currentTime, d: dur || posSalva(fid).d } : posSalva(fid);
+        var btn = w.querySelector(".gap-play");
+        if(btn) btn.textContent = (vivo && tocando) ? "⏸" : "▶";
+        var r = w.querySelector(".gap-prog");
+        if(r && !(document.activeElement === r)) r.value = s.d ? Math.round((s.t / s.d) * 1000) : 0;
+        var t = w.querySelector(".gap-t"), d = w.querySelector(".gap-d");
+        if(t) t.textContent = fmt(s.t);
+        if(d) d.textContent = s.d ? fmt(s.d) : "--:--";
+        var v = w.querySelector(".gap-vel");
+        if(v) v.textContent = taxa + "x";
+      });
+      // mini player
+      if(atual){
+        var tt = audio.currentTime || posSalva(atual.fileId).t;
+        var dd = dur || posSalva(atual.fileId).d;
+        mini.querySelector(".gm-nome").textContent = "🎧 " + (atual.nome || "Áudio");
+        mini.querySelector(".gm-play").textContent = tocando ? "⏸" : "▶";
+        var rr = mini.querySelector(".gmini-prog");
+        if(document.activeElement !== rr) rr.value = dd ? Math.round((tt / dd) * 1000) : 0;
+        mini.querySelector(".gm-t").textContent = fmt(tt) + " / " + (dd ? fmt(dd) : "--:--");
+        mini.querySelector(".gm-vel").textContent = taxa + "x";
+      }
+    }
+
+    function sessaoMedia(){
+      if(!("mediaSession" in navigator) || !atual) return;
+      try{
+        navigator.mediaSession.metadata = new MediaMetadata({ title: atual.nome || "Áudio do guia", artist: "Painel de Estudos" });
+        navigator.mediaSession.setActionHandler("play", function(){ audio.play(); });
+        navigator.mediaSession.setActionHandler("pause", function(){ audio.pause(); });
+        navigator.mediaSession.setActionHandler("seekbackward", function(){ pular(-10); });
+        navigator.mediaSession.setActionHandler("seekforward", function(){ pular(10); });
+        navigator.mediaSession.setActionHandler("seekto", function(d){ if(d && typeof d.seekTime === "number") audio.currentTime = d.seekTime; });
+      }catch(e){}
+    }
+
+    function carregar(info, tocar, ir){
+      if(atual && atual.fileId !== info.fileId){ salvarPos(true); }
+      var mesma = atual && atual.fileId === info.fileId && audio.getAttribute("src");
+      atual = { fileId: info.fileId, url: info.url, nome: info.nome };
+      var alvo = (typeof ir === "number") ? ir : posSalva(info.fileId).t;
+      if(!mesma){
+        audio.src = info.url;
+        audio.playbackRate = taxa;
+        var aplicar = function(){
+          audio.removeEventListener("loadedmetadata", aplicar);
+          if(alvo > 1 && (!isFinite(audio.duration) || alvo < audio.duration - 2)) audio.currentTime = alvo;
+          audio.playbackRate = taxa;
+        };
+        audio.addEventListener("loadedmetadata", aplicar);
+        audio.load();
+      } else if(typeof ir === "number"){ audio.currentTime = ir; }
+      sessaoMedia();
+      mostrarMini(true);
+      if(tocar){
+        var pr = audio.play();
+        if(pr && pr.catch) pr.catch(function(){ atualizarUI(); });
+      }
+      atualizarUI();
+    }
+
+    function pular(seg){
+      if(!atual) return;
+      var t = Math.max(0, audio.currentTime + seg);
+      if(isFinite(audio.duration)) t = Math.min(t, audio.duration);
+      audio.currentTime = t;
+    }
+    function trocarVelocidade(){
+      taxa = VELS[(VELS.indexOf(taxa) + 1) % VELS.length];
+      audio.defaultPlaybackRate = taxa; audio.playbackRate = taxa;
+      try{ localStorage.setItem(RATE_KEY, String(taxa)); }catch(e){}
+      atualizarUI();
+    }
+    function infoDoWidget(w){
+      return { fileId: w.dataset.fileId || w.dataset.url, url: w.dataset.url, nome: w.dataset.nome };
+    }
+
+    audio.addEventListener("timeupdate", function(){ salvarPos(false); atualizarUI(); });
+    audio.addEventListener("play", atualizarUI);
+    audio.addEventListener("pause", function(){ salvarPos(true); atualizarUI(); });
+    audio.addEventListener("ended", function(){ salvarPos(true); atualizarUI(); });
+    audio.addEventListener("loadedmetadata", function(){ salvarPos(true); atualizarUI(); });
+    audio.addEventListener("ratechange", atualizarUI);
+    audio.addEventListener("error", function(){
+      if(!atual) return;
+      showToast("Não consegui carregar o áudio. Confira se o arquivo ainda está no Drive (pasta PainelEstudos_Audios).");
+      atualizarUI();
+    });
+    window.addEventListener("pagehide", function(){ salvarPos(true); });
+    document.addEventListener("visibilitychange", function(){ if(document.hidden) salvarPos(true); });
+
+    // cliques nos botões (widgets do guia e mini player)
+    document.addEventListener("click", function(e){
+      var b = e.target.closest ? e.target.closest("[data-aud], [data-m]") : null;
+      if(!b) return;
+      var w = b.closest(".guia-audio-wrap");
+      var acao = b.getAttribute("data-aud") || b.getAttribute("data-m");
+      if(w) e.stopPropagation();      // não alterna a barra de alinhamento ao usar o player
+      e.preventDefault();
+      var info = w ? infoDoWidget(w) : atual;
+      if(!info) return;
+      var mesma = !!(atual && atual.fileId === info.fileId && audio.getAttribute("src"));
+      if(acao === "play"){
+        if(mesma){
+          if(audio.paused || audio.ended) audio.play(); else audio.pause();
+        } else carregar(info, true);
+      } else if(acao === "back" || acao === "fwd"){
+        var d = acao === "back" ? -10 : 10;
+        if(mesma) pular(d);
+        else carregar(info, false, Math.max(0, posSalva(info.fileId).t + d));
+      } else if(acao === "vel"){
+        trocarVelocidade();
+      } else if(acao === "fechar"){
+        audio.pause(); salvarPos(true); mostrarMini(false);
+      }
+    }, true);
+    // barra de progresso
+    document.addEventListener("input", function(e){
+      var r = e.target;
+      if(!r || !r.matches || !r.matches(".gap-prog, .gmini-prog")) return;
+      e.stopPropagation();              // não dispara "salvar guia" a cada movimento
+      var w = r.closest(".guia-audio-wrap");
+      var info = w ? infoDoWidget(w) : atual;
+      if(!info) return;
+      var mesma = !!(atual && atual.fileId === info.fileId && audio.getAttribute("src"));
+      var dur = mesma && isFinite(audio.duration) ? audio.duration : posSalva(info.fileId).d;
+      if(!dur) return;
+      var alvo = (r.value / 1000) * dur;
+      if(mesma){ audio.currentTime = alvo; }
+      else {
+        var m = ler(POS_KEY, {}); m[info.fileId] = { t: alvo, d: dur }; gravar(POS_KEY, m);
+        atualizarUI();
+      }
+    }, true);
+    document.addEventListener("mousedown", function(e){
+      if(e.target.closest && e.target.closest(".guia-audio-wrap [data-aud]") && e.target.tagName !== "INPUT") e.preventDefault();
+    }, true);
+
+    window.painelAudioRemovido = function(fileId){
+      if(atual && atual.fileId === fileId){ audio.pause(); audio.removeAttribute("src"); audio.load(); atual = null; mostrarMini(false); }
+    };
+
+    // ao abrir o painel, mostra a última faixa pausada onde você parou
+    var ult = ler(LAST_KEY, null);
+    if(ult && ult.url){
+      atual = ult;
+      sessaoMedia();
+      mostrarMini(true);
+      atualizarUI();
+    }
+    // widgets novos (guia aberto/recarregado) mostram o tempo salvo
+    var pendente = false;
+    new MutationObserver(function(){
+      if(pendente) return;
+      pendente = true;
+      requestAnimationFrame(function(){ pendente = false; atualizarUI(); });
+    }).observe(document.body, { childList: true, subtree: true });
+  })();
+
   function inserirTabelaNoEditor(editorEl){
     var colunasStr = prompt("Quantas colunas a tabela vai ter?", "3");
     if(colunasStr === null) return;
@@ -4858,6 +5540,98 @@
       });
   }
 
+  /* ---------------- ÁUDIO: envio em pedaços para o Drive ---------------- */
+  var AUDIO_PEDACO = 1572864;            // 1,5 MB (múltiplo de 256 KB, exigência do Drive)
+  var AUDIO_MAX = 200 * 1024 * 1024;
+  var AUDIO_EXT = /\.(mp3|m4a|wav|ogg|aac|opus|flac|weba|webm|mp4)$/i;
+
+  function blobParaBase64(blob){
+    return new Promise(function(resolve, reject){
+      var r = new FileReader();
+      r.onload = function(){ var s = String(r.result); resolve(s.slice(s.indexOf(",") + 1)); };
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+  }
+  function postSemResposta(corpo, tentativas){
+    return fetch(SHEETS_API_URL, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(corpo)
+    }).catch(function(e){
+      if(tentativas > 0) return new Promise(function(res){ setTimeout(res, 1200); }).then(function(){ return postSemResposta(corpo, tentativas - 1); });
+      throw e;
+    });
+  }
+  function statusUpload(uploadId){
+    return jsonpRequest(SHEETS_API_URL + "?token=" + encodeURIComponent(SHEETS_API_TOKEN) + "&action=imagemStatus&uploadId=" + encodeURIComponent(uploadId));
+  }
+
+  function iniciarUploadAudio(editorEl, file){
+    if(!file || !(file.type.indexOf("audio/") === 0 || AUDIO_EXT.test(file.name || ""))){
+      showToast("Selecione um arquivo de áudio (mp3, m4a, wav, ogg…).");
+      return;
+    }
+    if(file.size > AUDIO_MAX){
+      showToast("Áudio muito grande (máx. 200 MB).");
+      return;
+    }
+    var uploadId = "au" + Date.now() + Math.random().toString(36).slice(2);
+    var total = Math.max(1, Math.ceil(file.size / AUDIO_PEDACO));
+    var mime = file.type || "audio/mpeg";
+    var placeholder = document.createElement("div");
+    placeholder.className = "guia-img-enviando";
+    placeholder.contentEditable = "false";
+    placeholder.textContent = "Enviando áudio… 0%";
+    inserirNoEditorNaPosicaoCursor(editorEl, placeholder);
+
+    function falhar(msg){
+      placeholder.textContent = msg;
+      setTimeout(function(){ if(placeholder.parentNode) placeholder.remove(); }, 6000);
+    }
+    function enviarPedaco(i){
+      if(!placeholder.parentNode) return Promise.reject(new Error("cancelado"));
+      var ini = i * AUDIO_PEDACO, fim = Math.min(file.size, ini + AUDIO_PEDACO);
+      return blobParaBase64(file.slice(ini, fim)).then(function(b64){
+        return postSemResposta({
+          token: SHEETS_API_TOKEN, action: "uploadAudioParte", uploadId: uploadId,
+          indice: i, total: total, inicio: ini, tamanhoTotal: file.size,
+          nomeArquivo: file.name || "audio", mime: mime, dados: b64
+        }, 2);
+      }).then(function(){
+        placeholder.textContent = "Enviando áudio… " + Math.round(((i + 1) / total) * 100) + "%";
+        if(i === 0 && total > 1){
+          // confere cedo se o Drive aceitou abrir o envio
+          return statusUpload(uploadId).then(function(r){ if(r && r.error) throw new Error(r.error); }, function(){});
+        }
+      }).then(function(){
+        return i + 1 < total ? enviarPedaco(i + 1) : null;
+      });
+    }
+    function esperarResultado(tent){
+      if(!placeholder.parentNode) return;
+      if(tent > 90){ falhar("O Drive demorou demais para responder. Confira a pasta PainelEstudos_Audios."); return; }
+      statusUpload(uploadId).then(function(resp){
+        if(resp && resp.error){ falhar("Falha no envio: " + String(resp.error).slice(0, 120)); return; }
+        if(resp && resp.url){
+          var temp = document.createElement("div");
+          var nomeLimpo = (file.name || "Áudio").replace(/\.[^.]+$/, "");
+          temp.innerHTML = renderAudioGuia(resp.fileId || "", encodeURIComponent(resp.url), "centro", codificarNota(nomeLimpo));
+          if(placeholder.parentNode) placeholder.parentNode.replaceChild(temp.firstChild, placeholder);
+          editorEl.dispatchEvent(new Event("input", {bubbles:true}));
+          showToast("Áudio adicionado ao guia.");
+        } else {
+          setTimeout(function(){ esperarResultado(tent + 1); }, 1000);
+        }
+      }).catch(function(){ setTimeout(function(){ esperarResultado(tent + 1); }, 1000); });
+    }
+    enviarPedaco(0).then(function(){ esperarResultado(0); }).catch(function(e){
+      if(e && e.message === "cancelado") return;
+      console.error("Falha ao enviar áudio", e);
+      falhar("Falha ao enviar o áudio" + (e && e.message ? ": " + String(e.message).slice(0, 100) : ". Tente de novo."));
+    });
+  }
+
   function excluirImagemRemota(fileId){
     if(!fileId) return;
     fetch(SHEETS_API_URL, {
@@ -4892,6 +5666,7 @@
           if(imgEl) imgEl.style.width = w2 + "%";
         } else if(acao === "excluir"){
           var fileIdDel = wrap.dataset.fileId;
+          if(window.painelAudioRemovido) window.painelAudioRemovido(fileIdDel);
           wrap.remove();
           excluirImagemRemota(fileIdDel);
         }
@@ -5005,6 +5780,9 @@
           } else {
             resultado += "\\(" + latexSer + "\\)";
           }
+        } else if(filho.classList && filho.classList.contains("guia-audio-wrap")){
+          if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
+          resultado += "{{audio|"+(filho.dataset.fileId||"")+"|"+encodeURIComponent(filho.dataset.url||"")+"|"+(filho.dataset.align||"centro")+"|"+codificarNota(filho.dataset.nome||"")+"}}\n";
         } else if(filho.classList && filho.classList.contains("guia-img-wrap")){
           var imgElSer = filho.querySelector("img.guia-img");
           var urlSer = imgElSer ? (imgElSer.getAttribute("src")||"") : "";
@@ -5016,6 +5794,11 @@
         } else if(tag === "div" || tag === "p"){
           if(resultado.length && resultado.charAt(resultado.length-1) !== "\n") resultado += "\n";
           resultado += serializarEditorParaMarkup(filho) + "\n";
+        } else if(filho.classList && filho.classList.contains("guia-bloco")){
+          var corB = filho.getAttribute("data-cor");
+          if(NOTA_CORES.indexOf(corB) < 0) corB = "amarelo";
+          var nI = function(k, d){ var v = parseInt(filho.getAttribute("data-"+k), 10); return isNaN(v) ? d : v; };
+          resultado += "{{bloco|"+corB+"|"+codificarNota(filho.getAttribute("data-nota") || "")+"|"+nI("dx",24)+"|"+nI("dy",22)+"|"+Math.max(120, nI("w",240))+"|"+Math.max(60, nI("h",110))+"|"+(filho.getAttribute("data-estado") === "c" ? "c" : "a")+"|"+nI("ax",0)+"|"+nI("ay",0)+"}}";
         } else if(filho.classList && filho.classList.contains("guia-nota")){
           var innerNota = serializarEditorParaMarkup(filho);
           var corNota = filho.getAttribute("data-cor");
@@ -5128,7 +5911,28 @@
         btnImagemLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
         btnImagemLeitura.addEventListener("click", function(){ inputImagemLeitura.click(); });
         acoesLeitura.appendChild(btnTabelaLeitura);
+        var btnBlocoLeitura = document.createElement("button");
+        btnBlocoLeitura.type = "button";
+        btnBlocoLeitura.className = "guia-botao-imagem"; btnBlocoLeitura.textContent = "🗒 Bloco";
+        btnBlocoLeitura.title = "Colocar um bloco flutuante em qualquer ponto do guia";
+        btnBlocoLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnBlocoLeitura.addEventListener("click", function(){ if(window.painelIniciarBloco) window.painelIniciarBloco(); });
         acoesLeitura.appendChild(btnImagemLeitura);
+        acoesLeitura.appendChild(btnBlocoLeitura);
+        var inputAudioLeitura = document.createElement("input");
+        inputAudioLeitura.type = "file"; inputAudioLeitura.accept = "audio/*,.mp3,.m4a,.wav,.ogg,.aac,.opus,.flac,.weba"; inputAudioLeitura.style.display = "none";
+        inputAudioLeitura.addEventListener("change", function(e){
+          var fa = e.target.files[0];
+          if(fa) iniciarUploadAudio(leituraEl, fa);
+          inputAudioLeitura.value = "";
+        });
+        var btnAudioLeitura = document.createElement("button");
+        btnAudioLeitura.type = "button";
+        btnAudioLeitura.className = "guia-botao-imagem"; btnAudioLeitura.textContent = "🎧 Áudio";
+        btnAudioLeitura.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnAudioLeitura.addEventListener("click", function(){ inputAudioLeitura.click(); });
+        acoesLeitura.appendChild(btnAudioLeitura);
+        acoesLeitura.appendChild(inputAudioLeitura);
         acoesLeitura.appendChild(inputImagemLeitura);
         acoesLeitura.appendChild(btnExcluirGuia);
         painel.appendChild(acoesLeitura);
@@ -5175,6 +5979,20 @@
         acoesImport.appendChild(btnTabelaEditor);
         acoesImport.appendChild(btnImagemEditor);
         acoesImport.appendChild(inputImagemEditor);
+        var inputAudioEditor = document.createElement("input");
+        inputAudioEditor.type = "file"; inputAudioEditor.accept = "audio/*,.mp3,.m4a,.wav,.ogg,.aac,.opus,.flac,.weba"; inputAudioEditor.style.display = "none";
+        inputAudioEditor.addEventListener("change", function(e){
+          var fa2 = e.target.files[0];
+          if(fa2) iniciarUploadAudio(editorEl, fa2);
+          inputAudioEditor.value = "";
+        });
+        var btnAudioEditor = document.createElement("button");
+        btnAudioEditor.type = "button";
+        btnAudioEditor.className = "guia-botao-imagem"; btnAudioEditor.textContent = "🎧 Áudio";
+        btnAudioEditor.addEventListener("mousedown", function(ev){ ev.preventDefault(); });
+        btnAudioEditor.addEventListener("click", function(){ inputAudioEditor.click(); });
+        acoesImport.appendChild(btnAudioEditor);
+        acoesImport.appendChild(inputAudioEditor);
         acoesImport.appendChild(btnSalvarGuia);
         acoesImport.appendChild(btnCancelarGuia);
         painel.appendChild(acoesImport);
