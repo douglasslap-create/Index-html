@@ -1192,7 +1192,7 @@
   /* âncora no texto: invisível; o ícone de verdade (marcador) fica na camada flutuante, onde você clicou */
   .guia-bloco{display:inline-block;width:0;height:1em;margin:0;vertical-align:-.12em;overflow:visible;user-select:none;pointer-events:none;}
   .gbm{
-    position:fixed;display:none;pointer-events:auto;width:20px;height:20px;cursor:grab;touch-action:none;user-select:none;
+    position:fixed;display:none;pointer-events:auto;width:28px;height:28px;cursor:grab;touch-action:none;user-select:none;
     background:var(--bl-c,#fcd34d);clip-path:polygon(0 0,100% 0,100% 64%,64% 100%,0 100%);
     filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));transition:transform .1s;
   }
@@ -4906,19 +4906,19 @@
       var semAncora = !a.isConnected || (ar.width === 0 && ar.height === 0 && ar.top === 0 && ar.left === 0) || (fsAberto !== noFs);
       if(semAncora){ el.style.display = "none"; mk.style.display = "none"; return; }
       var clip = areaVisivel(a);
-      var S = 20;
+      var S = 28;
       var mL = ar.left + num(a, "ax", 0), mT = ar.top + num(a, "ay", 0);
       // marcador: sempre dentro da área visível do guia
       mL = Math.min(Math.max(mL, clip.left + 2), clip.right - S - 2);
       var mkVisivel = !(mT + S < clip.top || mT > clip.bottom);
       mk.style.display = mkVisivel ? "block" : "none";
-      mk.style.left = mL + "px"; mk.style.top = mT + "px";
+      mk.style.left = (mL - 4) + "px"; mk.style.top = (mT - 4) + "px";
       mk.title = (a.getAttribute("data-nota") || "").slice(0, 80) || "Bloco vazio — clique para abrir";
       if(a.getAttribute("data-estado") === "c"){ el.style.display = "none"; return; }
       el.style.display = "block";
       var cw = el.offsetWidth, ch = el.offsetHeight;
       var dx = num(a, "dx", 26);
-      var left = mL + dx;
+      var left = mL + dx + 2;
       var top = mT + num(a, "dy", -4);
       if(dx >= 0 && left + cw > clip.right - 6 && mL - cw - 8 >= clip.left + 6) left = mL - cw - 8;   // não cabe à direita: abre à esquerda do ícone
       if(clip.right - clip.left > cw + 12){
@@ -5027,6 +5027,7 @@
           mk.removeEventListener("pointerup", soltar);
           mk.removeEventListener("pointercancel", soltar);
           if(moveu){ agendarSalvar(a); return; }
+          if(c._hover){ c._hover = false; pedirSync(); agendarSalvar(a); return; }   // aberto pelo mouse: o clique "fixa" aberto
           a.setAttribute("data-estado", a.getAttribute("data-estado") === "c" ? "a" : "c");
           pedirSync();
           agendarSalvar(a);
@@ -5036,6 +5037,28 @@
         mk.addEventListener("pointerup", soltar);
         mk.addEventListener("pointercancel", soltar);
       });
+
+      // passar o mouse no ícone abre o bloco; ao tirar o mouse ele fecha sozinho (clique no ícone ou no texto deixa aberto)
+      function sobre(x){ return x && x.matches && x.matches(":hover"); }
+      function talvezFechar(){
+        setTimeout(function(){
+          if(!c._hover) return;
+          if(sobre(mk) || sobre(el) || document.activeElement === ta){ return; }
+          c._hover = false;
+          a.setAttribute("data-estado", "c");
+          pedirSync();
+        }, 350);
+      }
+      mk.addEventListener("mouseenter", function(){
+        if(a.getAttribute("data-estado") !== "c") return;
+        c._hover = true;
+        a.setAttribute("data-estado", "a");
+        pedirSync();
+      });
+      mk.addEventListener("mouseleave", talvezFechar);
+      el.addEventListener("mouseleave", talvezFechar);
+      ta.addEventListener("focus", function(){ c._hover = false; });
+      ta.addEventListener("input", function(){ c._hover = false; });
 
       // arrastar
       head.addEventListener("pointerdown", function(e){
