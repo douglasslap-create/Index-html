@@ -1154,6 +1154,15 @@
     border:1px solid rgba(0,0,0,.25);border-radius:6px;padding:8px;font-size:14px;font-family:var(--font-body);
   }
   .guia-nota-card textarea:focus{outline:none;border-color:rgba(0,0,0,.6);box-shadow:none;}
+  .guia-nota-card .nota-edit{
+    width:100%;min-height:96px;max-height:260px;overflow-y:auto;resize:vertical;background:rgba(255,255,255,.55);color:#1a1a1a;
+    border:1px solid rgba(0,0,0,.25);border-radius:6px;padding:8px;font-size:14px;font-family:var(--font-body);line-height:1.45;
+    white-space:pre-wrap;word-break:break-word;box-sizing:border-box;
+  }
+  .guia-nota-card .nota-edit:focus{outline:none;border-color:rgba(0,0,0,.6);}
+  .nota-edit:empty:before,.gbc-txt:empty:before{content:attr(data-ph);opacity:.5;pointer-events:none;}
+  .guia-nota-card .guia-nota-texto b,.gbc-txt b,.guia-nota-card .nota-edit b{font-weight:800;}
+  .guia-nota-card button.nbtn.nbtn-negrito{padding:3px 10px;font-weight:800;}
   .guia-nota-linha{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap;}
   .guia-nota-dot{width:22px;height:22px;border-radius:50%;border:2px solid rgba(0,0,0,.25);padding:0;cursor:pointer;}
   .guia-nota-dot.sel{border-color:#000;box-shadow:0 0 0 2px rgba(255,255,255,.7);}
@@ -1220,12 +1229,14 @@
   .gbc-esp{flex:1;min-width:14px;}
   .gbc-btn{border:0;background:transparent;color:#1a1a1a;opacity:.6;cursor:pointer;font-size:15px;line-height:1;padding:2px 5px;border-radius:5px;}
   .gbc-btn:hover{opacity:1;background:rgba(255,255,255,.55);}
-  .gbc textarea.gbc-txt{
+  .gbc .gbc-negrito{opacity:.85;font-size:14px;padding:1px 7px;border:1px solid rgba(0,0,0,.25);}
+  .gbc .gbc-txt{overflow:auto;white-space:pre-wrap;word-break:break-word;box-sizing:border-box;}
+  .gbc textarea.gbc-txt,.gbc div.gbc-txt{
     display:block;margin:0 6px 6px;background:rgba(255,255,255,.55);color:#1a1a1a;border:1px solid rgba(0,0,0,.22);
     border-radius:6px;padding:7px 8px;font-size:14px;line-height:1.45;font-family:var(--font-body);
     resize:both;min-width:150px;min-height:60px;max-width:calc(100vw - 36px);width:240px;height:110px;
   }
-  .gbc textarea.gbc-txt:focus{outline:none;border-color:rgba(0,0,0,.6);box-shadow:none;}
+  .gbc textarea.gbc-txt:focus,.gbc div.gbc-txt:focus{outline:none;border-color:rgba(0,0,0,.6);box-shadow:none;}
   .guia-ctx-menu{
     position:fixed;z-index:1250;background:var(--bg-panel);border:1px solid var(--border-soft);border-radius:10px;
     padding:8px 10px;box-shadow:0 12px 30px rgba(0,0,0,.6);font-size:13px;color:var(--text-primary);display:none;
@@ -4192,7 +4203,7 @@
   var NOTA_CORES = ["amarelo","vermelho","azul","verde"];
   function codificarNota(t){ return encodeURIComponent(t).replace(/\*/g,"%2A").replace(/'/g,"%27"); }
   function decodificarNota(t){ try{ return decodeURIComponent(t); }catch(e){ return t; } }
-  function escAttr(t){ return escapeHtml(t).replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+  function escAttr(t){ return escapeHtml(t).replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/\*/g,"&#42;"); }
 
   function dividirNotasMarkup(str){
     var partes = [], i = 0;
@@ -4640,6 +4651,52 @@
   }
 
 
+  /* ---------------- NEGRITO NAS ANOTAÇÕES (post-its): **texto** ---------------- */
+  function notaParaHtml(txt){
+    return String(txt || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/\*\*([^*\n]+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+  }
+  function notaTextoPlano(txt){ return String(txt || "").replace(/\*\*/g, ""); }
+  function notaDeEditor(el){
+    var out = "";
+    function andar(n, ehRaiz){
+      if(n.nodeType === 3){ out += n.nodeValue.replace(/\u00a0/g, " "); return; }
+      if(n.nodeType !== 1) return;
+      var t = n.tagName;
+      if(t === "BR"){ out += "\n"; return; }
+      var bloco = (t === "DIV" || t === "P") && !ehRaiz;
+      if(bloco && out && out.charAt(out.length - 1) !== "\n") out += "\n";
+      var negrito = (t === "B" || t === "STRONG") || /bold|[7-9]00/.test(n.style && n.style.fontWeight || "");
+      var ini = out.length;
+      if(negrito) out += "**";
+      for(var i = 0; i < n.childNodes.length; i++) andar(n.childNodes[i], false);
+      if(negrito){
+        if(out.length === ini + 2) out = out.slice(0, ini);
+        else out += "**";
+      }
+    }
+    andar(el, true);
+    return out.replace(/\n+$/,"");
+  }
+  function prepararCaixaRica(box){
+    // cola sempre como texto simples (sem trazer fontes e cores de fora)
+    box.addEventListener("paste", function(e){
+      var d = e.clipboardData || window.clipboardData;
+      if(!d) return;
+      e.preventDefault();
+      var t = (d.getData("text/plain") || "");
+      document.execCommand("insertText", false, t);
+    });
+  }
+  function criarBotaoNegrito(box, classe){
+    var b = document.createElement("button");
+    b.type = "button"; b.className = classe; b.title = "Negrito (Ctrl+B): selecione um termo e clique"; b.innerHTML = "<b>N</b>";
+    b.addEventListener("mousedown", function(e){ e.preventDefault(); e.stopPropagation(); });
+    b.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+    b.addEventListener("click", function(){ box.focus(); document.execCommand("bold"); box.dispatchEvent(new Event("input", {bubbles:false})); });
+    return b;
+  }
+
   /* ---------------- NOTAS OCULTAS: criar, ver e editar ---------------- */
   (function(){
     var card = document.createElement("div");
@@ -4689,7 +4746,7 @@
       card.innerHTML = "";
       var t = document.createElement("div");
       t.className = "guia-nota-texto";
-      t.textContent = span.getAttribute("data-nota") || "";
+      t.innerHTML = notaParaHtml(span.getAttribute("data-nota") || "");
       card.appendChild(t);
       var rodape = document.createElement("div");
       rodape.className = "guia-nota-linha";
@@ -4715,13 +4772,17 @@
       var textoInicial = modo === "editar" ? (opts.span.getAttribute("data-nota") || "") : "";
       var corAtual = modo === "editar" ? (opts.span.getAttribute("data-cor") || "amarelo") : "amarelo";
       card.innerHTML = "";
-      var ta = document.createElement("textarea");
-      ta.placeholder = "Escreva a anotação (mnemônico, observação, jurisprudência…)";
-      ta.value = textoInicial;
+      var ta = document.createElement("div");
+      ta.className = "nota-edit";
+      ta.setAttribute("contenteditable", "true");
+      ta.setAttribute("data-ph", "Escreva a anotação (mnemônico, observação, jurisprudência…)");
+      ta.innerHTML = notaParaHtml(textoInicial);
+      prepararCaixaRica(ta);
       card.appendChild(ta);
 
       var linhaCores = document.createElement("div");
       linhaCores.className = "guia-nota-linha";
+      linhaCores.appendChild(criarBotaoNegrito(ta, "nbtn nbtn-negrito"));
       NOTA_CORES.forEach(function(c){
         var b = document.createElement("button");
         b.type = "button"; b.className = "guia-nota-dot" + (c === corAtual ? " sel" : "");
@@ -4754,7 +4815,7 @@
       card.appendChild(linhaCores);
 
       function confirmar(){
-        var texto = ta.value.trim();
+        var texto = notaDeEditor(ta).trim();
         if(!texto){ showToast("Escreva algo na anotação (ou use Cancelar)."); ta.focus(); return; }
         var editor;
         if(modo === "editar"){
@@ -4849,7 +4910,8 @@
         abrirEditor("editar", { span: span });
         return;
       }
-      if(estado && !card.contains(e.target) && !document.getElementById("guiaFlutuanteWrap").contains(e.target)) fecharCard();
+      var dentro = (e.composedPath ? e.composedPath().indexOf(card) > -1 : card.contains(e.target));
+      if(estado && !dentro && !document.getElementById("guiaFlutuanteWrap").contains(e.target)) fecharCard();
     });
     document.addEventListener("keydown", function(e){
       if(e.key === "Escape" && estado) fecharCard();
@@ -4913,7 +4975,7 @@
       var mkVisivel = !(mT + S < clip.top || mT > clip.bottom);
       mk.style.display = mkVisivel ? "block" : "none";
       mk.style.left = (mL - 4) + "px"; mk.style.top = (mT - 4) + "px";
-      mk.title = (a.getAttribute("data-nota") || "").slice(0, 80) || "Bloco vazio — clique para abrir";
+      mk.title = notaTextoPlano(a.getAttribute("data-nota") || "").slice(0, 80) || "Bloco vazio — clique para abrir";
       if(a.getAttribute("data-estado") === "c"){ el.style.display = "none"; return; }
       el.style.display = "block";
       var cw = el.offsetWidth, ch = el.offsetHeight;
@@ -4979,7 +5041,7 @@
       bDel.type = "button"; bDel.className = "gbc-btn"; bDel.textContent = "✕"; bDel.title = "Excluir bloco";
       bDel.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
       bDel.addEventListener("click", function(){
-        if((a.getAttribute("data-nota") || "").trim() && !confirm("Excluir este bloco e o que está escrito nele?")) return;
+        if(notaTextoPlano(a.getAttribute("data-nota") || "").trim() && !confirm("Excluir este bloco e o que está escrito nele?")) return;
         var ed = editorDe(a);
         a.remove();
         pedirSync();
@@ -4989,14 +5051,17 @@
       head.appendChild(bMin); head.appendChild(bDel);
       el.appendChild(head);
 
-      var ta = document.createElement("textarea");
+      var ta = document.createElement("div");
       ta.className = "gbc-txt";
-      ta.placeholder = "Escreva aqui…";
-      ta.value = a.getAttribute("data-nota") || "";
+      ta.setAttribute("contenteditable", "true");
+      ta.setAttribute("data-ph", "Escreva aqui…");
+      ta.innerHTML = notaParaHtml(a.getAttribute("data-nota") || "");
+      prepararCaixaRica(ta);
       ta.style.width = Math.max(150, num(a, "w", 240)) + "px";
       ta.style.height = Math.max(60, num(a, "h", 110)) + "px";
-      ta.addEventListener("input", function(){ a.setAttribute("data-nota", ta.value); agendarSalvar(a); });
+      ta.addEventListener("input", function(){ a.setAttribute("data-nota", notaDeEditor(ta)); agendarSalvar(a); });
       ta.addEventListener("keydown", function(e){ e.stopPropagation(); });
+      head.insertBefore(criarBotaoNegrito(ta, "gbc-btn gbc-negrito"), esp);
       el.appendChild(ta);
       camada.appendChild(el);
 
