@@ -1370,6 +1370,8 @@
     border-radius:10px;
   }
   .guia-negrito-btn:hover{border-color:var(--accent-brass);color:var(--accent-brass);}
+  .guia-cores-grade{display:grid;grid-template-columns:repeat(5,22px);justify-content:space-between;gap:10px 0;width:100%;}
+  .guia-flutuante-popover{justify-content:flex-start;}
   .guia-toolbar-divisor{width:1px;height:16px;background:var(--border-soft);margin:0 2px;}
   .guia-editor-editavel{
     min-height:180px;
@@ -2070,17 +2072,18 @@
   <div class="guia-flutuante-popover" id="guiaFlutuantePopover">
     <button type="button" class="guia-negrito-btn" id="guiaFlutuanteNegrito">N</button>
     <button type="button" class="guia-negrito-btn guia-nota-btn" id="guiaFlutuanteNota" title="Adicionar anotação oculta (post-it)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v10l-6 6H4z"/><path d="M14 20v-6h6"/><path d="M8 9h8M8 13h4"/></svg></button>
-    <span class="guia-toolbar-divisor"></span>
-    <button type="button" class="guia-cor-dot cor-amarelo" data-cor="amarelo" title="Amarelo"></button>
-    <button type="button" class="guia-cor-dot cor-verde" data-cor="verde" title="Verde"></button>
-    <button type="button" class="guia-cor-dot cor-vermelho" data-cor="vermelho" title="Vermelho"></button>
-    <button type="button" class="guia-cor-dot cor-azul" data-cor="azul" title="Azul"></button>
-    <button type="button" class="guia-cor-dot cor-rosa" data-cor="rosa" title="Rosa"></button>
-    <button type="button" class="guia-cor-dot cor-laranja" data-cor="laranja" title="Laranja"></button>
-    <button type="button" class="guia-cor-dot cor-roxo" data-cor="roxo" title="Roxo"></button>
-    <button type="button" class="guia-cor-dot cor-cinza" data-cor="cinza" title="Cinza"></button>
-    <button type="button" class="guia-cor-dot cor-marrom" data-cor="marrom" title="Marrom"></button>
-    <button type="button" class="guia-cor-dot cor-branco" data-cor="branco" title="Remover cor"></button>
+    <div class="guia-cores-grade">
+      <button type="button" class="guia-cor-dot cor-amarelo" data-cor="amarelo" title="Amarelo"></button>
+      <button type="button" class="guia-cor-dot cor-verde" data-cor="verde" title="Verde"></button>
+      <button type="button" class="guia-cor-dot cor-vermelho" data-cor="vermelho" title="Vermelho"></button>
+      <button type="button" class="guia-cor-dot cor-azul" data-cor="azul" title="Azul"></button>
+      <button type="button" class="guia-cor-dot cor-rosa" data-cor="rosa" title="Rosa"></button>
+      <button type="button" class="guia-cor-dot cor-laranja" data-cor="laranja" title="Laranja"></button>
+      <button type="button" class="guia-cor-dot cor-roxo" data-cor="roxo" title="Roxo"></button>
+      <button type="button" class="guia-cor-dot cor-cinza" data-cor="cinza" title="Cinza"></button>
+      <button type="button" class="guia-cor-dot cor-marrom" data-cor="marrom" title="Marrom"></button>
+      <button type="button" class="guia-cor-dot cor-branco" data-cor="branco" title="Remover cor"></button>
+    </div>
   </div>
 </div>
 
