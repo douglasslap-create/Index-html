@@ -5014,7 +5014,7 @@
       var mkVisivel = !(mT + S < clip.top || mT > clip.bottom);
       mk.style.display = mkVisivel ? "block" : "none";
       mk.style.left = (mL - 4) + "px"; mk.style.top = (mT - 4) + "px";
-      mk.title = notaTextoPlano(a.getAttribute("data-nota") || "").slice(0, 80) || "Bloco vazio — clique para abrir";
+      mk.removeAttribute("title");   // sem balão preto do navegador: passar o mouse já abre o bloco
       if(a.getAttribute("data-estado") === "c"){ el.style.display = "none"; return; }
       el.style.display = "block";
       var cw = el.offsetWidth, ch = el.offsetHeight;
