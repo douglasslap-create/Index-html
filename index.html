@@ -1563,6 +1563,40 @@
     .bar-row .bar-label{width:100px;font-size:12px;}
     .add-form{flex-direction:column;align-items:stretch;}
   }
+
+  /* ===== visual "post-it moderno" dos blocos de notas ===== */
+  .gbc, .guia-nota-card{
+    border-top:0 !important;border-radius:14px !important;overflow:hidden;position:fixed;
+    box-shadow:0 12px 28px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.4) inset !important;
+  }
+  .gbc:before, .guia-nota-card:before{
+    content:"";position:absolute;left:0;right:0;top:0;height:5px;background:var(--gbc-bd,var(--card-bd,#f59e0b));z-index:1;
+  }
+  .guia-nota-card{padding:16px 16px 12px !important;}
+  .gbc-head{padding:9px 8px 2px 10px !important;min-height:30px;}
+  .gbc-head > *:not(.gbc-grip){opacity:0;transition:opacity .15s ease;}
+  .gbc:hover .gbc-head > *, .gbc:focus-within .gbc-head > *{opacity:1;}
+  .gbc-grip{opacity:.4 !important;}
+  .gbc:hover .gbc-grip{opacity:.7 !important;}
+  .gbc-btn{opacity:.6;}
+  .gbc:hover .gbc-head > .gbc-btn{opacity:.6;}
+  .gbc:hover .gbc-head > .gbc-btn:hover{opacity:1;}
+  .gbc .gbc-negrito{background:rgba(0,0,0,.08);border:0 !important;border-radius:6px;font-weight:800;}
+  .gbc-dot, .guia-nota-dot{border:0 !important;box-shadow:none;transition:transform .12s ease;}
+  .gbc-dot:hover, .guia-nota-dot:hover{transform:scale(1.15);}
+  .gbc-dot.sel{box-shadow:0 0 0 2px var(--gbc-bg),0 0 0 3.5px rgba(0,0,0,.6) !important;}
+  .guia-nota-dot{width:18px !important;height:18px !important;}
+  .guia-nota-dot.sel{box-shadow:0 0 0 2px var(--card-bg),0 0 0 3.5px rgba(0,0,0,.6) !important;}
+  .gbc textarea.gbc-txt,.gbc div.gbc-txt,.guia-nota-card .nota-edit,.guia-nota-card textarea{
+    background:rgba(255,255,255,.38) !important;border:0 !important;border-radius:9px !important;
+    padding:9px 11px !important;line-height:1.55;
+  }
+  .gbc div.gbc-txt:focus,.guia-nota-card .nota-edit:focus,.guia-nota-card textarea:focus{background:rgba(255,255,255,.55) !important;}
+  .guia-nota-card button.nbtn{border:0 !important;background:rgba(0,0,0,.08) !important;border-radius:8px !important;padding:4px 11px !important;font-weight:700;}
+  .guia-nota-card button.nbtn:hover{background:rgba(0,0,0,.16) !important;}
+  .guia-nota-card button.nbtn.principal{background:#1a1a1a !important;color:#fff;}
+  .guia-nota-card button.nbtn.perigo:hover{background:#e11d48 !important;color:#fff;}
+  .guia-nota-texto{font-size:14.5px;line-height:1.55;}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
