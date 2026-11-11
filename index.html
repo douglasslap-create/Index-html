@@ -1201,7 +1201,7 @@
   /* âncora no texto: invisível; o ícone de verdade (marcador) fica na camada flutuante, onde você clicou */
   .guia-bloco{display:inline-block;width:0;height:1em;margin:0;vertical-align:-.12em;overflow:visible;user-select:none;pointer-events:none;}
   .gbm{
-    position:fixed;display:none;pointer-events:auto;width:28px;height:28px;cursor:grab;touch-action:none;user-select:none;
+    z-index:1;position:fixed;display:none;pointer-events:auto;width:28px;height:28px;cursor:grab;touch-action:none;user-select:none;
     background:var(--bl-c,#fcd34d);clip-path:polygon(0 0,100% 0,100% 64%,64% 100%,0 100%);
     filter:drop-shadow(0 2px 3px rgba(0,0,0,.5));transition:transform .1s;
   }
@@ -1565,6 +1565,7 @@
   }
 
   /* ===== visual "post-it moderno" dos blocos de notas ===== */
+  .gbc{z-index:5;}
   .gbc, .guia-nota-card{
     border-top:0 !important;border-radius:14px !important;overflow:hidden;position:fixed;
     box-shadow:0 12px 28px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.4) inset !important;
@@ -4965,6 +4966,7 @@
     camada.id = "guiaBlocoCamada";
     document.body.appendChild(camada);
     var cards = [];            // { anchor, el, ta }
+    var zTopo = 10;            // o bloco mexido por último fica por cima dos outros
     var agendado = false;
     var timerSalvar = null;
     var modoColocar = false;
@@ -5051,6 +5053,10 @@
     function criarCard(a){
       var el = document.createElement("div");
       el.className = "gbc gbc-" + (a.getAttribute("data-cor") || "amarelo");
+      function frente(){ el.style.zIndex = ++zTopo; }
+      el.addEventListener("pointerdown", frente, true);
+      el.addEventListener("mouseenter", frente);
+      el.addEventListener("focusin", frente);
       var head = document.createElement("div");
       head.className = "gbc-head";
       head.innerHTML = "<span class='gbc-grip'>⋮⋮</span>";
@@ -5154,6 +5160,7 @@
       mk.addEventListener("mouseenter", function(){
         if(a.getAttribute("data-estado") !== "c") return;
         c._hover = true;
+        frente();
         a.setAttribute("data-estado", "a");
         pedirSync();
       });
