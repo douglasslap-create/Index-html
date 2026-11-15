@@ -4813,6 +4813,7 @@
       var ta = document.createElement("div");
       ta.className = "nota-edit";
       ta.setAttribute("contenteditable", "true");
+      ta.setAttribute("spellcheck", "false");
       ta.setAttribute("data-ph", "Escreva a anotação (mnemônico, observação, jurisprudência…)");
       ta.innerHTML = notaParaHtml(textoInicial);
       prepararCaixaRica(ta);
@@ -5097,6 +5098,7 @@
       var ta = document.createElement("div");
       ta.className = "gbc-txt";
       ta.setAttribute("contenteditable", "true");
+      ta.setAttribute("spellcheck", "false");
       ta.setAttribute("data-ph", "Escreva aqui…");
       ta.innerHTML = notaParaHtml(a.getAttribute("data-nota") || "");
       prepararCaixaRica(ta);
